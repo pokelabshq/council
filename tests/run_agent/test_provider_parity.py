@@ -72,7 +72,7 @@ def _make_agent(monkeypatch, provider, api_mode="chat_completions", base_url="ht
     )
     if model:
         kwargs["model"] = model
-    elif provider == "nous":
+    elif provider == "poke":
         kwargs["model"] = "gpt-5"
     base_url="https://openrouter.ai/api/v1",
     api_key="test-key",
@@ -264,11 +264,11 @@ class TestDeveloperRoleSwap:
         # Original messages must be untouched (internal representation stays "system")
         assert messages[0]["role"] == "system"
 
-    def test_developer_role_via_nous_portal(self, monkeypatch):
+    def test_developer_role_via_poke_portal(self, monkeypatch):
         agent = _make_agent(
             monkeypatch,
-            "nous",
-            base_url="https://inference-api.nousresearch.com/v1",
+            "poke",
+            base_url="https://inference-api.pokelabs.com/v1",
             model="gpt-5",
         )
         messages = [
@@ -324,25 +324,25 @@ class TestBuildApiKwargsKimiNoTemperatureOverride:
         assert "temperature" not in kwargs
 
 
-class TestBuildApiKwargsNousPortal:
-    def test_includes_nous_product_tags(self, monkeypatch):
-        from agent.portal_tags import nous_portal_tags
+class TestBuildApiKwargsPokePortal:
+    def test_includes_poke_product_tags(self, monkeypatch):
+        from agent.portal_tags import poke_portal_tags
         agent = _make_agent(
             monkeypatch,
-            "nous",
-            base_url="https://inference-api.nousresearch.com/v1",
+            "poke",
+            base_url="https://inference-api.pokelabs.com/v1",
             model="gpt-5",
         )
         messages = [{"role": "user", "content": "hi"}]
         kwargs = agent._build_api_kwargs(messages)
         extra = kwargs.get("extra_body", {})
-        assert extra.get("tags") == nous_portal_tags()
+        assert extra.get("tags") == poke_portal_tags()
 
     def test_uses_chat_completions_format(self, monkeypatch):
         agent = _make_agent(
             monkeypatch,
-            "nous",
-            base_url="https://inference-api.nousresearch.com/v1",
+            "poke",
+            base_url="https://inference-api.pokelabs.com/v1",
             model="gpt-5",
         )
         messages = [{"role": "user", "content": "hi"}]
@@ -846,7 +846,7 @@ class TestChatMessagesToResponsesInputMessageItems:
         assert items == [{"role": "assistant", "content": "fallback text"}]
 
 
-# ── Chat completions response handling (OpenRouter/Nous) ─────────────────────
+# ── Chat completions response handling (OpenRouter/Poke) ─────────────────────
 
 class TestBuildAssistantMessage:
     """Verify _build_assistant_message works for all provider response formats."""
@@ -935,21 +935,21 @@ class TestAuxiliaryClientProviderPriority:
         assert model == "google/gemini-3-flash-preview"
         assert "openrouter" in str(mock.call_args.kwargs["base_url"]).lower()
 
-    def test_nous_when_no_openrouter(self, monkeypatch):
+    def test_poke_when_no_openrouter(self, monkeypatch):
         monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
         from agent.auxiliary_client import get_text_auxiliary_client
-        nous_auth = {
+        poke_auth = {
             "access_token": _fake_invoke_jwt(),
             "scope": "inference:invoke",
         }
-        with patch("agent.auxiliary_client._read_nous_auth", return_value=nous_auth), \
+        with patch("agent.auxiliary_client._read_poke_auth", return_value=poke_auth), \
              patch("agent.auxiliary_client.OpenAI") as mock, \
-             patch("hermes_cli.models.get_nous_recommended_aux_model", return_value=None):
+             patch("council_cli.models.get_poke_recommended_aux_model", return_value=None):
             client, model = get_text_auxiliary_client()
         assert model == "google/gemini-3-flash-preview"
 
-    def test_custom_endpoint_when_no_nous(self, monkeypatch):
-        """Custom endpoint is used when no OpenRouter/Nous keys are available.
+    def test_custom_endpoint_when_no_poke(self, monkeypatch):
+        """Custom endpoint is used when no OpenRouter/Poke keys are available.
 
         Since the March 2026 config refactor, OPENAI_BASE_URL env var is no
         longer consulted — base_url comes from config.yaml via
@@ -958,7 +958,7 @@ class TestAuxiliaryClientProviderPriority:
         monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
         monkeypatch.setenv("OPENAI_API_KEY", "local-key")
         from agent.auxiliary_client import get_text_auxiliary_client
-        with patch("agent.auxiliary_client._read_nous_auth", return_value=None), \
+        with patch("agent.auxiliary_client._read_poke_auth", return_value=None), \
              patch("agent.auxiliary_client._resolve_custom_runtime",
                    return_value=("http://localhost:1234/v1", "local-key")), \
              patch("agent.auxiliary_client.OpenAI") as mock:
@@ -978,7 +978,7 @@ class TestAuxiliaryClientProviderPriority:
         monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
         monkeypatch.delenv("OPENAI_API_KEY", raising=False)
         from agent.auxiliary_client import get_text_auxiliary_client
-        with patch("agent.auxiliary_client._read_nous_auth", return_value=None), \
+        with patch("agent.auxiliary_client._read_poke_auth", return_value=None), \
              patch("agent.auxiliary_client._read_codex_access_token", return_value="codex-tok"), \
              patch("agent.auxiliary_client.OpenAI"):
             client, model = get_text_auxiliary_client()

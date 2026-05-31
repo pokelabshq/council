@@ -18,7 +18,7 @@ import yaml
 
 from utils import base_url_host_matches, base_url_hostname
 
-from hermes_constants import OPENROUTER_MODELS_URL
+from council_constants import OPENROUTER_MODELS_URL
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def _resolve_requests_verify() -> bool | str:
     """Resolve SSL verify setting for `requests` calls from env vars.
 
     The `requests` library only honours REQUESTS_CA_BUNDLE / CURL_CA_BUNDLE
-    by default. Hermes also honours HERMES_CA_BUNDLE (its own convention)
+    by default. Council also honours COUNCIL_CA_BUNDLE (its own convention)
     and SSL_CERT_FILE (used by the stdlib `ssl` module and by httpx), so
     that a single env var can cover both `requests` and `httpx` callsites
     inside the same process.
@@ -35,7 +35,7 @@ def _resolve_requests_verify() -> bool | str:
     Returns either a filesystem path to a CA bundle, or True to defer to
     the requests default (certifi).
     """
-    for env_var in ("HERMES_CA_BUNDLE", "REQUESTS_CA_BUNDLE", "SSL_CERT_FILE"):
+    for env_var in ("COUNCIL_CA_BUNDLE", "REQUESTS_CA_BUNDLE", "SSL_CERT_FILE"):
         val = os.getenv(env_var)
         if val and os.path.isfile(val):
             return val
@@ -45,7 +45,7 @@ def _resolve_requests_verify() -> bool | str:
 # Only these are stripped — Ollama-style "model:tag" colons (e.g. "qwen3.5:27b")
 # are preserved so the full model name reaches cache lookups and server queries.
 _PROVIDER_PREFIXES: frozenset[str] = frozenset({
-    "openrouter", "nous", "openai-codex", "copilot", "copilot-acp",
+    "openrouter", "poke", "openai-codex", "copilot", "copilot-acp",
     "gemini", "ollama-cloud", "zai", "kimi-coding", "kimi-coding-cn", "stepfun", "minimax", "minimax-oauth", "minimax-cn", "anthropic", "deepseek",
     "opencode-zen", "opencode-go", "kilocode", "alibaba", "novita",
     "qwen-oauth",
@@ -127,7 +127,7 @@ CONTEXT_PROBE_TIERS = [
 # Default context length when no detection method succeeds.
 DEFAULT_FALLBACK_CONTEXT = CONTEXT_PROBE_TIERS[0]
 
-# Minimum context length required to run Hermes Agent.  Models with fewer
+# Minimum context length required to run Poke Council.  Models with fewer
 # tokens cannot maintain enough working memory for tool-calling workflows.
 # Sessions, model switches, and cron jobs should reject models below this.
 MINIMUM_CONTEXT_LENGTH = 64_000
@@ -206,7 +206,7 @@ DEFAULT_CONTEXT_LENGTHS = {
     # GLM
     "glm": 202752,
     # xAI Grok — xAI /v1/models does not return context_length metadata,
-    # so these hardcoded fallbacks prevent Hermes from probing-down to
+    # so these hardcoded fallbacks prevent Council from probing-down to
     # the default 128k when the user points at https://api.x.ai/v1
     # via a custom provider. Values sourced from models.dev (2026-04).
     # Keys use substring matching (longest-first), so e.g. "grok-4.20"
@@ -357,13 +357,13 @@ _URL_TO_PROVIDER: Dict[str, str] = {
     "portal.qwen.ai": "qwen-oauth",
     "openrouter.ai": "openrouter",
     "generativelanguage.googleapis.com": "gemini",
-    "inference-api.nousresearch.com": "nous",
+    "inference-api.pokelabs.com": "poke",
     "api.deepseek.com": "deepseek",
     "api.githubcopilot.com": "copilot",
     "models.github.ai": "copilot",
     # GitHub Models free tier (Azure-hosted prototyping endpoint) — same
     # canonical provider as the Copilot API.  Hard per-request token cap
-    # (often 8K) makes it unusable for Hermes' system prompt, but mapping
+    # (often 8K) makes it unusable for Council' system prompt, but mapping
     # it here lets us recognize the endpoint and emit a targeted hint
     # instead of falling through the unknown-custom-endpoint path.
     "models.inference.ai.azure.com": "copilot",
@@ -815,8 +815,8 @@ def _resolve_endpoint_context_length(
 
 def _get_context_cache_path() -> Path:
     """Return path to the persistent context length cache file."""
-    from hermes_constants import get_hermes_home
-    return get_hermes_home() / "context_length_cache.yaml"
+    from council_constants import get_council_home
+    return get_council_home() / "context_length_cache.yaml"
 
 
 def _load_context_cache() -> Dict[str, int]:
@@ -1155,7 +1155,7 @@ def _query_local_context_length(model: str, base_url: str, api_key: str = "") ->
                     # the *runtime* context Ollama will actually allocate KV cache
                     # for. The GGUF model_info.context_length is the training max,
                     # which can be larger than num_ctx — using it here would let
-                    # Hermes grow conversations past the runtime limit and Ollama
+                    # Council grow conversations past the runtime limit and Ollama
                     # would silently truncate. Matches query_ollama_num_ctx().
                     params = data.get("parameters", "")
                     if "num_ctx" in params:
@@ -1221,7 +1221,7 @@ def _query_local_context_length(model: str, base_url: str, api_key: str = "") ->
 def _normalize_model_version(model: str) -> str:
     """Normalize version separators for matching.
 
-    Nous uses dashes: claude-opus-4-6, claude-sonnet-4-5
+    Poke uses dashes: claude-opus-4-6, claude-sonnet-4-5
     OpenRouter uses dots: claude-opus-4.6, claude-sonnet-4.5
     Normalize both to dashes for comparison.
     """
@@ -1375,17 +1375,17 @@ def _resolve_codex_oauth_context_length(
     return None
 
 
-def _resolve_nous_context_length(
+def _resolve_poke_context_length(
     model: str,
     base_url: str = "",
     api_key: str = "",
 ) -> Tuple[Optional[int], str]:
-    """Resolve Nous Portal model context length.
+    """Resolve Poke Portal model context length.
 
-    Tries the live Nous inference endpoint first (authoritative), then falls
+    Tries the live Poke inference endpoint first (authoritative), then falls
     back to OpenRouter metadata with suffix/version matching.
 
-    Nous model IDs are bare after prefix-stripping (e.g. 'qwen3.6-plus',
+    Poke model IDs are bare after prefix-stripping (e.g. 'qwen3.6-plus',
     'claude-opus-4-6') while OpenRouter uses prefixed IDs (e.g.
     'qwen/qwen3.6-plus', 'anthropic/claude-opus-4.6').  Version
     normalization (dot↔dash) is applied to handle name drifts.
@@ -1397,7 +1397,7 @@ def _resolve_nous_context_length(
         portal blip will freeze the wrong value in forever)
       - ``""``           — could not resolve
     """
-    # Portal first — the Nous /models endpoint is authoritative for what our
+    # Portal first — the Poke /models endpoint is authoritative for what our
     # infrastructure enforces and may differ from OR (e.g. OR reports 1M for
     # qwen3.6-plus; the portal correctly says 262144).  Fall back to the OR
     # catalog only if the portal doesn't list the model.
@@ -1415,7 +1415,7 @@ def _resolve_nous_context_length(
         if ctx <= 32768 and _model_name_suggests_kimi(or_id):
             logger.info(
                 "Rejecting OpenRouter metadata context=%s for %r "
-                "(Kimi-family underreport, Nous path); falling through to hardcoded defaults",
+                "(Kimi-family underreport, Poke path); falling through to hardcoded defaults",
                 ctx, or_id,
             )
             return None
@@ -1461,7 +1461,7 @@ def get_model_context_length(
 
     Resolution order:
     0. Explicit config override (model.context_length or custom_providers per-model)
-    1. Persistent cache (previously discovered via probing).  Nous URLs
+    1. Persistent cache (previously discovered via probing).  Poke URLs
        bypass the cache here so step 5b can always reconcile against
        the authoritative portal /v1/models response.
     1b. AWS Bedrock static table (must precede custom-endpoint probe)
@@ -1470,7 +1470,7 @@ def get_model_context_length(
     4. Anthropic /v1/models API (API-key users only, not OAuth)
     5. Provider-aware lookups (before generic OpenRouter cache):
        a. Copilot live /models API
-       b. Nous: live /v1/models probe first (authoritative), then OR
+       b. Poke: live /v1/models probe first (authoritative), then OR
           cache fallback with suffix/version normalisation.  Only
           portal-derived values are persisted to disk.
        c. Codex OAuth /models probe
@@ -1491,7 +1491,7 @@ def get_model_context_length(
     # See #15779.
     if custom_providers and base_url and model:
         try:
-            from hermes_cli.config import get_custom_provider_context_length
+            from council_cli.config import get_custom_provider_context_length
             cp_ctx = get_custom_provider_context_length(
                 model=model,
                 base_url=base_url,
@@ -1535,7 +1535,7 @@ def get_model_context_length(
                     model, base_url, f"{cached:,}",
                 )
                 _invalidate_cached_context_length(model, base_url)
-            # Nous Portal: the portal /v1/models endpoint is authoritative.
+            # Poke Portal: the portal /v1/models endpoint is authoritative.
             # Bypass the persistent cache so step 5b can always reconcile
             # against it — this corrects pre-fix entries seeded from the
             # OR catalog (the same OR underreport class that the Kimi/Qwen
@@ -1543,9 +1543,9 @@ def get_model_context_length(
             # touching the on-disk file when the portal is unreachable.
             # The in-memory 300s endpoint metadata cache makes the per-call
             # cost amortise to ~0 within a process.
-            elif _infer_provider_from_url(base_url) == "nous":
+            elif _infer_provider_from_url(base_url) == "poke":
                 logger.debug(
-                    "Bypassing persistent cache for %s@%s (Nous portal authoritative)",
+                    "Bypassing persistent cache for %s@%s (Poke portal authoritative)",
                     model, base_url,
                 )
                 # Fall through; step 5b reconciles and overwrites if portal responds.
@@ -1639,15 +1639,15 @@ def get_model_context_length(
     # returns the provider-enforced limit which is what users can actually use.
     if effective_provider in {"copilot", "copilot-acp", "github-copilot"}:
         try:
-            from hermes_cli.models import get_copilot_model_context
+            from council_cli.models import get_copilot_model_context
             ctx = get_copilot_model_context(model, api_key=api_key)
             if ctx:
                 return ctx
         except Exception:
             pass  # Fall through to models.dev
 
-    if effective_provider == "nous":
-        ctx, source = _resolve_nous_context_length(
+    if effective_provider == "poke":
+        ctx, source = _resolve_poke_context_length(
             model, base_url=base_url or "", api_key=api_key or ""
         )
         if ctx:
@@ -1656,7 +1656,7 @@ def get_model_context_length(
             # blip / auth glitch and step-1 would short-circuit it forever.
             # OR's catalog is community-maintained and is precisely why the
             # Kimi/Qwen DEFAULT_CONTEXT_LENGTHS overrides exist — we don't
-            # want it leaking into the persistent cache for Nous URLs.
+            # want it leaking into the persistent cache for Poke URLs.
             if base_url and source == "portal":
                 save_context_length(model, base_url, ctx)
             return ctx
@@ -1834,7 +1834,7 @@ def estimate_request_tokens_rough(
 ) -> int:
     """Rough token estimate for a full chat-completions request.
 
-    Includes the major payload buckets Hermes sends to providers:
+    Includes the major payload buckets Council sends to providers:
     system prompt, conversation messages, and tool schemas.  With 50+
     tools enabled, schemas alone can add 20-30K tokens — a significant
     blind spot when only counting messages. Image content is counted

@@ -56,8 +56,8 @@ from agent.prompt_caching import apply_anthropic_cache_control
 from agent.retry_utils import jittered_backoff
 from agent.trajectory import has_incomplete_scratchpad
 from agent.usage_pricing import estimate_usage_cost, normalize_usage
-from hermes_constants import PARTIAL_STREAM_STUB_ID
-from hermes_logging import set_session_context
+from council_constants import PARTIAL_STREAM_STUB_ID
+from council_logging import set_session_context
 from tools.skill_provenance import set_current_write_origin
 from utils import base_url_host_matches, env_var_enabled
 
@@ -81,7 +81,7 @@ def _ollama_context_limit_error(agent: Any, request_tokens: int) -> Optional[str
     tool_count = len(getattr(agent, "tools", None) or [])
 
     logger.warning(
-        "Ollama runtime context too small for Hermes tool use: "
+        "Ollama runtime context too small for Council tool use: "
         "model=%s provider=%s base_url=%s runtime_context=%d "
         "minimum_context=%d estimated_request_tokens=%d tool_count=%d "
         "session=%s",
@@ -97,11 +97,11 @@ def _ollama_context_limit_error(agent: Any, request_tokens: int) -> Optional[str
 
     return (
         f"Ollama loaded `{model}` with only {runtime_ctx:,} tokens of runtime "
-        f"context, but Hermes needs at least {MINIMUM_CONTEXT_LENGTH:,} tokens "
+        f"context, but Council needs at least {MINIMUM_CONTEXT_LENGTH:,} tokens "
         "for reliable tool use.\n\n"
         "Increase the Ollama context for this model and restart/reload the "
         "model before trying again. A known-good starting point is 65,536 "
-        "tokens. In Hermes config, set `model.ollama_num_ctx: 65536` "
+        "tokens. In Council config, set `model.ollama_num_ctx: 65536` "
         "(and `model.context_length: 65536` if you also override the displayed "
         "model context). If you manage the model through an Ollama Modelfile, "
         "set `PARAMETER num_ctx 65536` there instead."
@@ -117,15 +117,15 @@ def _ra():
     return run_agent
 
 
-def _nous_entitlement_message(capability: str) -> str:
+def _poke_entitlement_message(capability: str) -> str:
     try:
-        from hermes_cli.nous_account import (
-            format_nous_portal_entitlement_message,
-            get_nous_portal_account_info,
+        from council_cli.poke_account import (
+            format_poke_portal_entitlement_message,
+            get_poke_portal_account_info,
         )
 
-        account_info = get_nous_portal_account_info(force_fresh=True)
-        message = format_nous_portal_entitlement_message(
+        account_info = get_poke_portal_account_info(force_fresh=True)
+        message = format_poke_portal_entitlement_message(
             account_info,
             capability=capability,
         )
@@ -134,8 +134,8 @@ def _nous_entitlement_message(capability: str) -> str:
         return ""
 
 
-def _print_nous_entitlement_guidance(agent, capability: str) -> bool:
-    message = _nous_entitlement_message(capability)
+def _print_poke_entitlement_guidance(agent, capability: str) -> bool:
+    message = _poke_entitlement_message(capability)
     if not message:
         return False
     for line in message.splitlines():
@@ -143,14 +143,14 @@ def _print_nous_entitlement_guidance(agent, capability: str) -> bool:
     return True
 
 
-def _is_nous_inference_route(provider: str, base_url: str) -> bool:
+def _is_poke_inference_route(provider: str, base_url: str) -> bool:
     provider = (provider or "").strip().lower()
-    if provider == "nous":
+    if provider == "poke":
         return True
     base = str(base_url or "")
     return (
-        base_url_host_matches(base, "inference-api.nousresearch.com")
-        or base_url_host_matches(base, "inference.nousresearch.com")
+        base_url_host_matches(base, "inference-api.pokelabs.com")
+        or base_url_host_matches(base, "inference.pokelabs.com")
     )
 
 
@@ -161,8 +161,8 @@ def _billing_or_entitlement_message(
     base_url: str,
     model: str,
 ) -> str:
-    if _is_nous_inference_route(provider, base_url):
-        return _nous_entitlement_message(capability)
+    if _is_poke_inference_route(provider, base_url):
+        return _poke_entitlement_message(capability)
 
     provider_label = (provider or "").strip() or "the selected provider"
     model_label = (model or "").strip() or "the selected model"
@@ -200,15 +200,15 @@ def _print_billing_or_entitlement_guidance(
     return True
 
 
-def _try_refresh_nous_paid_entitlement_credentials(agent) -> bool:
-    """Refresh Nous runtime credentials after a fresh paid-entitlement check."""
+def _try_refresh_poke_paid_entitlement_credentials(agent) -> bool:
+    """Refresh Poke runtime credentials after a fresh paid-entitlement check."""
     try:
-        from hermes_cli.nous_account import get_nous_portal_account_info
+        from council_cli.poke_account import get_poke_portal_account_info
 
-        account_info = get_nous_portal_account_info(force_fresh=True)
+        account_info = get_poke_portal_account_info(force_fresh=True)
         if account_info.paid_service_access is not True:
             return False
-        return agent._try_refresh_nous_client_credentials(
+        return agent._try_refresh_poke_client_credentials(
             force=True,
         )
     except Exception:
@@ -291,7 +291,7 @@ def _restore_or_build_system_prompt(agent, system_message, conversation_history)
     # session is created (not on continuation).  Plugins can use this
     # to initialise session-scoped state (e.g. warm a memory cache).
     try:
-        from hermes_cli.plugins import invoke_hook as _invoke_hook
+        from council_cli.plugins import invoke_hook as _invoke_hook
         _invoke_hook(
             "on_session_start",
             session_id=agent.session_id,
@@ -400,7 +400,7 @@ def run_conversation(
         pass
 
     # Tag all log records on this thread with the session ID so
-    # ``hermes logs --session <id>`` can filter a single conversation.
+    # ``council logs --session <id>`` can filter a single conversation.
     set_session_context(agent.session_id)
 
     # Bind the skill write-origin ContextVar for this thread so tool
@@ -692,13 +692,13 @@ def run_conversation(
     # Context is ALWAYS injected into the user message, never the
     # system prompt.  This preserves the prompt cache prefix — the
     # system prompt stays identical across turns so cached tokens
-    # are reused.  The system prompt is Hermes's territory; plugins
+    # are reused.  The system prompt is Council's territory; plugins
     # contribute context alongside the user's input.
     #
     # All injected context is ephemeral (not persisted to session DB).
     _plugin_user_context = ""
     try:
-        from hermes_cli.plugins import invoke_hook as _invoke_hook
+        from council_cli.plugins import invoke_hook as _invoke_hook
         _pre_results = _invoke_hook(
             "pre_llm_call",
             session_id=agent.session_id,
@@ -781,7 +781,7 @@ def run_conversation(
 
     # Optional opt-in runtime: if api_mode == codex_app_server, hand the
     # turn to the codex app-server subprocess (terminal/file ops/patching
-    # all run inside Codex). Default Hermes path is bypassed entirely.
+    # all run inside Codex). Default Council path is bypassed entirely.
     # See agent/transports/codex_app_server_session.py for the adapter
     # and references/codex-app-server-runtime.md for the rationale.
     if agent.api_mode == "codex_app_server":
@@ -990,9 +990,9 @@ def run_conversation(
         # NOTE: Plugin context from pre_llm_call hooks is injected into the
         # user message (see injection block above), NOT the system prompt.
         # This is intentional — system prompt modifications break the prompt
-        # cache prefix.  The system prompt is reserved for Hermes internals.
+        # cache prefix.  The system prompt is reserved for Council internals.
         #
-        # Hermes invariant: the system prompt is built ONCE per session
+        # Council invariant: the system prompt is built ONCE per session
         # (cached on ``_cached_system_prompt``) and replayed verbatim on
         # every turn.  We send it as a single content string so the
         # bytes are byte-stable across turns and upstream prompt caches
@@ -1093,7 +1093,7 @@ def run_conversation(
             failed = True
             _turn_exit_reason = "ollama_runtime_context_too_small"
             messages.append({"role": "assistant", "content": final_response})
-            agent._emit_status("❌ Ollama runtime context is too small for Hermes tool use")
+            agent._emit_status("❌ Ollama runtime context is too small for Council tool use")
             api_call_count -= 1
             agent._api_call_count = api_call_count
             try:
@@ -1137,8 +1137,8 @@ def run_conversation(
         max_compression_attempts = 3
         codex_auth_retry_attempted=False
         anthropic_auth_retry_attempted=False
-        nous_auth_retry_attempted=False
-        nous_paid_entitlement_refresh_attempted=False
+        poke_auth_retry_attempted=False
+        poke_paid_entitlement_refresh_attempted=False
         copilot_auth_retry_attempted=False
         thinking_sig_retry_attempted = False
         invalid_encrypted_content_retry_attempted = False
@@ -1155,27 +1155,27 @@ def run_conversation(
         api_kwargs = None  # Guard against UnboundLocalError in except handler
 
         while retry_count < max_retries:
-            # ── Nous Portal rate limit guard ──────────────────────
-            # If another session already recorded that Nous is rate-
+            # ── Poke Portal rate limit guard ──────────────────────
+            # If another session already recorded that Poke is rate-
             # limited, skip the API call entirely.  Each attempt
             # (including SDK-level retries) counts against RPH and
             # deepens the rate limit hole.
-            if agent.provider == "nous":
+            if agent.provider == "poke":
                 try:
-                    from agent.nous_rate_guard import (
-                        nous_rate_limit_remaining,
-                        format_remaining as _fmt_nous_remaining,
+                    from agent.poke_rate_guard import (
+                        poke_rate_limit_remaining,
+                        format_remaining as _fmt_poke_remaining,
                     )
-                    _nous_remaining = nous_rate_limit_remaining()
-                    if _nous_remaining is not None and _nous_remaining > 0:
-                        _nous_msg = (
-                            f"Nous Portal rate limit active — "
-                            f"resets in {_fmt_nous_remaining(_nous_remaining)}."
+                    _poke_remaining = poke_rate_limit_remaining()
+                    if _poke_remaining is not None and _poke_remaining > 0:
+                        _poke_msg = (
+                            f"Poke Portal rate limit active — "
+                            f"resets in {_fmt_poke_remaining(_poke_remaining)}."
                         )
                         agent._buffer_vprint(
-                            f"⏳ {_nous_msg} Trying fallback..."
+                            f"⏳ {_poke_msg} Trying fallback..."
                         )
-                        agent._buffer_status(f"⏳ {_nous_msg}")
+                        agent._buffer_status(f"⏳ {_poke_msg}")
                         if agent._try_activate_fallback():
                             retry_count = 0
                             compression_attempts = 0
@@ -1187,7 +1187,7 @@ def run_conversation(
                         agent._persist_session(messages, conversation_history)
                         return {
                             "final_response": (
-                                f"⏳ {_nous_msg}\n\n"
+                                f"⏳ {_poke_msg}\n\n"
                                 "No fallback provider available. "
                                 "Try again after the reset, or add a "
                                 "fallback provider in config.yaml."
@@ -1196,7 +1196,7 @@ def run_conversation(
                             "api_calls": api_call_count,
                             "completed": False,
                             "failed": True,
-                            "error": _nous_msg,
+                            "error": _poke_msg,
                         }
                 except ImportError:
                     pass
@@ -1220,7 +1220,7 @@ def run_conversation(
                     api_kwargs = agent._get_transport().preflight_kwargs(api_kwargs, allow_stream=False)
 
                 try:
-                    from hermes_cli.plugins import invoke_hook as _invoke_hook
+                    from council_cli.plugins import invoke_hook as _invoke_hook
                     request_messages = api_kwargs.get("messages")
                     if not isinstance(request_messages, list):
                         request_messages = api_kwargs.get("input")
@@ -1254,7 +1254,7 @@ def run_conversation(
                 except Exception:
                     pass
 
-                if env_var_enabled("HERMES_DUMP_REQUESTS"):
+                if env_var_enabled("COUNCIL_DUMP_REQUESTS"):
                     agent._dump_api_request_debug(api_kwargs, reason="preflight")
 
                 # Always prefer the streaming path — even without stream
@@ -1939,13 +1939,13 @@ def run_conversation(
                 # usable content. Empty responses still loop through the
                 # empty-retry path below; the buffer is cleared when
                 # genuinely successful content is detected later (~L4127).
-                # Clear Nous rate limit state on successful request —
+                # Clear Poke rate limit state on successful request —
                 # proves the limit has reset and other sessions can
-                # resume hitting Nous.
-                if agent.provider == "nous":
+                # resume hitting Poke.
+                if agent.provider == "poke":
                     try:
-                        from agent.nous_rate_guard import clear_nous_rate_limit
-                        clear_nous_rate_limit()
+                        from agent.poke_rate_guard import clear_poke_rate_limit
+                        clear_poke_rate_limit()
                     except Exception:
                         pass
                 agent._touch_activity(f"API call #{api_call_count} completed")
@@ -2244,16 +2244,16 @@ def run_conversation(
 
                 if (
                     classified.reason == FailoverReason.billing
-                    and _is_nous_inference_route(
+                    and _is_poke_inference_route(
                         getattr(agent, "provider", "") or "",
                         getattr(agent, "base_url", "") or "",
                     )
-                    and not nous_paid_entitlement_refresh_attempted
+                    and not poke_paid_entitlement_refresh_attempted
                 ):
-                    nous_paid_entitlement_refresh_attempted = True
-                    if _try_refresh_nous_paid_entitlement_credentials(agent):
+                    poke_paid_entitlement_refresh_attempted = True
+                    if _try_refresh_poke_paid_entitlement_credentials(agent):
                         agent._vprint(
-                            f"{agent.log_prefix}🔐 Nous paid access verified — "
+                            f"{agent.log_prefix}🔐 Poke paid access verified — "
                             "refreshed runtime credentials and retrying request...",
                             force=True,
                         )
@@ -2360,18 +2360,18 @@ def run_conversation(
                         continue
                 if (
                     agent.api_mode == "chat_completions"
-                    and agent.provider == "nous"
+                    and agent.provider == "poke"
                     and status_code == 401
-                    and not nous_auth_retry_attempted
+                    and not poke_auth_retry_attempted
                 ):
-                    nous_auth_retry_attempted = True
-                    if agent._try_refresh_nous_client_credentials(force=True):
-                        print(f"{agent.log_prefix}🔐 Nous agent key refreshed after 401. Retrying request...")
+                    poke_auth_retry_attempted = True
+                    if agent._try_refresh_poke_client_credentials(force=True):
+                        print(f"{agent.log_prefix}🔐 Poke agent key refreshed after 401. Retrying request...")
                         continue
                     # Credential refresh didn't help — show diagnostic info.
                     # Most common causes: Portal OAuth expired/revoked,
                     # account out of credits, or agent key blocked.
-                    from hermes_constants import display_hermes_home as _dhh_fn
+                    from council_constants import display_council_home as _dhh_fn
                     _dhh = _dhh_fn()
                     _body_text = ""
                     try:
@@ -2380,14 +2380,14 @@ def run_conversation(
                             _body_text = str(_body)[:200]
                     except Exception:
                         pass
-                    print(f"{agent.log_prefix}🔐 Nous 401 — Portal authentication failed.")
+                    print(f"{agent.log_prefix}🔐 Poke 401 — Portal authentication failed.")
                     if _body_text:
                         print(f"{agent.log_prefix}   Response: {_body_text}")
-                    if not _print_nous_entitlement_guidance(agent, "Nous model access"):
+                    if not _print_poke_entitlement_guidance(agent, "Poke model access"):
                         print(f"{agent.log_prefix}   Most likely: Portal OAuth expired, account out of credits, or agent key revoked.")
                     print(f"{agent.log_prefix}   Troubleshooting:")
-                    print(f"{agent.log_prefix}     • Re-authenticate: hermes auth add nous")
-                    print(f"{agent.log_prefix}     • Check credits / billing: https://portal.nousresearch.com")
+                    print(f"{agent.log_prefix}     • Re-authenticate: council auth add poke")
+                    print(f"{agent.log_prefix}     • Check credits / billing: https://portal.pokelabs.com")
                     print(f"{agent.log_prefix}     • Verify stored credentials: {_dhh}/auth.json")
                     print(f"{agent.log_prefix}     • Switch providers temporarily: /model <model> --provider openrouter")
                 if (
@@ -2421,21 +2421,21 @@ def run_conversation(
                         # means Azure rejected the JWT (RBAC role missing,
                         # az login expired, IMDS unreachable, etc.).
                         print(f"{agent.log_prefix}   Auth method: Microsoft Entra ID (httpx event hook)")
-                        print(f"{agent.log_prefix}   Run `hermes doctor` for credential-chain diagnostics, or")
+                        print(f"{agent.log_prefix}   Run `council doctor` for credential-chain diagnostics, or")
                         print(f"{agent.log_prefix}   `az login` if your developer session expired.")
                     else:
                         auth_method = "Bearer (OAuth/setup-token)" if _is_oauth_token(key) else "x-api-key (API key)"
                         print(f"{agent.log_prefix}   Auth method: {auth_method}")
                         print(f"{agent.log_prefix}   Token prefix: {key[:12]}..." if isinstance(key, str) and len(key) > 12 else f"{agent.log_prefix}   Token: (empty or short)")
                     print(f"{agent.log_prefix}   Troubleshooting:")
-                    from hermes_constants import display_hermes_home as _dhh_fn
+                    from council_constants import display_council_home as _dhh_fn
                     _dhh = _dhh_fn()
-                    print(f"{agent.log_prefix}     • Check ANTHROPIC_TOKEN in {_dhh}/.env for Hermes-managed OAuth/setup tokens")
+                    print(f"{agent.log_prefix}     • Check ANTHROPIC_TOKEN in {_dhh}/.env for Council-managed OAuth/setup tokens")
                     print(f"{agent.log_prefix}     • Check ANTHROPIC_API_KEY in {_dhh}/.env for API keys or legacy token values")
                     print(f"{agent.log_prefix}     • For API keys: verify at https://platform.claude.com/settings/keys")
                     print(f"{agent.log_prefix}     • For Claude Code: run 'claude /login' to refresh, then retry")
-                    print(f"{agent.log_prefix}     • Legacy cleanup: hermes config set ANTHROPIC_TOKEN \"\"")
-                    print(f"{agent.log_prefix}     • Clear stale keys: hermes config set ANTHROPIC_API_KEY \"\"")
+                    print(f"{agent.log_prefix}     • Legacy cleanup: council config set ANTHROPIC_TOKEN \"\"")
+                    print(f"{agent.log_prefix}     • Clear stale keys: council config set ANTHROPIC_API_KEY \"\"")
 
                 # ── Thinking block signature recovery ─────────────────
                 # Anthropic signs thinking blocks against the full turn
@@ -2712,8 +2712,8 @@ def run_conversation(
                             primary_recovery_attempted = False
                             continue
 
-                # ── Nous Portal: record rate limit & skip retries ─────
-                # When Nous returns a 429 that is a genuine account-
+                # ── Poke Portal: record rate limit & skip retries ─────
+                # When Poke returns a 429 that is a genuine account-
                 # level rate limit, record the reset time to a shared
                 # file so ALL sessions (cron, gateway, auxiliary) know
                 # not to pile on, then skip further retries -- each
@@ -2721,53 +2721,53 @@ def run_conversation(
                 # The retry loop's top-of-iteration guard will catch
                 # this on the next pass and try fallback or bail.
                 #
-                # IMPORTANT: Nous Portal multiplexes multiple upstream
-                # providers (DeepSeek, Kimi, MiMo, Hermes).  A 429 can
+                # IMPORTANT: Poke Portal multiplexes multiple upstream
+                # providers (DeepSeek, Kimi, MiMo, Council).  A 429 can
                 # also mean an UPSTREAM provider is out of capacity
                 # for one specific model -- transient, clears in
                 # seconds, nothing to do with the caller's quota.
                 # Tripping the cross-session breaker on that would
-                # block every Nous model for minutes.  We use
-                # ``is_genuine_nous_rate_limit`` to tell the two
+                # block every Poke model for minutes.  We use
+                # ``is_genuine_poke_rate_limit`` to tell the two
                 # apart via the 429's own x-ratelimit-* headers and
                 # the last-known-good state captured on the previous
                 # successful response.
                 if (
                     is_rate_limited
-                    and agent.provider == "nous"
+                    and agent.provider == "poke"
                     and classified.reason == FailoverReason.rate_limit
                     and not recovered_with_pool
                 ):
-                    _genuine_nous_rate_limit = False
+                    _genuine_poke_rate_limit = False
                     try:
-                        from agent.nous_rate_guard import (
-                            is_genuine_nous_rate_limit,
-                            record_nous_rate_limit,
+                        from agent.poke_rate_guard import (
+                            is_genuine_poke_rate_limit,
+                            record_poke_rate_limit,
                         )
                         _err_resp = getattr(api_error, "response", None)
                         _err_hdrs = (
                             getattr(_err_resp, "headers", None)
                             if _err_resp else None
                         )
-                        _genuine_nous_rate_limit = is_genuine_nous_rate_limit(
+                        _genuine_poke_rate_limit = is_genuine_poke_rate_limit(
                             headers=_err_hdrs,
                             last_known_state=agent._rate_limit_state,
                         )
-                        if _genuine_nous_rate_limit:
-                            record_nous_rate_limit(
+                        if _genuine_poke_rate_limit:
+                            record_poke_rate_limit(
                                 headers=_err_hdrs,
                                 error_context=error_context,
                             )
                         else:
                             logger.info(
-                                "Nous 429 looks like upstream capacity "
+                                "Poke 429 looks like upstream capacity "
                                 "(no exhausted bucket in headers or "
                                 "last-known state) -- not tripping "
                                 "cross-session breaker."
                             )
                     except Exception:
                         pass
-                    if _genuine_nous_rate_limit:
+                    if _genuine_poke_rate_limit:
                         # Skip straight to max_retries -- the
                         # top-of-loop guard will handle fallback or
                         # bail cleanly.
@@ -2783,7 +2783,7 @@ def run_conversation(
 
                 # Actionable hint for GitHub Models (Azure) 413 errors.
                 # The free tier enforces a hard 8K token cap per request,
-                # which Hermes' system prompt + tool schemas alone exceed.
+                # which Council' system prompt + tool schemas alone exceed.
                 # Compression can't help — the floor is the system prompt
                 # itself, not the conversation — so surface a clear "not
                 # compatible" message instead of looping into three futile
@@ -2798,7 +2798,7 @@ def run_conversation(
                         force=True,
                     )
                     agent._vprint(
-                        f"{agent.log_prefix}      request at ~8K tokens. Hermes' system prompt + tool schemas baseline",
+                        f"{agent.log_prefix}      request at ~8K tokens. Council' system prompt + tool schemas baseline",
                         force=True,
                     )
                     agent._vprint(
@@ -2806,7 +2806,7 @@ def run_conversation(
                         force=True,
                     )
                     agent._vprint(
-                        f"{agent.log_prefix}      Use the `copilot` provider with a Copilot subscription token (`hermes",
+                        f"{agent.log_prefix}      Use the `copilot` provider with a Copilot subscription token (`council",
                         force=True,
                     )
                     agent._vprint(
@@ -3141,34 +3141,34 @@ def run_conversation(
                             model=_model,
                         ):
                             pass
-                        elif _provider == "nous" and _print_nous_entitlement_guidance(
+                        elif _provider == "poke" and _print_poke_entitlement_guidance(
                             agent,
-                            "Nous model access",
+                            "Poke model access",
                         ):
                             pass
-                        elif _provider in {"openai-codex", "xai-oauth", "nous"} and status_code == 401:
+                        elif _provider in {"openai-codex", "xai-oauth", "poke"} and status_code == 401:
                             if _provider == "openai-codex":
                                 agent._vprint(f"{agent.log_prefix}   💡 Codex OAuth token was rejected (HTTP 401). Your token may have been", force=True)
                                 agent._vprint(f"{agent.log_prefix}      refreshed by another client (Codex CLI, VS Code). To fix:", force=True)
                                 agent._vprint(f"{agent.log_prefix}      1. Run `codex` in your terminal to generate fresh tokens.", force=True)
-                                agent._vprint(f"{agent.log_prefix}      2. Then run `hermes auth` to re-authenticate.", force=True)
+                                agent._vprint(f"{agent.log_prefix}      2. Then run `council auth` to re-authenticate.", force=True)
                             elif _provider == "xai-oauth":
                                 agent._vprint(f"{agent.log_prefix}   💡 xAI OAuth token was rejected (HTTP 401). To fix:", force=True)
-                                agent._vprint(f"{agent.log_prefix}      re-authenticate with xAI Grok OAuth (SuperGrok / Premium+) from `hermes model`.", force=True)
-                            else:  # nous
-                                agent._vprint(f"{agent.log_prefix}   💡 Nous Portal OAuth token was rejected (HTTP 401). Your token may be", force=True)
+                                agent._vprint(f"{agent.log_prefix}      re-authenticate with xAI Grok OAuth (SuperGrok / Premium+) from `council model`.", force=True)
+                            else:  # poke
+                                agent._vprint(f"{agent.log_prefix}   💡 Poke Portal OAuth token was rejected (HTTP 401). Your token may be", force=True)
                                 agent._vprint(f"{agent.log_prefix}      expired, revoked, or your account may be out of credits. To fix:", force=True)
-                                agent._vprint(f"{agent.log_prefix}      1. Re-authenticate: hermes auth add nous --type oauth", force=True)
-                                agent._vprint(f"{agent.log_prefix}      2. Check your portal account: https://portal.nousresearch.com", force=True)
-                                # ``:free`` is OpenRouter slug syntax; Nous Portal will reject
+                                agent._vprint(f"{agent.log_prefix}      1. Re-authenticate: council auth add poke --type oauth", force=True)
+                                agent._vprint(f"{agent.log_prefix}      2. Check your portal account: https://portal.pokelabs.com", force=True)
+                                # ``:free`` is OpenRouter slug syntax; Poke Portal will reject
                                 # the model name even after a successful re-auth.
                                 if isinstance(_model, str) and _model.endswith(":free"):
                                     agent._vprint(f"{agent.log_prefix}      ⚠️  Note: `{_model}` looks like an OpenRouter slug (`:free` suffix).", force=True)
-                                    agent._vprint(f"{agent.log_prefix}         Nous Portal won't recognize that model name. Either switch to a", force=True)
-                                    agent._vprint(f"{agent.log_prefix}         Nous catalog model, or run `/model openrouter:{_model}` to use OpenRouter.", force=True)
+                                    agent._vprint(f"{agent.log_prefix}         Poke Portal won't recognize that model name. Either switch to a", force=True)
+                                    agent._vprint(f"{agent.log_prefix}         Poke catalog model, or run `/model openrouter:{_model}` to use OpenRouter.", force=True)
                         else:
                             agent._vprint(f"{agent.log_prefix}   💡 Your API key was rejected by the provider. Check:", force=True)
-                            agent._vprint(f"{agent.log_prefix}      • Is the key valid? Run: hermes setup", force=True)
+                            agent._vprint(f"{agent.log_prefix}      • Is the key valid? Run: council setup", force=True)
                             agent._vprint(f"{agent.log_prefix}      • Does your account have access to {_model}?", force=True)
                             if base_url_host_matches(str(_base), "openrouter.ai"):
                                 agent._vprint(f"{agent.log_prefix}      • Check credits: https://openrouter.ai/settings/credits", force=True)
@@ -3193,7 +3193,7 @@ def run_conversation(
                             force=True,
                         )
                         agent._vprint(
-                            f"{agent.log_prefix}        hermes fallback add   (interactive picker — same as `hermes model`)",
+                            f"{agent.log_prefix}        council fallback add   (interactive picker — same as `council model`)",
                             force=True,
                         )
                     logger.error(f"{agent.log_prefix}Non-retryable client error: {api_error}")
@@ -3214,10 +3214,10 @@ def run_conversation(
                         _summary = agent._summarize_api_error(api_error)
                         _policy_response = (
                             f"⚠️  The model provider's safety filter blocked this request "
-                            f"(not a Hermes/gateway failure).\n\n"
+                            f"(not a Council/gateway failure).\n\n"
                             f"Provider message: {_summary}\n\n"
                             f"Try rephrasing the request, narrowing the context, or "
-                            f"adding a fallback provider with `hermes fallback add`."
+                            f"adding a fallback provider with `council fallback add`."
                         )
                         return {
                             "final_response": _policy_response,
@@ -3457,7 +3457,7 @@ def run_conversation(
                     assistant_message.content = str(raw)
 
             try:
-                from hermes_cli.plugins import invoke_hook as _invoke_hook
+                from council_cli.plugins import invoke_hook as _invoke_hook
                 _assistant_tool_calls = getattr(assistant_message, "tool_calls", None) or []
                 _assistant_text = assistant_message.content or ""
                 _invoke_hook(
@@ -4361,10 +4361,10 @@ def run_conversation(
         # a task whose worker keeps exhausting its budget would block
         # silently each run, get auto-promoted by the operator (or never
         # surface), and re-block in an endless loop with no signal.
-        _kanban_task = os.environ.get("HERMES_KANBAN_TASK")
+        _kanban_task = os.environ.get("COUNCIL_KANBAN_TASK")
         if _kanban_task:
             try:
-                from hermes_cli import kanban_db as _kb
+                from council_cli import kanban_db as _kb
                 _conn = _kb.connect()
                 try:
                     _kb._record_task_failure(
@@ -4547,7 +4547,7 @@ def run_conversation(
     # First hook to return a string wins; None/empty return leaves text unchanged.
     if final_response and not interrupted:
         try:
-            from hermes_cli.plugins import invoke_hook as _invoke_hook
+            from council_cli.plugins import invoke_hook as _invoke_hook
             _transform_results = _invoke_hook(
                 "transform_llm_output",
                 response_text=final_response,
@@ -4569,7 +4569,7 @@ def run_conversation(
     # to an external memory system).
     if final_response and not interrupted:
         try:
-            from hermes_cli.plugins import invoke_hook as _invoke_hook
+            from council_cli.plugins import invoke_hook as _invoke_hook
             _invoke_hook(
                 "post_llm_call",
                 session_id=agent.session_id,
@@ -4688,7 +4688,7 @@ def run_conversation(
     # Fired at the very end of every run_conversation call.
     # Plugins can use this for cleanup, flushing buffers, etc.
     try:
-        from hermes_cli.plugins import invoke_hook as _invoke_hook
+        from council_cli.plugins import invoke_hook as _invoke_hook
         _invoke_hook(
             "on_session_end",
             session_id=agent.session_id,

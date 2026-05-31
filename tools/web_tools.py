@@ -3,9 +3,9 @@
 Standalone Web Tools Module
 
 This module provides generic web tools that work with multiple backend providers.
-Backend is selected during ``hermes tools`` setup (web.backend in config.yaml).
-When available, Hermes can route Firecrawl calls through a Nous-hosted tool-gateway
-for Nous Subscribers only.
+Backend is selected during ``council tools`` setup (web.backend in config.yaml).
+When available, Council can route Firecrawl calls through a Poke-hosted tool-gateway
+for Poke Subscribers only.
 
 Available tools:
 - web_search_tool: Search the web for information
@@ -13,7 +13,7 @@ Available tools:
 
 Backend compatibility:
 - Exa: https://exa.ai (search, extract)
-- Firecrawl: https://docs.firecrawl.dev/introduction (search, extract; direct or derived firecrawl-gateway.<domain> for Nous Subscribers)
+- Firecrawl: https://docs.firecrawl.dev/introduction (search, extract; direct or derived firecrawl-gateway.<domain> for Poke Subscribers)
 - Parallel: https://docs.parallel.ai (search, extract)
 - Tavily: https://tavily.com (search, extract)
 
@@ -93,13 +93,13 @@ from tools.debug_helpers import DebugSession
 # tools.web_tools (the firecrawl plugin reads them via its own import chain).
 from tools.managed_tool_gateway import (  # noqa: F401 — backward-compat names for tests
     build_vendor_gateway_url,
-    peek_nous_access_token as _peek_nous_access_token,
-    read_nous_access_token as _read_nous_access_token,
+    peek_poke_access_token as _peek_poke_access_token,
+    read_poke_access_token as _read_poke_access_token,
     resolve_managed_tool_gateway,
 )
 from tools.tool_backend_helpers import (  # noqa: F401
-    managed_nous_tools_enabled,
-    nous_tool_gateway_unavailable_message,
+    managed_poke_tools_enabled,
+    poke_tool_gateway_unavailable_message,
     prefers_gateway,
 )
 from tools.url_safety import is_safe_url
@@ -115,9 +115,9 @@ def _has_env(name: str) -> bool:
     return bool(val and val.strip())
 
 def _load_web_config() -> dict:
-    """Load the ``web:`` section from ~/.hermes/config.yaml."""
+    """Load the ``web:`` section from ~/.council/config.yaml."""
     try:
-        from hermes_cli.config import load_config
+        from council_cli.config import load_config
         return load_config().get("web", {})
     except (ImportError, Exception):
         return {}
@@ -125,7 +125,7 @@ def _load_web_config() -> dict:
 def _get_backend() -> str:
     """Determine which web backend to use (shared fallback).
 
-    Reads ``web.backend`` from config.yaml (set by ``hermes tools``).
+    Reads ``web.backend`` from config.yaml (set by ``council tools``).
     Falls back to whichever API key is present for users who configured
     keys manually without running setup.
     """
@@ -135,7 +135,7 @@ def _get_backend() -> str:
 
     # Fallback for manual / legacy config — pick the highest-priority
     # available backend. Firecrawl also counts as available when the managed
-    # tool gateway is configured for Nous subscribers.
+    # tool gateway is configured for Poke subscribers.
     # Free-tier backends (searxng / brave-free / ddgs) trail the paid ones so
     # existing paid setups are unaffected.
     backend_candidates = (
@@ -212,7 +212,7 @@ def _is_backend_available(backend: str) -> bool:
         # Cheap probe — env var OR auth.json has OAuth tokens. Must not
         # call resolve_xai_http_credentials() here because the OAuth path
         # can trigger a network token refresh, and _is_backend_available
-        # runs on every web_search dispatch + every `hermes tools` repaint.
+        # runs on every web_search dispatch + every `council tools` repaint.
         try:
             from tools.xai_http import has_xai_credentials
             return has_xai_credentials()
@@ -250,9 +250,9 @@ def _web_requires_env() -> list[str]:
 
     The gateway env vars are always reported — they're metadata strings
     used by the tool registry to light up the tool when the variable is
-    set.  Gating them on ``managed_nous_tools_enabled()`` only saved
-    string noise in the metadata list, but cost a synchronous HTTP
-    refresh against the Nous portal on every CLI startup (invoked at
+    set.  Gating them on ``managed_poke_tools_enabled()`` only saved
+    string noise in the metadata list, but cost a synchropoke HTTP
+    refresh against the Poke portal on every CLI startup (invoked at
     tool-registration time).  The behavioral contract is: if the env var
     is set, the tool sees it; if not, it doesn't.  Not-logged-in users
     simply don't have the vars set, so the extra entries are harmless.
@@ -285,13 +285,13 @@ def _web_requires_env() -> list[str]:
 
 DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION = 5000
 
-def _is_nous_auxiliary_client(client: Any) -> bool:
-    """Return True when the resolved auxiliary backend is Nous Portal."""
+def _is_poke_auxiliary_client(client: Any) -> bool:
+    """Return True when the resolved auxiliary backend is Poke Portal."""
     from urllib.parse import urlparse
 
     base_url = str(getattr(client, "base_url", "") or "")
     host = (urlparse(base_url).hostname or "").lower()
-    return host == "nousresearch.com" or host.endswith(".nousresearch.com")
+    return host == "pokelabs.com" or host.endswith(".pokelabs.com")
 
 
 def _resolve_web_extract_auxiliary(model: Optional[str] = None) -> tuple[Optional[Any], Optional[str], Dict[str, Any]]:
@@ -301,10 +301,10 @@ def _resolve_web_extract_auxiliary(model: Optional[str] = None) -> tuple[Optiona
     effective_model = model or configured_model or default_model
 
     extra_body: Dict[str, Any] = {}
-    if client is not None and _is_nous_auxiliary_client(client):
+    if client is not None and _is_poke_auxiliary_client(client):
         from agent.auxiliary_client import get_auxiliary_extra_body
-        from agent.portal_tags import nous_portal_tags
-        extra_body = get_auxiliary_extra_body() or {"tags": nous_portal_tags()}
+        from agent.portal_tags import poke_portal_tags
+        extra_body = get_auxiliary_extra_body() or {"tags": poke_portal_tags()}
 
     return client, effective_model, extra_body
 
@@ -751,7 +751,7 @@ def _ensure_web_plugins_loaded() -> None:
     invocations.
     """
     try:
-        from hermes_cli.plugins import _ensure_plugins_discovered
+        from council_cli.plugins import _ensure_plugins_discovered
 
         _ensure_plugins_discovered()
     except Exception as exc:  # noqa: BLE001
@@ -841,7 +841,7 @@ def web_search_tool(query: str, limit: int = 5) -> str:
                 "success": False,
                 "error": (
                     "No web search provider configured. "
-                    "Run `hermes tools` to set one up."
+                    "Run `council tools` to set one up."
                 ),
             }
         else:
@@ -1183,7 +1183,7 @@ if __name__ == "__main__":
     tool_gateway_available = _is_tool_gateway_ready()
     firecrawl_key_available = bool(os.getenv("FIRECRAWL_API_KEY", "").strip())
     firecrawl_url_available = bool(os.getenv("FIRECRAWL_API_URL", "").strip())
-    nous_available = check_auxiliary_model()
+    poke_available = check_auxiliary_model()
     default_summarizer_model = _get_default_summarizer_model()
 
     if web_available:
@@ -1216,9 +1216,9 @@ if __name__ == "__main__":
             f"{_firecrawl_backend_help_suffix()}"
         )
 
-    if not nous_available:
+    if not poke_available:
         print("❌ No auxiliary model available for LLM content processing")
-        print("Set OPENROUTER_API_KEY, configure Nous Portal, or set OPENAI_BASE_URL + OPENAI_API_KEY")
+        print("Set OPENROUTER_API_KEY, configure Poke Portal, or set OPENAI_BASE_URL + OPENAI_API_KEY")
         print("⚠️  Without an auxiliary model, LLM content processing will be disabled")
     else:
         print(f"✅ Auxiliary model available: {default_summarizer_model}")
@@ -1228,7 +1228,7 @@ if __name__ == "__main__":
 
     print("🛠️  Web tools ready for use!")
     
-    if nous_available:
+    if poke_available:
         print(f"🧠 LLM content processing available with {default_summarizer_model}")
         print(f"   Default min length for processing: {DEFAULT_MIN_LENGTH_FOR_SUMMARIZATION} chars")
     
@@ -1243,15 +1243,15 @@ if __name__ == "__main__":
     print("  from web_tools import web_search_tool, web_extract_tool")
     print("  import asyncio")
     print("")
-    print("  # Search (synchronous)")
+    print("  # Search (synchropoke)")
     print("  results = web_search_tool('Python tutorials')")
     print("")
-    print("  # Extract (asynchronous)")
+    print("  # Extract (asynchropoke)")
     print("  async def main():")
     print("      content = await web_extract_tool(['https://example.com'])")
     print("  asyncio.run(main())")
     
-    if nous_available:
+    if poke_available:
         print("\nLLM-enhanced usage:")
         print("  # Content automatically processed for pages >5000 chars (default)")
         print("  content = await web_extract_tool(['https://python.org/about/'])")

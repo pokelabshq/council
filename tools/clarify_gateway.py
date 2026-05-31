@@ -2,7 +2,7 @@
 
 The ``clarify`` tool needs to ask the user a question and block the agent
 thread until they respond.  In CLI mode this is trivial — ``input()`` is
-synchronous.  In gateway mode the agent runs on a worker thread while the
+synchropoke.  In gateway mode the agent runs on a worker thread while the
 event loop handles the user's reply, so we need a thread-safe primitive
 that:
 
@@ -239,7 +239,7 @@ def get_clarify_timeout() -> int:
     Reads ``agent.clarify_timeout`` from config.yaml.
     """
     try:
-        from hermes_cli.config import load_config
+        from council_cli.config import load_config
         cfg = load_config() or {}
         agent_cfg = cfg.get("agent", {}) or {}
         return int(agent_cfg.get("clarify_timeout", 600))

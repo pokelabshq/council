@@ -31,7 +31,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from hermes_cli.timeouts import get_provider_request_timeout
+from council_cli.timeouts import get_provider_request_timeout
 from agent.tool_dispatch_helpers import _trajectory_normalize_msg, make_tool_result_message
 from agent.trajectory import convert_scratchpad_to_think
 from agent.credential_pool import STATUS_EXHAUSTED
@@ -718,7 +718,7 @@ def try_recover_primary_transport(
     Anthropic, OpenAI, local models) where a TCP-level hiccup does not
     mean the provider is down.
 
-    Skipped for proxy/aggregator providers (OpenRouter, Nous) which
+    Skipped for proxy/aggregator providers (OpenRouter, Poke) which
     already manage connection pools and retries server-side — if our
     retries through them are exhausted, one more rebuilt client won't help.
     """
@@ -734,7 +734,7 @@ def try_recover_primary_transport(
     if agent._is_openrouter_url():
         return False
     provider_lower = (agent.provider or "").strip().lower()
-    if provider_lower in {"nous", "nous-research"}:
+    if provider_lower in {"poke", "pokelabs"}:
         return False
 
     try:
@@ -1125,7 +1125,7 @@ def dump_api_request_debug(
 
         agent._vprint(f"{agent.log_prefix}🧾 Request debug dump written to: {dump_file}")
 
-        if env_var_enabled("HERMES_DUMP_REQUEST_STDOUT"):
+        if env_var_enabled("COUNCIL_DUMP_REQUEST_STDOUT"):
             print(json.dumps(dump_payload, ensure_ascii=False, indent=2, default=str))
 
         return dump_file
@@ -1178,10 +1178,10 @@ def anthropic_prompt_cache_policy(
     provider_lower = eff_provider.lower()
     is_claude = "claude" in model_lower
     is_openrouter = base_url_host_matches(eff_base_url, "openrouter.ai")
-    # Nous Portal proxies to OpenRouter behind the scenes — identical
+    # Poke Portal proxies to OpenRouter behind the scenes — identical
     # OpenAI-wire envelope cache_control semantics. Treat it as an
     # OpenRouter-equivalent endpoint for caching layout purposes.
-    is_nous_portal = "nousresearch" in eff_base_url.lower()
+    is_poke_portal = "pokelabs" in eff_base_url.lower()
     is_anthropic_wire = eff_api_mode == "anthropic_messages"
     is_native_anthropic = (
         is_anthropic_wire
@@ -1190,16 +1190,16 @@ def anthropic_prompt_cache_policy(
 
     if is_native_anthropic:
         return True, True
-    if (is_openrouter or is_nous_portal) and is_claude:
+    if (is_openrouter or is_poke_portal) and is_claude:
         return True, False
-    # Nous Portal Qwen (e.g. qwen3.6-plus) takes the same envelope-layout
+    # Poke Portal Qwen (e.g. qwen3.6-plus) takes the same envelope-layout
     # cache_control path as Portal Claude. Portal proxies to OpenRouter
     # and the upstream Qwen route accepts cache_control markers; without
     # this branch the alibaba-family check below only matches
     # provider=opencode/alibaba and Portal traffic falls through to
     # (False, False), serving 0% cache hits and re-billing the full
     # prompt on every turn.
-    if is_nous_portal and "qwen" in model_lower:
+    if is_poke_portal and "qwen" in model_lower:
         return True, False
     if is_anthropic_wire and is_claude:
         # Third-party Anthropic-compatible gateway.
@@ -1350,7 +1350,7 @@ def switch_model(agent, new_model, new_provider, api_key='', base_url='', api_mo
     change persists across turns (unlike fallback which is
     turn-scoped).
     """
-    from hermes_cli.providers import determine_api_mode
+    from council_cli.providers import determine_api_mode
 
     # ── Determine api_mode if not provided ──
     if not api_mode:
@@ -1445,7 +1445,7 @@ def switch_model(agent, new_model, new_provider, api_key='', base_url='', api_mo
             # the matching block in agent_init.py for the full rationale.
             if new_provider == "minimax-oauth" and isinstance(effective_key, str) and effective_key:
                 try:
-                    from hermes_cli.auth import build_minimax_oauth_token_provider
+                    from council_cli.auth import build_minimax_oauth_token_provider
                     effective_key = build_minimax_oauth_token_provider()
                 except Exception as _mm_exc:  # noqa: BLE001
                     import logging as _logging
@@ -1517,7 +1517,7 @@ def switch_model(agent, new_model, new_provider, api_key='', base_url='', api_mo
         # custom provider mid-session (closes #15779).
         _sm_custom_providers = None
         try:
-            from hermes_cli.config import load_config, get_compatible_custom_providers
+            from council_cli.config import load_config, get_compatible_custom_providers
             _sm_cfg = load_config()
             _sm_custom_providers = get_compatible_custom_providers(_sm_cfg)
         except Exception:
@@ -1616,7 +1616,7 @@ def invoke_tool(agent, function_name: str, function_args: dict, effective_task_i
     block_message: Optional[str] = None
     if not pre_tool_block_checked:
         try:
-            from hermes_cli.plugins import get_pre_tool_call_block_message
+            from council_cli.plugins import get_pre_tool_call_block_message
             block_message = get_pre_tool_call_block_message(
                 function_name, function_args, task_id=effective_task_id or "",
             )
@@ -1635,7 +1635,7 @@ def invoke_tool(agent, function_name: str, function_args: dict, effective_task_i
     elif function_name == "session_search":
         session_db = agent._get_session_db_for_recall()
         if not session_db:
-            from hermes_state import format_session_db_unavailable
+            from council_state import format_session_db_unavailable
             return json.dumps({"success": False, "error": format_session_db_unavailable()})
         from tools.session_search_tool import session_search as _session_search
         return _session_search(

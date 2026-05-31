@@ -1,5 +1,5 @@
-# nix/web.nix — Hermes Web Dashboard (Vite/React) frontend build
-{ pkgs, hermesNpmLib, ... }:
+# nix/web.nix — Council Web Dashboard (Vite/React) frontend build
+{ pkgs, councilNpmLib, ... }:
 let
   src = ../web;
   npmDeps = pkgs.fetchNpmDeps {
@@ -7,13 +7,13 @@ let
     hash = "sha256-HV0aISBVjwbGqDj8qQynSxGFrrZDzuYAW3D3lB/x3zo=";
   };
 
-  npm = hermesNpmLib.mkNpmPassthru { folder = "web"; attr = "web"; pname = "hermes-web"; };
+  npm = councilNpmLib.mkNpmPassthru { folder = "web"; attr = "web"; pname = "council-web"; };
 
   packageJson = builtins.fromJSON (builtins.readFile (src + "/package.json"));
   version = packageJson.version;
 in
 pkgs.buildNpmPackage (npm // {
-  pname = "hermes-web";
+  pname = "council-web";
   inherit src npmDeps version;
 
   doCheck = false;

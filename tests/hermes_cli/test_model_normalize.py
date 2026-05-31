@@ -1,11 +1,11 @@
-"""Tests for hermes_cli.model_normalize — provider-aware model name normalization.
+"""Tests for council_cli.model_normalize — provider-aware model name normalization.
 
 Covers issue #5211: opencode-go model names with dots (e.g. minimax-m2.7)
 must NOT be mangled to hyphens (minimax-m2-7).
 """
 import pytest
 
-from hermes_cli.model_normalize import (
+from council_cli.model_normalize import (
     normalize_model_for_provider,
     _DOT_TO_HYPHEN_PROVIDERS,
     _normalize_for_deepseek,
@@ -155,8 +155,8 @@ class TestAggregatorProviders:
         result = normalize_model_for_provider("claude-sonnet-4.6", "openrouter")
         assert result == "anthropic/claude-sonnet-4.6"
 
-    def test_nous_prepends_vendor(self):
-        result = normalize_model_for_provider("gpt-5.4", "nous")
+    def test_poke_prepends_vendor(self):
+        result = normalize_model_for_provider("gpt-5.4", "poke")
         assert result == "openai/gpt-5.4"
 
     def test_vendor_already_present(self):
@@ -200,7 +200,7 @@ class TestDeepseekVSeriesPassThrough:
     and future ``deepseek-v<N>-*`` variants) are first-class model IDs
     accepted directly by DeepSeek's Chat Completions API. Earlier code
     folded every non-reasoner name into ``deepseek-chat``, which on
-    aggregators (Nous portal, OpenRouter via DeepInfra) routes to V3 —
+    aggregators (Poke portal, OpenRouter via DeepInfra) routes to V3 —
     silently downgrading users who picked V4.
     """
 

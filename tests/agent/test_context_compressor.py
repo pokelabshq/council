@@ -419,7 +419,7 @@ class TestSummaryFallbackToMainModel:
         mock_ok.choices = [MagicMock()]
         mock_ok.choices[0].message.content = "summary via main model"
 
-        # A 400 from OpenRouter / Nous portal with an opaque message — does
+        # A 400 from OpenRouter / Poke portal with an opaque message — does
         # NOT match _is_model_not_found, but still an unrecoverable misconfig.
         err_400 = Exception("400 Bad Request: provider rejected model")
         err_400.status_code = 400
@@ -2043,13 +2043,13 @@ class TestTruncateToolCallArgsJson:
         import json as _json
         shrink = self._helper()
         original = _json.dumps({
-            "path": "~/.hermes/skills/shopping/browser-setup-notes.md",
+            "path": "~/.council/skills/shopping/browser-setup-notes.md",
             "content": "# Shopping Browser Setup Notes\n\n" + "abc " * 400,
         })
         assert len(original) > 500
         shrunk = shrink(original)
         parsed = _json.loads(shrunk)  # must not raise
-        assert parsed["path"] == "~/.hermes/skills/shopping/browser-setup-notes.md"
+        assert parsed["path"] == "~/.council/skills/shopping/browser-setup-notes.md"
         assert parsed["content"].endswith("...[truncated]")
         assert len(shrunk) < len(original)
 
@@ -2126,7 +2126,7 @@ class TestTruncateToolCallArgsJson:
             )
         huge_content = "# Shopping Browser Setup Notes\n\n## Overview\n" + "x " * 400
         args_payload = _json.dumps({
-            "path": "~/.hermes/skills/shopping/browser-setup-notes.md",
+            "path": "~/.council/skills/shopping/browser-setup-notes.md",
             "content": huge_content,
         })
         assert len(args_payload) > 500  # triggers the Pass-3 shrink
@@ -2145,5 +2145,5 @@ class TestTruncateToolCallArgsJson:
         shrunk = result[1]["tool_calls"][0]["function"]["arguments"]
         # Must parse — otherwise downstream provider returns 400
         parsed = _json.loads(shrunk)
-        assert parsed["path"] == "~/.hermes/skills/shopping/browser-setup-notes.md"
+        assert parsed["path"] == "~/.council/skills/shopping/browser-setup-notes.md"
         assert parsed["content"].endswith("...[truncated]")

@@ -1,4 +1,4 @@
-"""Unit tests for hermes_cli.pty_bridge — PTY spawning + byte forwarding.
+"""Unit tests for council_cli.pty_bridge — PTY spawning + byte forwarding.
 
 These tests drive the bridge with minimal POSIX processes (echo, env, sleep,
 printf) to verify it behaves like a PTY you can read/write/resize/close.
@@ -15,7 +15,7 @@ import pytest
 
 pytest.importorskip("ptyprocess", reason="ptyprocess not installed")
 
-from hermes_cli.pty_bridge import PtyBridge, PtyUnavailableError
+from council_cli.pty_bridge import PtyBridge, PtyUnavailableError
 
 
 skip_on_windows = pytest.mark.skipif(
@@ -57,10 +57,10 @@ class TestPtyBridgeSpawn:
 @skip_on_windows
 class TestPtyBridgeIO:
     def test_reads_child_stdout(self):
-        bridge = PtyBridge.spawn(["/bin/sh", "-c", "printf hermes-ok"])
+        bridge = PtyBridge.spawn(["/bin/sh", "-c", "printf council-ok"])
         try:
-            output = _read_until(bridge, b"hermes-ok")
-            assert b"hermes-ok" in output
+            output = _read_until(bridge, b"council-ok")
+            assert b"council-ok" in output
         finally:
             bridge.close()
 
@@ -161,8 +161,8 @@ class TestPtyBridgeEnv:
 
     def test_env_is_forwarded(self):
         bridge = PtyBridge.spawn(
-            ["/bin/sh", "-c", "printf %s \"$HERMES_PTY_TEST\""],
-            env={**os.environ, "HERMES_PTY_TEST": "pty-env-works"},
+            ["/bin/sh", "-c", "printf %s \"$COUNCIL_PTY_TEST\""],
+            env={**os.environ, "COUNCIL_PTY_TEST": "pty-env-works"},
         )
         try:
             output = _read_until(bridge, b"pty-env-works")

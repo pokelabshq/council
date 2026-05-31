@@ -1,1 +1,1 @@
-# Hermes plugins package
+# Council plugins package

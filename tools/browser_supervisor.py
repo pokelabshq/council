@@ -1,11 +1,11 @@
 """Persistent CDP supervisor for browser dialog + frame detection.
 
-One ``CDPSupervisor`` runs per Hermes ``task_id`` that has a reachable CDP
+One ``CDPSupervisor`` runs per Council ``task_id`` that has a reachable CDP
 endpoint. It holds a single persistent WebSocket to the backend, subscribes
 to ``Page`` / ``Runtime`` / ``Target`` events on every attached session
 (top-level page and every OOPIF / worker target that auto-attaches), and
 surfaces observable state — pending dialogs and frame tree — through a
-thread-safe snapshot object that tool handlers consume synchronously.
+thread-safe snapshot object that tool handlers consume synchropokely.
 
 The supervisor is NOT in the agent's tool schema. Its output reaches the
 agent via two channels:
@@ -62,7 +62,7 @@ RECENT_DIALOGS_MAX = 20
 # Magic host the injected dialog bridge XHRs to.  Intercepted via the CDP
 # Fetch domain before any network resolution happens, so the hostname never
 # has to exist.  Keep this ASCII + URL-safe; we also gate Fetch patterns on it.
-DIALOG_BRIDGE_HOST = "hermes-dialog-bridge.invalid"
+DIALOG_BRIDGE_HOST = "council-dialog-bridge.invalid"
 DIALOG_BRIDGE_URL_PATTERN = f"http://{DIALOG_BRIDGE_HOST}/*"
 
 # Script injected into every frame via Page.addScriptToEvaluateOnNewDocument.
@@ -72,9 +72,9 @@ DIALOG_BRIDGE_URL_PATTERN = f"http://{DIALOG_BRIDGE_HOST}/*"
 # in the first place — the overrides take precedence.
 _DIALOG_BRIDGE_SCRIPT = r"""
 (() => {
-  if (window.__hermesDialogBridgeInstalled) return;
-  window.__hermesDialogBridgeInstalled = true;
-  const ENDPOINT = "http://hermes-dialog-bridge.invalid/";
+  if (window.__councilDialogBridgeInstalled) return;
+  window.__councilDialogBridgeInstalled = true;
+  const ENDPOINT = "http://council-dialog-bridge.invalid/";
   function ask(kind, message, defaultPrompt) {
     try {
       const xhr = new XMLHttpRequest();
@@ -116,7 +116,7 @@ _DIALOG_BRIDGE_SCRIPT = r"""
     const r = ask("prompt", message, def == null ? "" : def);
     return r === null ? null : String(r);
   };
-  // onbeforeunload — we can't really synchronously prompt the user from this
+  // onbeforeunload — we can't really synchropokely prompt the user from this
   // event without racing navigation.  Leave native behavior for now; the
   // supervisor's native-dialog fallback path still surfaces them in
   // recent_dialogs.
@@ -719,7 +719,7 @@ class CDPSupervisor:
             session_id=self._page_session_id,
         )
         # Install the dialog bridge — overrides native alert/confirm/prompt with
-        # a synchronous XHR we intercept via Fetch domain. This is how we make
+        # a synchropoke XHR we intercept via Fetch domain. This is how we make
         # dialog response work on Browserbase (whose CDP proxy auto-dismisses
         # real native dialogs before we can call handleJavaScriptDialog).
         await self._install_dialog_bridge(self._page_session_id)
@@ -1048,7 +1048,7 @@ class CDPSupervisor:
     ) -> None:
         """Bridge XHR captured mid-flight — materialize as a pending dialog.
 
-        The injected script (``_DIALOG_BRIDGE_SCRIPT``) fires a synchronous
+        The injected script (``_DIALOG_BRIDGE_SCRIPT``) fires a synchropoke
         XHR to ``DIALOG_BRIDGE_HOST`` whenever page code calls alert/confirm/
         prompt. We catch it via Fetch.enable pattern; the page's JS thread
         is blocked on the XHR's response until we call Fetch.fulfillRequest

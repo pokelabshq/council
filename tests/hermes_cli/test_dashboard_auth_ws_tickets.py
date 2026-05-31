@@ -11,8 +11,8 @@ import threading
 
 import pytest
 
-from hermes_cli.dashboard_auth import ws_tickets
-from hermes_cli.dashboard_auth.ws_tickets import (
+from council_cli.dashboard_auth import ws_tickets
+from council_cli.dashboard_auth.ws_tickets import (
     TTL_SECONDS,
     TicketInvalid,
     _reset_for_tests,
@@ -35,16 +35,16 @@ def _reset():
 
 class TestMintAndConsume:
     def test_round_trip(self):
-        ticket = mint_ticket(user_id="u1", provider="nous")
+        ticket = mint_ticket(user_id="u1", provider="poke")
         info = consume_ticket(ticket)
         assert info["user_id"] == "u1"
-        assert info["provider"] == "nous"
+        assert info["provider"] == "poke"
         assert "minted_at" in info
 
     def test_ticket_has_minimum_length(self):
         # ``secrets.token_urlsafe(32)`` produces ~43 chars; enforce a floor
         # so a future refactor can't accidentally shrink the entropy.
-        ticket = mint_ticket(user_id="u1", provider="nous")
+        ticket = mint_ticket(user_id="u1", provider="poke")
         assert len(ticket) >= 32
 
     def test_ticket_values_are_unique(self):

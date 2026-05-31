@@ -3,7 +3,7 @@
 Image Generation Tools Module
 
 Provides image generation via FAL.ai. Multiple FAL models are supported and
-selectable via ``hermes tools`` → Image Generation; the active model is
+selectable via ``council tools`` → Image Generation; the active model is
 persisted to ``image_gen.model`` in ``config.yaml``.
 
 Architecture:
@@ -65,8 +65,8 @@ from tools.fal_common import (
 from tools.managed_tool_gateway import resolve_managed_tool_gateway
 from tools.tool_backend_helpers import (
     fal_key_is_configured,
-    managed_nous_tools_enabled,
-    nous_tool_gateway_unavailable_message,
+    managed_poke_tools_enabled,
+    poke_tool_gateway_unavailable_message,
     prefers_gateway,
 )
 
@@ -185,7 +185,7 @@ FAL_MODELS: Dict[str, Dict[str, Any]] = {
             "output_format": "png",
             "safety_tolerance": "5",
             # "1K" is the cheapest tier; 4K doubles the per-image cost.
-            # Users on Nous Subscription should stay at 1K for predictable billing.
+            # Users on Poke Subscription should stay at 1K for predictable billing.
             "resolution": "1K",
         },
         "supports": {
@@ -236,7 +236,7 @@ FAL_MODELS: Dict[str, Dict[str, Any]] = {
             "portrait": "portrait_4_3",       # 768x1024
         },
         "defaults": {
-            # Same quality pinning as gpt-image-1.5: medium keeps Nous
+            # Same quality pinning as gpt-image-1.5: medium keeps Poke
             # Portal billing predictable. "high" is 3-4x the per-image
             # cost at the same size; "low" is too rough for production use.
             "quality": "medium",
@@ -321,7 +321,7 @@ FAL_MODELS: Dict[str, Dict[str, Any]] = {
     # Krea 2 — Krea's first foundation image model, day-0 partner launch on
     # fal (2026-05-27). Same model family as our direct ``plugins/image_gen/krea``
     # backend, exposed here for users who prefer to bill through their
-    # existing FAL key / Nous Portal subscription rather than register
+    # existing FAL key / Poke Portal subscription rather than register
     # directly with Krea.  Both variants share the same parameter schema —
     # only model id, price, and recommended use case differ.
     "fal-ai/krea/v2/medium/text-to-image": {
@@ -396,7 +396,7 @@ _managed_fal_client_lock = threading.Lock()
 
 
 # ---------------------------------------------------------------------------
-# Managed FAL gateway (Nous Subscription)
+# Managed FAL gateway (Poke Subscription)
 # ---------------------------------------------------------------------------
 def _resolve_managed_fal_gateway():
     """Return managed fal-queue gateway config when the user prefers the gateway
@@ -412,7 +412,7 @@ def _get_managed_fal_client(managed_gateway):
 
     client_config = (
         managed_gateway.gateway_origin.rstrip("/"),
-        managed_gateway.nous_user_token,
+        managed_gateway.poke_user_token,
     )
     with _managed_fal_client_lock:
         if _managed_fal_client is not None and _managed_fal_client_config == client_config:
@@ -423,7 +423,7 @@ def _get_managed_fal_client(managed_gateway):
         _load_fal_client()
         _managed_fal_client = _ManagedFalSyncClient(
             fal_client,
-            key=managed_gateway.nous_user_token,
+            key=managed_gateway.poke_user_token,
             queue_run_origin=managed_gateway.gateway_origin,
         )
         _managed_fal_client_config = client_config
@@ -457,17 +457,17 @@ def _submit_fal_request(model: str, arguments: Dict[str, Any]):
             if status in {401, 402, 403}:
                 gateway_message = (
                     "\n\n"
-                    + nous_tool_gateway_unavailable_message(
+                    + poke_tool_gateway_unavailable_message(
                         "managed FAL image generation",
                         force_fresh=True,
                     )
                 )
             raise ValueError(
-                f"Nous Subscription gateway rejected model '{model}' "
+                f"Poke Subscription gateway rejected model '{model}' "
                 f"(HTTP {status}). This model may not yet be enabled on "
-                f"the Nous Portal's FAL proxy. Either:\n"
+                f"the Poke Portal's FAL proxy. Either:\n"
                 f"  • Set FAL_KEY in your environment to use FAL.ai directly, or\n"
-                f"  • Pick a different model via `hermes tools` → Image Generation."
+                f"  • Pick a different model via `council tools` → Image Generation."
                 f"{gateway_message}"
             ) from exc
         raise
@@ -484,7 +484,7 @@ def _resolve_fal_model() -> tuple:
     """
     model_id = ""
     try:
-        from hermes_cli.config import load_config
+        from council_cli.config import load_config
         cfg = load_config()
         img_cfg = cfg.get("image_gen") if isinstance(cfg, dict) else None
         if isinstance(img_cfg, dict):
@@ -766,19 +766,19 @@ def _build_no_backend_setup_message() -> str:
 
     Used by the in-tree FAL path. Mentions:
       - FAL_KEY signup link
-      - managed-gateway status (if Nous tools are enabled)
+      - managed-gateway status (if Poke tools are enabled)
       - plugin alternative pointer (so users on a stale ``image_gen.provider``
         know the registry exists and how to inspect it)
     """
     lines = ["Image generation is unavailable in this environment.", ""]
     lines.append("Missing requirements:")
-    if managed_nous_tools_enabled():
+    if managed_poke_tools_enabled():
         lines.append(
             "  - FAL_KEY is not set and the managed FAL gateway is unreachable"
         )
     else:
         lines.append("  - FAL_KEY environment variable is not set")
-        gateway_message = nous_tool_gateway_unavailable_message(
+        gateway_message = poke_tool_gateway_unavailable_message(
             "managed FAL image generation",
         )
         if gateway_message:
@@ -789,14 +789,14 @@ def _build_no_backend_setup_message() -> str:
         "  1. Get a free API key at https://fal.ai and set "
         "FAL_KEY=<your-key> (then restart the session)"
     )
-    if managed_nous_tools_enabled():
+    if managed_poke_tools_enabled():
         lines.append(
-            "  2. Sign in to a Nous account that has the managed FAL "
-            "gateway enabled (`hermes setup`)"
+            "  2. Sign in to a Poke account that has the managed FAL "
+            "gateway enabled (`council setup`)"
         )
     lines.append(
-        "  3. Configure a different image_gen provider via `hermes tools` "
-        "→ Image Generation (run `hermes plugins list` to see installed "
+        "  3. Configure a different image_gen provider via `council tools` "
+        "→ Image Generation (run `council plugins list` to see installed "
         "backends)"
     )
     return "\n".join(lines)
@@ -811,7 +811,7 @@ def check_image_generation_requirements() -> bool:
     2. Any plugin-registered provider whose ``is_available()`` returns True.
 
     Plugins win only when the in-tree FAL path is NOT ready, which matches
-    the historical behavior: shipping hermes with a FAL key configured
+    the historical behavior: shipping council with a FAL key configured
     should still expose the tool. The active selection among ready
     providers is resolved per-call by ``image_gen.provider``.
     """
@@ -829,7 +829,7 @@ def check_image_generation_requirements() -> bool:
     # Probe plugin providers. Discovery is idempotent and cheap.
     try:
         from agent.image_gen_registry import list_providers
-        from hermes_cli.plugins import _ensure_plugins_discovered
+        from council_cli.plugins import _ensure_plugins_discovered
 
         _ensure_plugins_discovered()
         for provider in list_providers():
@@ -915,7 +915,7 @@ IMAGE_GENERATE_SCHEMA = {
 def _read_configured_image_model():
     """Return the value of ``image_gen.model`` from config.yaml, or None."""
     try:
-        from hermes_cli.config import load_config
+        from council_cli.config import load_config
         cfg = load_config()
         section = cfg.get("image_gen") if isinstance(cfg, dict) else None
         if isinstance(section, dict):
@@ -939,7 +939,7 @@ def _read_configured_image_provider():
     issue #26241).
     """
     try:
-        from hermes_cli.config import load_config
+        from council_cli.config import load_config
         cfg = load_config()
         section = cfg.get("image_gen") if isinstance(cfg, dict) else None
         if isinstance(section, dict):
@@ -974,7 +974,7 @@ def _dispatch_to_plugin_provider(prompt: str, aspect_ratio: str):
         # Import locally so plugin discovery isn't triggered just by
         # importing this module (tests rely on that).
         from agent.image_gen_registry import get_provider
-        from hermes_cli.plugins import _ensure_plugins_discovered
+        from council_cli.plugins import _ensure_plugins_discovered
 
         _ensure_plugins_discovered()
         provider = get_provider(configured)
@@ -998,7 +998,7 @@ def _dispatch_to_plugin_provider(prompt: str, aspect_ratio: str):
             "image": None,
             "error": (
                 f"image_gen.provider='{configured}' is set but no plugin "
-                f"registered that name. Run `hermes plugins list` to see "
+                f"registered that name. Run `council plugins list` to see "
                 f"available image gen backends."
             ),
             "error_type": "provider_not_registered",

@@ -4,7 +4,7 @@
  * Exposes React, UI components, hooks, and utilities on the window so
  * that plugin bundles can use them without bundling their own copies.
  *
- * Plugins call window.__HERMES_PLUGINS__.register(name, Component)
+ * Plugins call window.__COUNCIL_PLUGINS__.register(name, Component)
  * to register their tab component.
  */
 
@@ -19,15 +19,15 @@ import React, {
 } from "react";
 import { api, fetchJSON } from "@/lib/api";
 import { cn, timeAgo, isoTimeAgo } from "@/lib/utils";
-import { Badge } from "@nous-research/ui/ui/components/badge";
-import { Button } from "@nous-research/ui/ui/components/button";
-import { Checkbox } from "@nous-research/ui/ui/components/checkbox";
-import { Select, SelectOption } from "@nous-research/ui/ui/components/select";
-import { Card, CardHeader, CardTitle, CardContent } from "@nous-research/ui/ui/components/card";
-import { Input } from "@nous-research/ui/ui/components/input";
-import { Label } from "@nous-research/ui/ui/components/label";
-import { Separator } from "@nous-research/ui/ui/components/separator";
-import { Tabs, TabsList, TabsTrigger } from "@nous-research/ui/ui/components/tabs";
+import { Badge } from "@pokelabs/ui/ui/components/badge";
+import { Button } from "@pokelabs/ui/ui/components/button";
+import { Checkbox } from "@pokelabs/ui/ui/components/checkbox";
+import { Select, SelectOption } from "@pokelabs/ui/ui/components/select";
+import { Card, CardHeader, CardTitle, CardContent } from "@pokelabs/ui/ui/components/card";
+import { Input } from "@pokelabs/ui/ui/components/input";
+import { Label } from "@pokelabs/ui/ui/components/label";
+import { Separator } from "@pokelabs/ui/ui/components/separator";
+import { Tabs, TabsList, TabsTrigger } from "@pokelabs/ui/ui/components/tabs";
 import { useI18n } from "@/i18n";
 import { registerSlot, PluginSlot } from "./slots";
 
@@ -90,8 +90,8 @@ export function getRegisteredCount(): number {
 
 declare global {
   interface Window {
-    __HERMES_PLUGIN_SDK__: unknown;
-    __HERMES_PLUGINS__: {
+    __COUNCIL_PLUGIN_SDK__: unknown;
+    __COUNCIL_PLUGINS__: {
       register: typeof registerPlugin;
       registerSlot: typeof registerSlot;
     };
@@ -99,12 +99,12 @@ declare global {
 }
 
 export function exposePluginSDK() {
-  window.__HERMES_PLUGINS__ = {
+  window.__COUNCIL_PLUGINS__ = {
     register: registerPlugin,
     registerSlot,
   };
 
-  window.__HERMES_PLUGIN_SDK__ = {
+  window.__COUNCIL_PLUGIN_SDK__ = {
     // React core — plugins use these instead of importing react
     React,
     hooks: {
@@ -117,12 +117,12 @@ export function exposePluginSDK() {
       createContext,
     },
 
-    // Hermes API client
+    // Council API client
     api,
     // Raw fetchJSON for plugin-specific endpoints
     fetchJSON,
 
-    // UI components — Nous DS where available, shadcn/ui primitives elsewhere.
+    // UI components — Poke DS where available, shadcn/ui primitives elsewhere.
     components: {
       Card,
       CardHeader,

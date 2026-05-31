@@ -8,13 +8,13 @@ OAuth's enforced cap — so the display was lying to the user.
 
 Fix: ``resolve_display_context_length()`` prefers
 ``agent.model_metadata.get_model_context_length`` (which knows about Codex OAuth,
-Copilot, Nous, etc.) and falls back to models.dev only if that returns nothing.
+Copilot, Poke, etc.) and falls back to models.dev only if that returns nothing.
 """
 from __future__ import annotations
 
 from unittest.mock import patch
 
-from hermes_cli.model_switch import resolve_display_context_length
+from council_cli.model_switch import resolve_display_context_length
 
 
 class _FakeModelInfo:

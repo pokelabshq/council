@@ -15,11 +15,11 @@ import pytest
 
 @pytest.fixture
 def curator_env(tmp_path, monkeypatch):
-    """Isolated HERMES_HOME + freshly reloaded curator + skill_usage modules."""
-    home = tmp_path / ".hermes"
+    """Isolated COUNCIL_HOME + freshly reloaded curator + skill_usage modules."""
+    home = tmp_path / ".council"
     (home / "skills").mkdir(parents=True)
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
 
     import tools.skill_usage as usage
     importlib.reload(usage)
@@ -296,7 +296,7 @@ def test_run_review_records_state(curator_env):
     _write_skill(skills_dir, "a")
     u.mark_agent_created("a")
 
-    result = c.run_curator_review(synchronous=True)
+    result = c.run_curator_review(synchropoke=True)
     assert "started_at" in result
     state = c.load_state()
     assert state["last_run_at"] is not None
@@ -307,7 +307,7 @@ def test_run_review_records_state(curator_env):
 def test_dry_run_does_not_advance_state(curator_env, monkeypatch):
     """Dry-run previews must not bump last_run_at or run_count. A preview
     shouldn't defer the next scheduled real pass or look like a real run in
-    `hermes curator status`. Fixes #18373.
+    `council curator status`. Fixes #18373.
     """
     c = curator_env["curator"]
     u = curator_env["usage"]
@@ -324,7 +324,7 @@ def test_dry_run_does_not_advance_state(curator_env, monkeypatch):
         },
     )
 
-    c.run_curator_review(synchronous=True, dry_run=True)
+    c.run_curator_review(synchropoke=True, dry_run=True)
     state = c.load_state()
     assert state.get("last_run_at") is None, "dry-run must not seed last_run_at"
     assert state.get("run_count", 0) == 0, "dry-run must not bump run_count"
@@ -351,7 +351,7 @@ def test_dry_run_injects_report_only_banner(curator_env, monkeypatch):
                 "tool_calls": [], "error": None}
     monkeypatch.setattr(c, "_run_llm_review", _stub)
 
-    c.run_curator_review(synchronous=True, dry_run=True)
+    c.run_curator_review(synchropoke=True, dry_run=True)
     assert "DRY-RUN" in captured["prompt"]
     assert "DO NOT" in captured["prompt"]
 
@@ -377,11 +377,11 @@ def test_dry_run_skips_automatic_transitions(curator_env, monkeypatch):
                    "tool_calls": [], "error": None},
     )
 
-    c.run_curator_review(synchronous=True, dry_run=True)
+    c.run_curator_review(synchropoke=True, dry_run=True)
     assert called["n"] == 0, "dry-run must skip apply_automatic_transitions"
 
 
-def test_run_review_synchronous_invokes_llm_stub(curator_env, monkeypatch):
+def test_run_review_synchropoke_invokes_llm_stub(curator_env, monkeypatch):
     c = curator_env["curator"]
     u = curator_env["usage"]
     skills_dir = curator_env["home"] / "skills"
@@ -402,7 +402,7 @@ def test_run_review_synchronous_invokes_llm_stub(curator_env, monkeypatch):
     monkeypatch.setattr(c, "_run_llm_review", _stub)
 
     captured = []
-    c.run_curator_review(on_summary=lambda s: captured.append(s), synchronous=True)
+    c.run_curator_review(on_summary=lambda s: captured.append(s), synchropoke=True)
 
     assert len(calls) == 1
     assert "skill CURATOR" in calls[0] or "CURATOR" in calls[0]
@@ -420,7 +420,7 @@ def test_run_review_skips_llm_when_no_candidates(curator_env, monkeypatch):
     )
 
     captured = []
-    c.run_curator_review(on_summary=lambda s: captured.append(s), synchronous=True)
+    c.run_curator_review(on_summary=lambda s: captured.append(s), synchropoke=True)
 
     assert calls == []  # LLM not invoked
     assert any("skipped" in s for s in captured)
@@ -621,8 +621,8 @@ def test_curator_review_prompt_offers_support_file_actions():
 
 
 def test_cli_unpin_refuses_bundled_skill(curator_env, capsys):
-    """hermes curator unpin must refuse bundled/hub skills too (matches pin)."""
-    from hermes_cli import curator as cli
+    """council curator unpin must refuse bundled/hub skills too (matches pin)."""
+    from council_cli import curator as cli
     skills_dir = curator_env["home"] / "skills"
     _write_skill(skills_dir, "ship-skill")
     (skills_dir / ".bundled_manifest").write_text(
@@ -639,7 +639,7 @@ def test_cli_unpin_refuses_bundled_skill(curator_env, capsys):
 
 
 def test_cli_pin_refuses_bundled_skill(curator_env, capsys):
-    from hermes_cli import curator as cli
+    from council_cli import curator as cli
     skills_dir = curator_env["home"] / "skills"
     _write_skill(skills_dir, "ship-skill")
     (skills_dir / ".bundled_manifest").write_text(
@@ -659,7 +659,7 @@ def test_cli_pin_refuses_bundled_skill(curator_env, capsys):
 # curator review-model resolution (canonical auxiliary.curator slot)
 #
 # Curator was unified with the rest of the aux task system in Apr 2026 so
-# `hermes model` → auxiliary picker, the dashboard Models tab, and the full
+# `council model` → auxiliary picker, the dashboard Models tab, and the full
 # per-task config (timeout, base_url, api_key, extra_body) all work for it.
 # Voscko report: curator.auxiliary.{provider,model} was advertised but never
 # read. Fix wires curator through auxiliary.curator with a legacy fallback.
@@ -832,13 +832,13 @@ def test_review_model_new_slot_wins_over_legacy(curator_env):
     cfg = {
         "model": {"provider": "openrouter", "default": "openai/gpt-5.5"},
         "auxiliary": {
-            "curator": {"provider": "nous", "model": "new-winner"},
+            "curator": {"provider": "poke", "model": "new-winner"},
         },
         "curator": {
             "auxiliary": {"provider": "openrouter", "model": "legacy-loser"},
         },
     }
-    assert curator._resolve_review_model(cfg) == ("nous", "new-winner")
+    assert curator._resolve_review_model(cfg) == ("poke", "new-winner")
 
 
 def test_review_model_handles_missing_sections(curator_env):
@@ -861,9 +861,9 @@ def test_curator_slot_is_canonical_aux_task():
     (test_aux_config.py) for the main tasks — this test pins `curator`
     specifically so the unification doesn't silently regress.
     """
-    from hermes_cli.config import DEFAULT_CONFIG
-    from hermes_cli.main import _AUX_TASKS
-    from hermes_cli.web_server import _AUX_TASK_SLOTS
+    from council_cli.config import DEFAULT_CONFIG
+    from council_cli.main import _AUX_TASKS
+    from council_cli.web_server import _AUX_TASK_SLOTS
 
     # 1. DEFAULT_CONFIG.auxiliary — schema source
     assert "curator" in DEFAULT_CONFIG["auxiliary"], \
@@ -873,11 +873,11 @@ def test_curator_slot_is_canonical_aux_task():
     assert slot["model"] == ""
     assert slot["timeout"] > 0, "curator timeout should be set (reviews run long)"
 
-    # 2. hermes_cli/main.py _AUX_TASKS — CLI picker
+    # 2. council_cli/main.py _AUX_TASKS — CLI picker
     aux_keys = {k for k, _name, _desc in _AUX_TASKS}
     assert "curator" in aux_keys, "curator missing from _AUX_TASKS (CLI picker)"
 
-    # 3. hermes_cli/web_server.py _AUX_TASK_SLOTS — REST API allowlist
+    # 3. council_cli/web_server.py _AUX_TASK_SLOTS — REST API allowlist
     assert "curator" in _AUX_TASK_SLOTS, \
         "curator missing from _AUX_TASK_SLOTS (dashboard REST API)"
 

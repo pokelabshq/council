@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import type { ActionStatusResponse } from "@/lib/api";
-import { Toast } from "@nous-research/ui/ui/components/toast";
+import { Toast } from "@pokelabs/ui/ui/components/toast";
 import { useI18n } from "@/i18n";
 import {
   SystemActionsContext,
@@ -10,7 +10,7 @@ import {
 
 const ACTION_NAMES: Record<SystemAction, string> = {
   restart: "gateway-restart",
-  update: "hermes-update",
+  update: "council-update",
 };
 
 export function SystemActionsProvider({
@@ -72,7 +72,7 @@ export function SystemActionsProvider({
         if (action === "restart") {
           await api.restartGateway();
         } else {
-          await api.updateHermes();
+          await api.updateCouncil();
         }
         setActiveAction(action);
       } catch (err) {

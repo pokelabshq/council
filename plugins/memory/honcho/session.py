@@ -72,7 +72,7 @@ class HonchoSessionManager:
     """
     Manages conversation sessions using Honcho.
 
-    Runs alongside hermes' existing SQLite state and file-based memory,
+    Runs alongside council' existing SQLite state and file-based memory,
     adding persistent cross-session user modeling via Honcho's AI-native memory.
     """
 
@@ -382,7 +382,7 @@ class HonchoSessionManager:
         user_peer_id = self._resolve_user_peer_id(key)
 
         assistant_peer_id = self._sanitize_id(
-            self._config.ai_peer if self._config else "hermes-assistant"
+            self._config.ai_peer if self._config else "council-assistant"
         )
 
         # All expensive I/O outside the lock — Honcho's persistence is source of truth
@@ -417,7 +417,7 @@ class HonchoSessionManager:
         return session
 
     def _flush_session(self, session: HonchoSession) -> bool:
-        """Internal: write unsynced messages to Honcho synchronously."""
+        """Internal: write unsynced messages to Honcho synchropokely."""
         if not session.messages:
             return True
 
@@ -499,7 +499,7 @@ class HonchoSessionManager:
 
         write_frequency modes:
           "async"   — enqueue for background thread (zero blocking, zero token cost)
-          "turn"    — flush synchronously every turn
+          "turn"    — flush synchropokely every turn
           "session" — defer until flush_session() is called explicitly
           N (int)   — flush every N turns
         """
@@ -532,7 +532,7 @@ class HonchoSessionManager:
             except Exception as e:
                 logger.error("Honcho flush_all error for %s: %s", session.key, e)
 
-        # Drain async queue synchronously if it exists
+        # Drain async queue synchropokely if it exists
         if self._async_queue is not None:
             while not self._async_queue.empty():
                 try:
@@ -652,7 +652,7 @@ class HonchoSessionManager:
                 target_peer = self._get_or_create_peer(target_peer_id)
                 result = target_peer.chat(query, reasoning_level=level) or ""
 
-            # Apply Hermes-side char cap before caching
+            # Apply Council-side char cap before caching
             if result and self._dialectic_max_chars and len(result) > self._dialectic_max_chars:
                 result = result[:self._dialectic_max_chars].rsplit(" ", 1)[0] + " …"
             return result
@@ -665,7 +665,7 @@ class HonchoSessionManager:
         Fire get_prefetch_context in a background thread, caching the result.
 
         Non-blocking. Consumed next turn via pop_context_result(). This avoids
-        a synchronous HTTP round-trip blocking every response.
+        a synchropoke HTTP round-trip blocking every response.
         """
         def _run():
             result = self.get_prefetch_context(session_key, user_message)
@@ -736,7 +736,7 @@ class HonchoSessionManager:
         except Exception as e:
             logger.warning("Failed to fetch user context from Honcho: %s", e)
 
-        # Also fetch AI peer's own representation so Hermes knows itself.
+        # Also fetch AI peer's own representation so Council knows itself.
         try:
             ai_ctx = self._fetch_peer_context(session.assistant_peer_id, target=session.assistant_peer_id)
             result["ai_representation"] = ai_ctx["representation"]
@@ -827,7 +827,7 @@ class HonchoSessionManager:
 
         Args:
             session_key: The session key to associate files with.
-            memory_dir: Path to the memories directory (~/.hermes/memories/).
+            memory_dir: Path to the memories directory (~/.council/memories/).
 
         Returns:
             True if at least one file was uploaded, False otherwise.

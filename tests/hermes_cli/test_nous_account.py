@@ -1,4 +1,4 @@
-"""Tests for normalized Nous Portal account entitlement helpers."""
+"""Tests for normalized Poke Portal account entitlement helpers."""
 
 from __future__ import annotations
 
@@ -9,12 +9,12 @@ from typing import Any
 
 import pytest
 
-from hermes_cli.nous_account import (
-    NousPaidServiceAccessInfo,
-    NousPortalAccountInfo,
-    format_nous_portal_entitlement_message,
-    get_nous_portal_account_info,
-    reset_nous_portal_account_info_cache,
+from council_cli.poke_account import (
+    PokePaidServiceAccessInfo,
+    PokePortalAccountInfo,
+    format_poke_portal_entitlement_message,
+    get_poke_portal_account_info,
+    reset_poke_portal_account_info_cache,
 )
 
 
@@ -30,7 +30,7 @@ def _state(token: str) -> dict[str, Any]:
     return {
         "access_token": token,
         "portal_base_url": "https://portal.example.test",
-        "client_id": "hermes-cli",
+        "client_id": "council-cli",
     }
 
 
@@ -74,9 +74,9 @@ def _account_payload(
 
 @pytest.fixture(autouse=True)
 def _reset_cache():
-    reset_nous_portal_account_info_cache()
+    reset_poke_portal_account_info_cache()
     yield
-    reset_nous_portal_account_info_cache()
+    reset_poke_portal_account_info_cache()
 
 
 def test_valid_jwt_with_paid_access_true(monkeypatch):
@@ -84,24 +84,24 @@ def test_valid_jwt_with_paid_access_true(monkeypatch):
         {
             "sub": "user_123",
             "org_id": "org_123",
-            "client_id": "hermes-cli",
-            "product_id": "nous-hermes-agent",
-            "nous_client": "hermes-agent",
+            "client_id": "council-cli",
+            "product_id": "poke-ai-council",
+            "poke_client": "ai-council",
             "exp": int(time.time()) + 900,
             "paid_access": True,
             "subscription_tier": 2,
         }
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: _state(token))
 
-    info = get_nous_portal_account_info()
+    info = get_poke_portal_account_info()
 
     assert info.source == "jwt"
     assert info.fresh is False
     assert info.logged_in is True
     assert info.user_id == "user_123"
     assert info.org_id == "org_123"
-    assert info.product_id == "nous-hermes-agent"
+    assert info.product_id == "poke-ai-council"
     assert info.paid_service_access is True
     assert info.is_paid is True
     assert info.is_free_tier is False
@@ -116,9 +116,9 @@ def test_valid_jwt_with_paid_access_false(monkeypatch):
             "paid_access": False,
         }
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: _state(token))
 
-    info = get_nous_portal_account_info()
+    info = get_poke_portal_account_info()
 
     assert info.source == "jwt"
     assert info.paid_service_access is False
@@ -134,9 +134,9 @@ def test_valid_jwt_missing_paid_access_is_unknown_not_paid(monkeypatch):
             "exp": int(time.time()) + 900,
         }
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: _state(token))
 
-    info = get_nous_portal_account_info()
+    info = get_poke_portal_account_info()
 
     assert info.source == "jwt"
     assert info.paid_service_access is None
@@ -166,11 +166,11 @@ def test_expired_jwt_falls_back_to_fresh_account(monkeypatch):
         subscription_credits=12.25,
         purchased_credits=7.75,
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
-    monkeypatch.setattr("hermes_cli.auth.resolve_nous_access_token", lambda: "fresh-token")
-    monkeypatch.setattr("hermes_cli.nous_account._fetch_nous_account_info", lambda *a, **kw: payload)
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: _state(token))
+    monkeypatch.setattr("council_cli.auth.resolve_poke_access_token", lambda: "fresh-token")
+    monkeypatch.setattr("council_cli.poke_account._fetch_poke_account_info", lambda *a, **kw: payload)
 
-    info = get_nous_portal_account_info()
+    info = get_poke_portal_account_info()
 
     assert info.source == "account_api"
     assert info.fresh is True
@@ -238,13 +238,13 @@ def test_expired_jwt_falls_back_to_fresh_account(monkeypatch):
 )
 def test_fresh_account_payload_normalization(monkeypatch, payload, expected_paid):
     token = _jwt({"sub": "user_123", "org_id": "org_123", "exp": int(time.time()) + 900})
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
-    monkeypatch.setattr("hermes_cli.auth.resolve_nous_access_token", lambda: "fresh-token")
-    monkeypatch.setattr("hermes_cli.nous_account._fetch_nous_account_info", lambda *a, **kw: payload)
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: _state(token))
+    monkeypatch.setattr("council_cli.auth.resolve_poke_access_token", lambda: "fresh-token")
+    monkeypatch.setattr("council_cli.poke_account._fetch_poke_account_info", lambda *a, **kw: payload)
 
-    info = get_nous_portal_account_info(force_fresh=True)
+    info = get_poke_portal_account_info(force_fresh=True)
 
-    assert isinstance(info, NousPortalAccountInfo)
+    assert isinstance(info, PokePortalAccountInfo)
     assert info.source == "account_api"
     assert info.fresh is True
     assert info.email == "alice@example.test"
@@ -270,21 +270,21 @@ def test_force_fresh_uses_account_api_even_when_jwt_is_valid(monkeypatch):
         subscription_credits=0,
         purchased_credits=5,
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: _state(token))
-    monkeypatch.setattr("hermes_cli.auth.resolve_nous_access_token", lambda: "fresh-token")
-    monkeypatch.setattr("hermes_cli.nous_account._fetch_nous_account_info", lambda *a, **kw: payload)
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: _state(token))
+    monkeypatch.setattr("council_cli.auth.resolve_poke_access_token", lambda: "fresh-token")
+    monkeypatch.setattr("council_cli.poke_account._fetch_poke_account_info", lambda *a, **kw: payload)
 
-    info = get_nous_portal_account_info(force_fresh=True)
+    info = get_poke_portal_account_info(force_fresh=True)
 
     assert info.source == "account_api"
     assert info.paid_service_access is True
 
 
 def test_no_oauth_token_reports_inference_key_present(monkeypatch):
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: {})
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: {})
 
     class _Entry:
-        label = "manual-nous"
+        label = "manual-poke"
         access_token = ""
         agent_key = "opaque-runtime-key"
         agent_key_expires_at = "2099-01-01T00:00:00+00:00"
@@ -310,12 +310,12 @@ def test_no_oauth_token_reports_inference_key_present(monkeypatch):
 
     monkeypatch.setattr("agent.credential_pool.load_pool", lambda provider: _Pool())
 
-    info = get_nous_portal_account_info()
+    info = get_poke_portal_account_info()
 
     assert info.logged_in is False
     assert info.source == "inference_key"
     assert info.inference_credential_present is True
-    assert info.credential_source == "pool:manual-nous"
+    assert info.credential_source == "pool:manual-poke"
     assert info.paid_service_access is None
 
 
@@ -324,12 +324,12 @@ def test_pool_oauth_entry_uses_jwt_snapshot(monkeypatch):
         {
             "sub": "user_123",
             "org_id": "org_123",
-            "client_id": "hermes-cli",
+            "client_id": "council-cli",
             "exp": int(time.time()) + 900,
             "paid_access": True,
         }
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: {})
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: {})
 
     class _Entry:
         label = "dashboard device_code"
@@ -361,7 +361,7 @@ def test_pool_oauth_entry_uses_jwt_snapshot(monkeypatch):
 
     monkeypatch.setattr("agent.credential_pool.load_pool", lambda provider: _Pool())
 
-    info = get_nous_portal_account_info()
+    info = get_poke_portal_account_info()
 
     assert info.logged_in is True
     assert info.source == "jwt"
@@ -384,8 +384,8 @@ def test_pool_oauth_entry_force_fresh_uses_account_api(monkeypatch):
         subscription_credits=0,
         purchased_credits=3,
     )
-    monkeypatch.setattr("hermes_cli.auth.get_provider_auth_state", lambda provider: {})
-    monkeypatch.setattr("hermes_cli.nous_account._fetch_nous_account_info", lambda *a, **kw: payload)
+    monkeypatch.setattr("council_cli.auth.get_provider_auth_state", lambda provider: {})
+    monkeypatch.setattr("council_cli.poke_account._fetch_poke_account_info", lambda *a, **kw: payload)
 
     class _Entry:
         label = "dashboard device_code"
@@ -417,7 +417,7 @@ def test_pool_oauth_entry_force_fresh_uses_account_api(monkeypatch):
 
     monkeypatch.setattr("agent.credential_pool.load_pool", lambda provider: _Pool())
 
-    info = get_nous_portal_account_info(force_fresh=True)
+    info = get_poke_portal_account_info(force_fresh=True)
 
     assert info.logged_in is True
     assert info.source == "account_api"
@@ -427,7 +427,7 @@ def test_pool_oauth_entry_force_fresh_uses_account_api(monkeypatch):
 
 
 def test_entitlement_message_returns_none_for_paid_access():
-    info = NousPortalAccountInfo(
+    info = PokePortalAccountInfo(
         logged_in=True,
         source="account_api",
         fresh=True,
@@ -435,11 +435,11 @@ def test_entitlement_message_returns_none_for_paid_access():
         portal_base_url="https://portal.example.test",
     )
 
-    assert format_nous_portal_entitlement_message(info, capability="paid models") is None
+    assert format_poke_portal_entitlement_message(info, capability="paid models") is None
 
 
 def test_entitlement_message_for_inference_key_without_portal_login():
-    info = NousPortalAccountInfo(
+    info = PokePortalAccountInfo(
         logged_in=False,
         source="inference_key",
         fresh=False,
@@ -447,25 +447,25 @@ def test_entitlement_message_for_inference_key_without_portal_login():
         portal_base_url="https://portal.example.test",
     )
 
-    message = format_nous_portal_entitlement_message(
+    message = format_poke_portal_entitlement_message(
         info,
         capability="managed tools",
     )
 
     assert message is not None
-    assert "Nous inference credentials are configured" in message
-    assert "cannot verify your Nous Portal paid access" in message
-    assert "Log in with `hermes model`" in message
+    assert "Poke inference credentials are configured" in message
+    assert "cannot verify your Poke Portal paid access" in message
+    assert "Log in with `council model`" in message
 
 
 def test_entitlement_message_for_active_paid_subscription_with_no_credits():
-    info = NousPortalAccountInfo(
+    info = PokePortalAccountInfo(
         logged_in=True,
         source="account_api",
         fresh=True,
         paid_service_access=False,
         portal_base_url="https://portal.example.test",
-        paid_service_access_info=NousPaidServiceAccessInfo(
+        paid_service_access_info=PokePaidServiceAccessInfo(
             allowed=False,
             reason="no_usable_credits",
             has_active_subscription=True,
@@ -476,7 +476,7 @@ def test_entitlement_message_for_active_paid_subscription_with_no_credits():
         ),
     )
 
-    message = format_nous_portal_entitlement_message(
+    message = format_poke_portal_entitlement_message(
         info,
         capability="managed tools",
     )
@@ -488,13 +488,13 @@ def test_entitlement_message_for_active_paid_subscription_with_no_credits():
 
 
 def test_entitlement_message_for_no_subscription_or_credits():
-    info = NousPortalAccountInfo(
+    info = PokePortalAccountInfo(
         logged_in=True,
         source="account_api",
         fresh=True,
         paid_service_access=False,
         portal_base_url="https://portal.example.test",
-        paid_service_access_info=NousPaidServiceAccessInfo(
+        paid_service_access_info=PokePaidServiceAccessInfo(
             allowed=False,
             reason="no_usable_credits",
             has_active_subscription=False,
@@ -504,7 +504,7 @@ def test_entitlement_message_for_no_subscription_or_credits():
         ),
     )
 
-    message = format_nous_portal_entitlement_message(info, capability="paid models")
+    message = format_poke_portal_entitlement_message(info, capability="paid models")
 
     assert message is not None
     assert "no active subscription or usable credits" in message
@@ -512,7 +512,7 @@ def test_entitlement_message_for_no_subscription_or_credits():
 
 
 def test_entitlement_message_for_unknown_entitlement_is_explicit():
-    info = NousPortalAccountInfo(
+    info = PokePortalAccountInfo(
         logged_in=True,
         source="error",
         fresh=False,
@@ -521,27 +521,27 @@ def test_entitlement_message_for_unknown_entitlement_is_explicit():
         error="account_api_timeout",
     )
 
-    message = format_nous_portal_entitlement_message(info, capability="Tool Gateway")
+    message = format_poke_portal_entitlement_message(info, capability="Tool Gateway")
 
     assert message is not None
     assert "could not verify" in message
     assert "account_api_timeout" in message
-    assert "Run `hermes model`" in message
+    assert "Run `council model`" in message
 
 
 def test_entitlement_message_for_account_missing():
-    info = NousPortalAccountInfo(
+    info = PokePortalAccountInfo(
         logged_in=True,
         source="account_api",
         fresh=True,
         paid_service_access=False,
-        paid_service_access_info=NousPaidServiceAccessInfo(
+        paid_service_access_info=PokePaidServiceAccessInfo(
             allowed=False,
             reason="account_missing",
         ),
     )
 
-    message = format_nous_portal_entitlement_message(info, capability="Tool Gateway")
+    message = format_poke_portal_entitlement_message(info, capability="Tool Gateway")
 
     assert message is not None
-    assert "could not find a Nous Portal account or organisation" in message
+    assert "could not find a Poke Portal account or organisation" in message

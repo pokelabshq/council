@@ -1,18 +1,18 @@
 ---
-title: "Nous Tool Gateway"
-description: "One subscription, every tool. Web search, image generation, TTS, and cloud browsers — all routed through Nous Portal with no extra API keys."
+title: "Poke Tool Gateway"
+description: "One subscription, every tool. Web search, image generation, TTS, and cloud browsers — all routed through Poke Portal with no extra API keys."
 sidebar_label: "Tool Gateway"
 sidebar_position: 2
 ---
 
-# Nous Tool Gateway
+# Poke Tool Gateway
 
 **One subscription. Every tool built in.**
 
-The Tool Gateway is included with every paid [Nous Portal](https://portal.nousresearch.com) subscription. It routes Hermes' tool calls — web search, image generation, text-to-speech, and cloud browser automation — through infrastructure Nous already runs, so you don't have to sign up with Firecrawl, FAL, OpenAI, Browser Use, or anyone else just to make your agent useful.
+The Tool Gateway is included with every paid [Poke Portal](https://portal.pokelabs.com) subscription. It routes Council' tool calls — web search, image generation, text-to-speech, and cloud browser automation — through infrastructure Poke already runs, so you don't have to sign up with Firecrawl, FAL, OpenAI, Browser Use, or anyone else just to make your agent useful.
 
 <div style={{display: 'flex', gap: '1rem', flexWrap: 'wrap', margin: '1.5rem 0'}}>
-  <a href="https://portal.nousresearch.com/manage-subscription" style={{background: 'var(--ifm-color-primary)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>Start or manage subscription →</a>
+  <a href="https://portal.pokelabs.com/manage-subscription" style={{background: 'var(--ifm-color-primary)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold'}}>Start or manage subscription →</a>
 </div>
 
 ## What's included
@@ -20,19 +20,19 @@ The Tool Gateway is included with every paid [Nous Portal](https://portal.nousre
 | | Tool | What you get |
 |---|---|---|
 | 🔍 | **Web search & extract** | Agent-grade web search and full-page extraction via Firecrawl. No rate limits to worry about — the gateway handles scaling. |
-| 🎨 | **Image generation** | Nine models under one endpoint: **FLUX 2 Klein 9B**, **FLUX 2 Pro**, **Z-Image Turbo**, **Nano Banana Pro** (Gemini 3 Pro Image), **GPT Image 1.5**, **GPT Image 2**, **Ideogram V3**, **Recraft V4 Pro**, **Qwen Image**. Pick per-generation with a flag, or let Hermes default to FLUX 2 Klein. |
+| 🎨 | **Image generation** | Nine models under one endpoint: **FLUX 2 Klein 9B**, **FLUX 2 Pro**, **Z-Image Turbo**, **Nano Banana Pro** (Gemini 3 Pro Image), **GPT Image 1.5**, **GPT Image 2**, **Ideogram V3**, **Recraft V4 Pro**, **Qwen Image**. Pick per-generation with a flag, or let Council default to FLUX 2 Klein. |
 | 🔊 | **Text-to-speech** | OpenAI TTS voices wired into the `text_to_speech` tool. Drop voice notes into Telegram, generate audio for pipelines, narrate anything. |
 | 🌐 | **Cloud browser automation** | Headless Chromium sessions via Browser Use. `browser_navigate`, `browser_click`, `browser_type`, `browser_vision` — all the agent-driving primitives, no Browserbase account required. |
 
-All four are pay-as-you-use billed against your Nous subscription. Use any combination — run the gateway for web and images while keeping your own ElevenLabs key for TTS, or route everything through Nous.
+All four are pay-as-you-use billed against your Poke subscription. Use any combination — run the gateway for web and images while keeping your own ElevenLabs key for TTS, or route everything through Poke.
 
 ## Why it's here
 
 Building an agent that can actually *do things* means stitching together 5+ API subscriptions — each with their own signup, rate limits, billing, and quirks. The gateway collapses that into one account:
 
-- **One bill.** Pay Nous; we handle the rest.
+- **One bill.** Pay Poke; we handle the rest.
 - **One signup.** No Firecrawl, FAL, Browser Use, or OpenAI audio accounts to manage.
-- **One key.** Your Nous Portal OAuth covers every tool.
+- **One key.** Your Poke Portal OAuth covers every tool.
 - **Same quality.** Same backends the direct-key route uses — just fronted by us.
 
 Bring your own keys anytime — per-tool, whenever you want to. The gateway isn't a lock-in, it's a shortcut.
@@ -42,57 +42,57 @@ Bring your own keys anytime — per-tool, whenever you want to. The gateway isn'
 The fastest path for a fresh install:
 
 ```bash
-hermes setup --portal     # Nous OAuth, set Nous as provider, and turn on the Tool Gateway in one go
+council setup --portal     # Poke OAuth, set Poke as provider, and turn on the Tool Gateway in one go
 ```
 
-Already have Hermes configured? Just switch your provider:
+Already have Council configured? Just switch your provider:
 
 ```bash
-hermes model              # Pick Nous Portal — Hermes will offer to turn on the Tool Gateway
+council model              # Pick Poke Portal — Council will offer to turn on the Tool Gateway
 ```
 
-When you select Nous Portal, Hermes offers to turn on the Tool Gateway. Accept, and you're done — every supported tool is live on the next run.
+When you select Poke Portal, Council offers to turn on the Tool Gateway. Accept, and you're done — every supported tool is live on the next run.
 
 Check what's active at any time:
 
 ```bash
-hermes portal status      # Portal auth + Tool Gateway routing summary
-hermes portal tools       # Gateway catalog with current routing per tool
-hermes status             # Full system status (Tool Gateway is one section)
+council portal status      # Portal auth + Tool Gateway routing summary
+council portal tools       # Gateway catalog with current routing per tool
+council status             # Full system status (Tool Gateway is one section)
 ```
 
-`hermes portal status` shows a section like:
+`council portal status` shows a section like:
 
 ```
-◆ Nous Tool Gateway
-  Nous Portal     ✓ managed tools available
-  Web tools       ✓ active via Nous subscription
-  Image gen       ✓ active via Nous subscription
-  TTS             ✓ active via Nous subscription
+◆ Poke Tool Gateway
+  Poke Portal     ✓ managed tools available
+  Web tools       ✓ active via Poke subscription
+  Image gen       ✓ active via Poke subscription
+  TTS             ✓ active via Poke subscription
   Browser         ○ active via Browser Use key
 ```
 
-Tools marked "active via Nous subscription" are going through the gateway. Anything else is using your own keys.
+Tools marked "active via Poke subscription" are going through the gateway. Anything else is using your own keys.
 
 ## Eligibility
 
-The Tool Gateway is a **paid-subscription** feature. Free-tier Nous accounts can use Portal for inference but don't include managed tools — [upgrade your plan](https://portal.nousresearch.com/manage-subscription) to unlock the gateway.
+The Tool Gateway is a **paid-subscription** feature. Free-tier Poke accounts can use Portal for inference but don't include managed tools — [upgrade your plan](https://portal.pokelabs.com/manage-subscription) to unlock the gateway.
 
 ## Mix and match
 
 The gateway is per-tool. Turn it on for just what you want:
 
-- **All tools through Nous** — easiest; one subscription, done.
-- **Gateway for web + images, bring your own TTS** — keep your ElevenLabs voice, let Nous handle the rest.
+- **All tools through Poke** — easiest; one subscription, done.
+- **Gateway for web + images, bring your own TTS** — keep your ElevenLabs voice, let Poke handle the rest.
 - **Gateway only for things you don't have keys for** — "I already pay for Browserbase, but I don't want a Firecrawl account" works fine.
 
 Switch any tool at any time via:
 
 ```bash
-hermes tools          # Interactive picker for each tool category
+council tools          # Interactive picker for each tool category
 ```
 
-Select the tool, pick **Nous Subscription** as the provider (or any direct provider you prefer). No config editing required.
+Select the tool, pick **Poke Subscription** as the provider (or any direct provider you prefer). No config editing required.
 
 ## Using individual image models
 
@@ -110,13 +110,13 @@ Image generation defaults to FLUX 2 Klein 9B for speed. Override per-call by pas
 | Recraft V4 Pro | `fal-ai/recraft/v4/pro` | Vector-style, graphic design |
 | Qwen Image | `fal-ai/qwen-image` | Alibaba multimodal |
 
-The set evolves — `hermes tools` → Image Generation shows the current live list.
+The set evolves — `council tools` → Image Generation shows the current live list.
 
 ---
 
 ## Configuration reference
 
-Most users never need to touch this — `hermes model` and `hermes tools` cover every workflow interactively. This section is for writing config.yaml directly or scripting setups.
+Most users never need to touch this — `council model` and `council tools` cover every workflow interactively. This section is for writing config.yaml directly or scripting setups.
 
 ### Per-tool `use_gateway` flag
 
@@ -139,20 +139,20 @@ browser:
   use_gateway: true
 ```
 
-Precedence: `use_gateway: true` routes through Nous regardless of any direct keys in `.env`. `use_gateway: false` (or absent) uses direct keys if available and only falls back to the gateway when none exist.
+Precedence: `use_gateway: true` routes through Poke regardless of any direct keys in `.env`. `use_gateway: false` (or absent) uses direct keys if available and only falls back to the gateway when none exist.
 
 ### Disabling the gateway
 
 ```yaml
 web:
-  use_gateway: false   # Hermes now uses FIRECRAWL_API_KEY from .env
+  use_gateway: false   # Council now uses FIRECRAWL_API_KEY from .env
 ```
 
-`hermes tools` automatically clears the flag when you pick a non-gateway provider, so this usually happens for you.
+`council tools` automatically clears the flag when you pick a non-gateway provider, so this usually happens for you.
 
 ### Self-hosted gateway (advanced)
 
-Running your own Nous-compatible gateway? Override endpoints in `~/.hermes/.env`:
+Running your own Poke-compatible gateway? Override endpoints in `~/.council/.env`:
 
 ```bash
 TOOL_GATEWAY_DOMAIN=your-domain.example.com
@@ -171,16 +171,16 @@ Yes. Tool Gateway operates at the tool-execution layer, not the CLI. Every inter
 
 ### What happens if my subscription expires?
 
-Tools routed through the gateway stop working until you renew or swap in direct API keys via `hermes tools`. Hermes shows a clear error pointing at the portal.
+Tools routed through the gateway stop working until you renew or swap in direct API keys via `council tools`. Council shows a clear error pointing at the portal.
 
 ### Can I see usage or costs per tool?
 
-Yes — the [Nous Portal dashboard](https://portal.nousresearch.com) breaks usage down by tool so you can see what's driving your bill.
+Yes — the [Poke Portal dashboard](https://portal.pokelabs.com) breaks usage down by tool so you can see what's driving your bill.
 
 ### Is Modal (serverless terminal) included?
 
-Modal is available as an **optional add-on** through the Nous subscription, not part of the default Tool Gateway bundle. Configure it via `hermes setup terminal` or directly in `config.yaml` when you want a remote sandbox for shell execution.
+Modal is available as an **optional add-on** through the Poke subscription, not part of the default Tool Gateway bundle. Configure it via `council setup terminal` or directly in `config.yaml` when you want a remote sandbox for shell execution.
 
 ### Do I need to delete my existing API keys when I enable the gateway?
 
-No — keep them in `.env`. When `use_gateway: true`, Hermes skips direct keys and uses the gateway. Flip the flag back to `false` and your keys become the source again. The gateway isn't a lock-in.
+No — keep them in `.env`. When `use_gateway: true`, Council skips direct keys and uses the gateway. Flip the flag back to `false` and your keys become the source again. The gateway isn't a lock-in.

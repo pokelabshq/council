@@ -1,4 +1,4 @@
-"""Regression tests for the OAuth dispatcher in hermes_cli.web_server.
+"""Regression tests for the OAuth dispatcher in council_cli.web_server.
 
 Bug history (2026-05-09): the `_OAUTH_PROVIDER_CATALOG` had two entries
 flagged ``flow: "pkce"`` — anthropic and minimax-oauth — and the
@@ -28,19 +28,19 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from hermes_cli.web_server import _SESSION_TOKEN, app
+from council_cli.web_server import _SESSION_TOKEN, app
 
 client = TestClient(app)
-HEADERS = {"X-Hermes-Session-Token": _SESSION_TOKEN}
+HEADERS = {"X-Council-Session-Token": _SESSION_TOKEN}
 
 
-def _fake_nous_device_data():
+def _fake_poke_device_data():
     return {
         "device_code": "device-code",
         "user_code": "NOUS-1234",
-        "verification_uri": "https://portal.nousresearch.com/device",
+        "verification_uri": "https://portal.pokelabs.com/device",
         "verification_uri_complete": (
-            "https://portal.nousresearch.com/device?user_code=NOUS-1234"
+            "https://portal.pokelabs.com/device?user_code=NOUS-1234"
         ),
         "expires_in": 600,
         "interval": 5,
@@ -48,7 +48,7 @@ def _fake_nous_device_data():
 
 
 def _invoke_scope_refusal():
-    request = httpx.Request("POST", "https://portal.nousresearch.com/oauth/device/code")
+    request = httpx.Request("POST", "https://portal.pokelabs.com/oauth/device/code")
     response = httpx.Response(
         400,
         json={
@@ -71,13 +71,13 @@ def test_minimax_login_does_not_launch_anthropic_flow():
         "state": "stub-state",
     }
     with patch(
-        "hermes_cli.auth._minimax_request_user_code",
+        "council_cli.auth._minimax_request_user_code",
         return_value=fake_user_code_resp,
     ), patch(
-        "hermes_cli.auth._minimax_pkce_pair",
+        "council_cli.auth._minimax_pkce_pair",
         return_value=("verifier-stub", "challenge-stub", "stub-state"),
     ), patch(
-        "hermes_cli.web_server._minimax_poller",
+        "council_cli.web_server._minimax_poller",
         return_value=None,
     ):
         resp = client.post(
@@ -100,21 +100,21 @@ def test_minimax_login_does_not_launch_anthropic_flow():
     assert body["expires_in"] == 600
 
 
-def test_nous_dashboard_device_flow_ignores_legacy_scope_override(monkeypatch):
-    from hermes_cli import auth as auth_mod
-    from hermes_cli import web_server as ws
+def test_poke_dashboard_device_flow_ignores_legacy_scope_override(monkeypatch):
+    from council_cli import auth as auth_mod
+    from council_cli import web_server as ws
 
     requested_scopes = []
 
     def fake_request_device_code(**kwargs):
         requested_scopes.append(kwargs["scope"])
-        return _fake_nous_device_data()
+        return _fake_poke_device_data()
 
-    monkeypatch.setenv("HERMES_AGENT_USE_LEGACY_SESSION_KEYS", "true")
+    monkeypatch.setenv("AI_COUNCIL_USE_LEGACY_SESSION_KEYS", "true")
     monkeypatch.setattr(auth_mod, "_request_device_code", fake_request_device_code)
-    monkeypatch.setattr(ws, "_nous_poller", lambda sid: None)
+    monkeypatch.setattr(ws, "_poke_poller", lambda sid: None)
 
-    result = asyncio.run(ws._start_device_code_flow("nous"))
+    result = asyncio.run(ws._start_device_code_flow("poke"))
     try:
         assert requested_scopes == [auth_mod.DEFAULT_NOUS_SCOPE]
         assert result["flow"] == "device_code"
@@ -127,9 +127,9 @@ def test_nous_dashboard_device_flow_ignores_legacy_scope_override(monkeypatch):
         ws._oauth_sessions.pop(result["session_id"], None)
 
 
-def test_nous_dashboard_device_flow_does_not_retry_legacy_scope_on_invoke_refusal(monkeypatch):
-    from hermes_cli import auth as auth_mod
-    from hermes_cli import web_server as ws
+def test_poke_dashboard_device_flow_does_not_retry_legacy_scope_on_invoke_refusal(monkeypatch):
+    from council_cli import auth as auth_mod
+    from council_cli import web_server as ws
 
     requested_scopes = []
 
@@ -137,29 +137,29 @@ def test_nous_dashboard_device_flow_does_not_retry_legacy_scope_on_invoke_refusa
         requested_scopes.append(kwargs["scope"])
         raise _invoke_scope_refusal()
 
-    monkeypatch.delenv("HERMES_AGENT_USE_LEGACY_SESSION_KEYS", raising=False)
+    monkeypatch.delenv("AI_COUNCIL_USE_LEGACY_SESSION_KEYS", raising=False)
     monkeypatch.setattr(auth_mod, "_request_device_code", fake_request_device_code)
-    monkeypatch.setattr(ws, "_nous_poller", lambda sid: None)
+    monkeypatch.setattr(ws, "_poke_poller", lambda sid: None)
 
     with pytest.raises(httpx.HTTPStatusError):
-        asyncio.run(ws._start_device_code_flow("nous"))
+        asyncio.run(ws._start_device_code_flow("poke"))
     assert requested_scopes == [auth_mod.DEFAULT_NOUS_SCOPE]
 
 
-def test_nous_dashboard_poller_preserves_effective_scope_when_token_omits_scope(monkeypatch):
-    from hermes_cli import auth as auth_mod
-    from hermes_cli import web_server as ws
+def test_poke_dashboard_poller_preserves_effective_scope_when_token_omits_scope(monkeypatch):
+    from council_cli import auth as auth_mod
+    from council_cli import web_server as ws
 
-    session_id = "nous-effective-scope-test"
+    session_id = "poke-effective-scope-test"
     ws._oauth_sessions[session_id] = {
         "session_id": session_id,
-        "provider": "nous",
+        "provider": "poke",
         "flow": "device_code",
         "created_at": time.time(),
         "status": "pending",
         "error_message": None,
-        "portal_base_url": "https://portal.nousresearch.com",
-        "client_id": "hermes-cli",
+        "portal_base_url": "https://portal.pokelabs.com",
+        "client_id": "council-cli",
         "device_code": "device-code",
         "interval": 5,
         "expires_at": time.time() + 600,
@@ -167,7 +167,7 @@ def test_nous_dashboard_poller_preserves_effective_scope_when_token_omits_scope(
     }
     captured_state = {}
 
-    def fake_refresh_nous_oauth_from_state(state, **kwargs):
+    def fake_refresh_poke_oauth_from_state(state, **kwargs):
         captured_state.update(state)
         return {**state, "agent_key": "jwt-agent-key"}
 
@@ -183,13 +183,13 @@ def test_nous_dashboard_poller_preserves_effective_scope_when_token_omits_scope(
     )
     monkeypatch.setattr(
         auth_mod,
-        "refresh_nous_oauth_from_state",
-        fake_refresh_nous_oauth_from_state,
+        "refresh_poke_oauth_from_state",
+        fake_refresh_poke_oauth_from_state,
     )
-    monkeypatch.setattr(auth_mod, "persist_nous_credentials", lambda state: None)
+    monkeypatch.setattr(auth_mod, "persist_poke_credentials", lambda state: None)
 
     try:
-        ws._nous_poller(session_id)
+        ws._poke_poller(session_id)
         assert captured_state["scope"] == auth_mod.DEFAULT_NOUS_SCOPE
         assert ws._oauth_sessions[session_id]["status"] == "approved"
     finally:
@@ -198,7 +198,7 @@ def test_nous_dashboard_poller_preserves_effective_scope_when_token_omits_scope(
 
 def test_minimax_dashboard_poller_accepts_absolute_ms_expired_in():
     """Dashboard MiniMax completion must accept unix-ms token expiry values."""
-    from hermes_cli import web_server as ws
+    from council_cli import web_server as ws
 
     now = datetime.now(timezone.utc)
     abs_ms = int((now.timestamp() + 1800) * 1000)
@@ -222,7 +222,7 @@ def test_minimax_dashboard_poller_accepts_absolute_ms_expired_in():
 
     try:
         with patch(
-            "hermes_cli.auth._minimax_poll_token",
+            "council_cli.auth._minimax_poll_token",
             return_value={
                 "status": "success",
                 "access_token": "access",
@@ -231,7 +231,7 @@ def test_minimax_dashboard_poller_accepts_absolute_ms_expired_in():
                 "token_type": "Bearer",
             },
         ), patch(
-            "hermes_cli.auth._minimax_save_auth_state",
+            "council_cli.auth._minimax_save_auth_state",
             side_effect=lambda state: captured_state.update(state),
         ):
             ws._minimax_poller(session_id)
@@ -252,7 +252,7 @@ def test_anthropic_pkce_branch_still_works():
         "expires_in": 600,
     }
     with patch(
-        "hermes_cli.web_server._start_anthropic_pkce",
+        "council_cli.web_server._start_anthropic_pkce",
         return_value=fake_anthropic_response,
     ):
         resp = client.post(
@@ -275,7 +275,7 @@ def test_unknown_pkce_provider_rejected_cleanly():
     branch, then hit "Unsupported flow" — proving the bug class is
     structurally prevented.
     """
-    from hermes_cli import web_server as ws
+    from council_cli import web_server as ws
 
     # Inject a hypothetical catalog entry that's pkce-flagged but isn't
     # anthropic. This shape mirrors what would happen if a developer
@@ -285,7 +285,7 @@ def test_unknown_pkce_provider_rejected_cleanly():
         "id": "hypothetical-pkce-provider",
         "name": "Hypothetical PKCE Provider",
         "flow": "pkce",
-        "cli_command": "hermes auth add hypothetical-pkce-provider",
+        "cli_command": "council auth add hypothetical-pkce-provider",
         "docs_url": "https://example.com",
         "status_fn": None,
     }

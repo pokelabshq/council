@@ -1,9 +1,9 @@
-import { Button } from "@nous-research/ui/ui/components/button";
-import { Checkbox } from "@nous-research/ui/ui/components/checkbox";
-import { ListItem } from "@nous-research/ui/ui/components/list-item";
-import { Spinner } from "@nous-research/ui/ui/components/spinner";
-import { Input } from "@nous-research/ui/ui/components/input";
-import { Label } from "@nous-research/ui/ui/components/label";
+import { Button } from "@pokelabs/ui/ui/components/button";
+import { Checkbox } from "@pokelabs/ui/ui/components/checkbox";
+import { ListItem } from "@pokelabs/ui/ui/components/list-item";
+import { Spinner } from "@pokelabs/ui/ui/components/spinner";
+import { Input } from "@pokelabs/ui/ui/components/input";
+import { Label } from "@pokelabs/ui/ui/components/label";
 import type { GatewayClient } from "@/lib/gatewayClient";
 import { Check, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";

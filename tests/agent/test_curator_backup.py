@@ -15,16 +15,16 @@ import pytest
 
 @pytest.fixture
 def backup_env(monkeypatch, tmp_path):
-    """Isolate HERMES_HOME + reload modules so every test starts clean."""
-    home = tmp_path / ".hermes"
+    """Isolate COUNCIL_HOME + reload modules so every test starts clean."""
+    home = tmp_path / ".council"
     home.mkdir()
     (home / "skills").mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
-    # Reload so get_hermes_home picks up the env var fresh.
-    import hermes_constants
-    importlib.reload(hermes_constants)
+    # Reload so get_council_home picks up the env var fresh.
+    import council_constants
+    importlib.reload(council_constants)
     from agent import curator_backup
     importlib.reload(curator_backup)
     return {"home": home, "skills": home / "skills", "cb": curator_backup}
@@ -270,7 +270,7 @@ def test_real_run_takes_pre_snapshot(backup_env, monkeypatch):
     skills = backup_env["skills"]
     _write_skill(skills, "alpha")
 
-    # Reload curator module against the freshly-env'd hermes_constants
+    # Reload curator module against the freshly-env'd council_constants
     from agent import curator
     importlib.reload(curator)
 
@@ -286,7 +286,7 @@ def test_real_run_takes_pre_snapshot(backup_env, monkeypatch):
         lambda now=None: {"checked": 1, "marked_stale": 0, "archived": 0, "reactivated": 0},
     )
 
-    curator.run_curator_review(synchronous=True)
+    curator.run_curator_review(synchropoke=True)
     # Pre-run snapshot should exist
     rows = cb.list_backups()
     assert any(r.get("reason") == "pre-curator-run" for r in rows), (
@@ -309,7 +309,7 @@ def test_dry_run_skips_snapshot(backup_env, monkeypatch):
                    "tool_calls": [], "error": None},
     )
 
-    curator.run_curator_review(synchronous=True, dry_run=True)
+    curator.run_curator_review(synchropoke=True, dry_run=True)
     rows = cb.list_backups()
     assert not any(r.get("reason") == "pre-curator-run" for r in rows), (
         "dry-run must not create a pre-run snapshot"
@@ -322,7 +322,7 @@ def test_dry_run_skips_snapshot(backup_env, monkeypatch):
 
 
 def _write_cron_jobs(home: Path, jobs: list) -> Path:
-    """Write a synthetic cron/jobs.json under HERMES_HOME. Returns the path.
+    """Write a synthetic cron/jobs.json under COUNCIL_HOME. Returns the path.
     Mirrors cron.jobs.save_jobs() wrapper shape: `{"jobs": [...], "updated_at": ...}`.
     """
     cron_dir = home / "cron"
@@ -336,9 +336,9 @@ def _write_cron_jobs(home: Path, jobs: list) -> Path:
 
 
 def _reload_cron_jobs(home: Path):
-    """Reload cron.jobs so its module-level HERMES_DIR picks up the tmp HOME."""
-    import hermes_constants
-    importlib.reload(hermes_constants)
+    """Reload cron.jobs so its module-level COUNCIL_DIR picks up the tmp HOME."""
+    import council_constants
+    importlib.reload(council_constants)
     if "cron.jobs" in sys.modules:
         import cron.jobs as _cj
         importlib.reload(_cj)
@@ -370,7 +370,7 @@ def test_snapshot_without_cron_jobs_file_still_succeeds(backup_env):
     """No cron/jobs.json on disk → snapshot succeeds, manifest records absence."""
     cb = backup_env["cb"]
     _write_skill(backup_env["skills"], "alpha")
-    # Deliberately do not create ~/.hermes/cron/jobs.json
+    # Deliberately do not create ~/.council/cron/jobs.json
 
     snap = cb.snapshot_skills(reason="test")
     assert snap is not None

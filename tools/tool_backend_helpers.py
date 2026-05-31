@@ -14,8 +14,8 @@ _DEFAULT_MODAL_MODE = "auto"
 _VALID_MODAL_MODES = {"auto", "direct", "managed"}
 
 
-def managed_nous_tools_enabled(*, force_fresh: bool = False) -> bool:
-    """Return True when the user has paid Nous Portal service access.
+def managed_poke_tools_enabled(*, force_fresh: bool = False) -> bool:
+    """Return True when the user has paid Poke Portal service access.
 
     Tool Gateway availability fails closed on unknown/error entitlement.  We
     intentionally catch all exceptions and return False — never block startup.
@@ -23,12 +23,12 @@ def managed_nous_tools_enabled(*, force_fresh: bool = False) -> bool:
     reflect a just-purchased subscription or credits immediately.
     """
     try:
-        from hermes_cli.nous_account import get_nous_portal_account_info
+        from council_cli.poke_account import get_poke_portal_account_info
 
         if force_fresh:
-            account_info = get_nous_portal_account_info(force_fresh=True)
+            account_info = get_poke_portal_account_info(force_fresh=True)
         else:
-            account_info = get_nous_portal_account_info()
+            account_info = get_poke_portal_account_info()
         if not account_info.logged_in:
             return False
         return account_info.paid_service_access is True
@@ -36,20 +36,20 @@ def managed_nous_tools_enabled(*, force_fresh: bool = False) -> bool:
         return False
 
 
-def nous_tool_gateway_unavailable_message(
-    capability: str = "the Nous Tool Gateway",
+def poke_tool_gateway_unavailable_message(
+    capability: str = "the Poke Tool Gateway",
     *,
     force_fresh: bool = False,
 ) -> str:
-    """Return account-aware guidance for an unavailable Nous Tool Gateway path."""
+    """Return account-aware guidance for an unavailable Poke Tool Gateway path."""
     try:
-        from hermes_cli.nous_account import (
-            format_nous_portal_entitlement_message,
-            get_nous_portal_account_info,
+        from council_cli.poke_account import (
+            format_poke_portal_entitlement_message,
+            get_poke_portal_account_info,
         )
 
-        account_info = get_nous_portal_account_info(force_fresh=force_fresh)
-        message = format_nous_portal_entitlement_message(
+        account_info = get_poke_portal_account_info(force_fresh=force_fresh)
+        message = format_poke_portal_entitlement_message(
             account_info,
             capability=capability,
         )
@@ -58,8 +58,8 @@ def nous_tool_gateway_unavailable_message(
     except Exception:
         pass
     return (
-        f"{capability} is unavailable. Run `hermes model` to refresh your "
-        "Nous Portal login and billing status."
+        f"{capability} is unavailable. Run `council model` to refresh your "
+        "Poke Portal login and billing status."
     )
 
 
@@ -111,7 +111,7 @@ def resolve_modal_backend_state(
     requested_mode = coerce_modal_mode(modal_mode)
     normalized_mode = normalize_modal_mode(modal_mode)
     if managed_enabled is None:
-        managed_enabled = managed_nous_tools_enabled()
+        managed_enabled = managed_poke_tools_enabled()
     managed_mode_blocked = (
         requested_mode == "managed" and not managed_enabled
     )
@@ -147,7 +147,7 @@ def prefers_gateway(config_section: str) -> bool:
     Reads ``<section>.use_gateway`` from config.yaml.  Never raises.
     """
     try:
-        from hermes_cli.config import load_config
+        from council_cli.config import load_config
         section = (load_config() or {}).get(config_section)
         if isinstance(section, dict):
             return is_truthy_value(section.get("use_gateway"), default=False)
@@ -159,8 +159,8 @@ def prefers_gateway(config_section: str) -> bool:
 def fal_key_is_configured() -> bool:
     """Return True when FAL_KEY is set to a non-whitespace value.
 
-    Consults both ``os.environ`` and ``~/.hermes/.env`` (via
-    ``hermes_cli.config.get_env_value`` when available) so tool-side
+    Consults both ``os.environ`` and ``~/.council/.env`` (via
+    ``council_cli.config.get_env_value`` when available) so tool-side
     checks and CLI setup-time checks agree.  A whitespace-only value
     is treated as unset everywhere.
     """
@@ -169,7 +169,7 @@ def fal_key_is_configured() -> bool:
         # Fall back to the .env file for CLI paths that may run before
         # dotenv is loaded into os.environ.
         try:
-            from hermes_cli.config import get_env_value
+            from council_cli.config import get_env_value
 
             value = get_env_value("FAL_KEY")
         except Exception:

@@ -1,16 +1,16 @@
-"""Tests for hermes_cli.status model/provider display."""
+"""Tests for council_cli.status model/provider display."""
 
 from types import SimpleNamespace
 
-from hermes_cli.nous_account import NousPaidServiceAccessInfo, NousPortalAccountInfo
-from hermes_cli.nous_subscription import NousFeatureState, NousSubscriptionFeatures
+from council_cli.poke_account import PokePaidServiceAccessInfo, PokePortalAccountInfo
+from council_cli.poke_subscription import PokeFeatureState, PokeSubscriptionFeatures
 
 
 def _patch_common_status_deps(monkeypatch, status_mod, tmp_path, *, openai_base_url=""):
-    import hermes_cli.auth as auth_mod
+    import council_cli.auth as auth_mod
 
     monkeypatch.setattr(status_mod, "get_env_path", lambda: tmp_path / ".env", raising=False)
-    monkeypatch.setattr(status_mod, "get_hermes_home", lambda: tmp_path, raising=False)
+    monkeypatch.setattr(status_mod, "get_council_home", lambda: tmp_path, raising=False)
 
     def _get_env_value(name: str):
         if name == "OPENAI_BASE_URL":
@@ -18,7 +18,7 @@ def _patch_common_status_deps(monkeypatch, status_mod, tmp_path, *, openai_base_
         return ""
 
     monkeypatch.setattr(status_mod, "get_env_value", _get_env_value, raising=False)
-    monkeypatch.setattr(auth_mod, "get_nous_auth_status", lambda: {}, raising=False)
+    monkeypatch.setattr(auth_mod, "get_poke_auth_status", lambda: {}, raising=False)
     monkeypatch.setattr(auth_mod, "get_codex_auth_status", lambda: {}, raising=False)
     monkeypatch.setattr(
         status_mod.subprocess,
@@ -28,7 +28,7 @@ def _patch_common_status_deps(monkeypatch, status_mod, tmp_path, *, openai_base_
 
 
 def test_show_status_displays_configured_dict_model_and_provider_label(monkeypatch, capsys, tmp_path):
-    from hermes_cli import status as status_mod
+    from council_cli import status as status_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path)
     monkeypatch.setattr(
@@ -49,7 +49,7 @@ def test_show_status_displays_configured_dict_model_and_provider_label(monkeypat
 
 
 def test_show_status_displays_legacy_string_model_and_custom_endpoint(monkeypatch, capsys, tmp_path):
-    from hermes_cli import status as status_mod
+    from council_cli import status as status_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path, openai_base_url="http://localhost:8080/v1")
     monkeypatch.setattr(status_mod, "load_config", lambda: {"model": "qwen3:latest"}, raising=False)
@@ -64,34 +64,34 @@ def test_show_status_displays_legacy_string_model_and_custom_endpoint(monkeypatc
     assert "Provider:     Custom endpoint" in out
 
 
-def test_show_status_reports_managed_nous_features(monkeypatch, capsys, tmp_path):
-    monkeypatch.setattr("hermes_cli.status.managed_nous_tools_enabled", lambda: True)
-    from hermes_cli import status as status_mod
+def test_show_status_reports_managed_poke_features(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr("council_cli.status.managed_poke_tools_enabled", lambda: True)
+    from council_cli import status as status_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path)
     monkeypatch.setattr(
         status_mod,
         "load_config",
-        lambda: {"model": {"default": "claude-opus-4-6", "provider": "nous"}},
+        lambda: {"model": {"default": "claude-opus-4-6", "provider": "poke"}},
         raising=False,
     )
-    monkeypatch.setattr(status_mod, "resolve_requested_provider", lambda requested=None: "nous", raising=False)
-    monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "nous", raising=False)
-    monkeypatch.setattr(status_mod, "provider_label", lambda provider: "Nous Portal", raising=False)
+    monkeypatch.setattr(status_mod, "resolve_requested_provider", lambda requested=None: "poke", raising=False)
+    monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "poke", raising=False)
+    monkeypatch.setattr(status_mod, "provider_label", lambda provider: "Poke Portal", raising=False)
     monkeypatch.setattr(
         status_mod,
-        "get_nous_subscription_features",
-        lambda config: NousSubscriptionFeatures(
+        "get_poke_subscription_features",
+        lambda config: PokeSubscriptionFeatures(
             subscribed=True,
-            nous_auth_present=True,
-            provider_is_nous=True,
+            poke_auth_present=True,
+            provider_is_poke=True,
             features={
-                "web": NousFeatureState("web", "Web tools", True, True, True, True, False, True, "firecrawl"),
-                "image_gen": NousFeatureState("image_gen", "Image generation", True, True, True, True, False, True, "Nous Subscription"),
-                "video_gen": NousFeatureState("video_gen", "Video generation", False, False, False, False, False, False, ""),
-                "tts": NousFeatureState("tts", "OpenAI TTS", True, True, True, True, False, True, "OpenAI TTS"),
-                "browser": NousFeatureState("browser", "Browser automation", True, True, True, True, False, True, "Browser Use"),
-                "modal": NousFeatureState("modal", "Modal execution", False, True, False, False, False, True, "local"),
+                "web": PokeFeatureState("web", "Web tools", True, True, True, True, False, True, "firecrawl"),
+                "image_gen": PokeFeatureState("image_gen", "Image generation", True, True, True, True, False, True, "Poke Subscription"),
+                "video_gen": PokeFeatureState("video_gen", "Video generation", False, False, False, False, False, False, ""),
+                "tts": PokeFeatureState("tts", "OpenAI TTS", True, True, True, True, False, True, "OpenAI TTS"),
+                "browser": PokeFeatureState("browser", "Browser automation", True, True, True, True, False, True, "Browser Use"),
+                "modal": PokeFeatureState("modal", "Modal execution", False, True, False, False, False, True, "local"),
             },
         ),
         raising=False,
@@ -100,41 +100,41 @@ def test_show_status_reports_managed_nous_features(monkeypatch, capsys, tmp_path
     status_mod.show_status(SimpleNamespace(all=False, deep=False))
 
     out = capsys.readouterr().out
-    assert "Nous Tool Gateway" in out
+    assert "Poke Tool Gateway" in out
     assert "Browser automation" in out
-    assert "active via Nous subscription" in out
+    assert "active via Poke subscription" in out
 
 
-def test_show_status_hides_nous_subscription_section_when_feature_flag_is_off(monkeypatch, capsys, tmp_path):
-    monkeypatch.setattr("hermes_cli.status.managed_nous_tools_enabled", lambda: False)
-    from hermes_cli import status as status_mod
+def test_show_status_hides_poke_subscription_section_when_feature_flag_is_off(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr("council_cli.status.managed_poke_tools_enabled", lambda: False)
+    from council_cli import status as status_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path)
     monkeypatch.setattr(
         status_mod,
         "load_config",
-        lambda: {"model": {"default": "claude-opus-4-6", "provider": "nous"}},
+        lambda: {"model": {"default": "claude-opus-4-6", "provider": "poke"}},
         raising=False,
     )
-    monkeypatch.setattr(status_mod, "resolve_requested_provider", lambda requested=None: "nous", raising=False)
-    monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "nous", raising=False)
-    monkeypatch.setattr(status_mod, "provider_label", lambda provider: "Nous Portal", raising=False)
+    monkeypatch.setattr(status_mod, "resolve_requested_provider", lambda requested=None: "poke", raising=False)
+    monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "poke", raising=False)
+    monkeypatch.setattr(status_mod, "provider_label", lambda provider: "Poke Portal", raising=False)
 
     status_mod.show_status(SimpleNamespace(all=False, deep=False))
 
     out = capsys.readouterr().out
-    assert "Nous Tool Gateway" not in out
+    assert "Poke Tool Gateway" not in out
 
 
-def test_show_status_reports_exhausted_nous_credits(monkeypatch, capsys, tmp_path):
-    monkeypatch.setattr("hermes_cli.status.managed_nous_tools_enabled", lambda: False)
-    from hermes_cli import status as status_mod
-    import hermes_cli.auth as auth_mod
+def test_show_status_reports_exhausted_poke_credits(monkeypatch, capsys, tmp_path):
+    monkeypatch.setattr("council_cli.status.managed_poke_tools_enabled", lambda: False)
+    from council_cli import status as status_mod
+    import council_cli.auth as auth_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path)
     monkeypatch.setattr(
         auth_mod,
-        "get_nous_auth_status",
+        "get_poke_auth_status",
         lambda: {
             "logged_in": False,
             "access_token": "jwt",
@@ -146,14 +146,14 @@ def test_show_status_reports_exhausted_nous_credits(monkeypatch, capsys, tmp_pat
     )
     monkeypatch.setattr(
         status_mod,
-        "get_nous_portal_account_info",
-        lambda: NousPortalAccountInfo(
+        "get_poke_portal_account_info",
+        lambda: PokePortalAccountInfo(
             logged_in=True,
             source="account_api",
             fresh=True,
             paid_service_access=False,
             portal_base_url="https://portal.example.test",
-            paid_service_access_info=NousPaidServiceAccessInfo(
+            paid_service_access_info=PokePaidServiceAccessInfo(
                 allowed=False,
                 reason="no_usable_credits",
                 has_active_subscription=True,
@@ -165,22 +165,22 @@ def test_show_status_reports_exhausted_nous_credits(monkeypatch, capsys, tmp_pat
         ),
         raising=False,
     )
-    monkeypatch.setattr(status_mod, "load_config", lambda: {"model": {"provider": "nous"}}, raising=False)
-    monkeypatch.setattr(status_mod, "resolve_requested_provider", lambda requested=None: "nous", raising=False)
-    monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "nous", raising=False)
-    monkeypatch.setattr(status_mod, "provider_label", lambda provider: "Nous Portal", raising=False)
+    monkeypatch.setattr(status_mod, "load_config", lambda: {"model": {"provider": "poke"}}, raising=False)
+    monkeypatch.setattr(status_mod, "resolve_requested_provider", lambda requested=None: "poke", raising=False)
+    monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "poke", raising=False)
+    monkeypatch.setattr(status_mod, "provider_label", lambda provider: "Poke Portal", raising=False)
 
     status_mod.show_status(SimpleNamespace(all=False, deep=False))
 
     out = capsys.readouterr().out
-    assert "Nous Tool Gateway" in out
+    assert "Poke Tool Gateway" in out
     assert "credits are exhausted" in out
     assert "https://portal.example.test/billing" in out
-    assert "free-tier Nous account" not in out
+    assert "free-tier Poke account" not in out
 
 
 def test_show_status_reports_empty_lmstudio_listing_as_reachable(monkeypatch, capsys, tmp_path):
-    from hermes_cli import status as status_mod
+    from council_cli import status as status_mod
 
     _patch_common_status_deps(monkeypatch, status_mod, tmp_path)
     monkeypatch.setattr(
@@ -199,7 +199,7 @@ def test_show_status_reports_empty_lmstudio_listing_as_reachable(monkeypatch, ca
     monkeypatch.setattr(status_mod, "resolve_provider", lambda requested=None, **kwargs: "lmstudio", raising=False)
     monkeypatch.setattr(status_mod, "provider_label", lambda provider: "LM Studio", raising=False)
     monkeypatch.setattr(
-        "hermes_cli.models.probe_lmstudio_models",
+        "council_cli.models.probe_lmstudio_models",
         lambda api_key=None, base_url=None, timeout=5.0: [],
     )
 

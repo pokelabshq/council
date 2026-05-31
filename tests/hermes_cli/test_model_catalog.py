@@ -1,4 +1,4 @@
-"""Tests for hermes_cli.model_catalog — remote manifest fetch + cache + fallback."""
+"""Tests for council_cli.model_catalog — remote manifest fetch + cache + fallback."""
 
 from __future__ import annotations
 
@@ -13,15 +13,15 @@ import pytest
 
 @pytest.fixture
 def isolated_home(tmp_path, monkeypatch):
-    """Isolate HERMES_HOME + reset any module-level catalog cache per test."""
-    home = tmp_path / ".hermes"
+    """Isolate COUNCIL_HOME + reset any module-level catalog cache per test."""
+    home = tmp_path / ".council"
     home.mkdir()
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
 
     # Force a fresh catalog module state for each test.
     import importlib
-    from hermes_cli import model_catalog
+    from council_cli import model_catalog
     importlib.reload(model_catalog)
     yield home
     model_catalog.reset_cache()
@@ -41,8 +41,8 @@ def _valid_manifest() -> dict:
                     {"id": "openrouter/elephant-alpha", "description": "free"},
                 ],
             },
-            "nous": {
-                "metadata": {"display_name": "Nous Portal"},
+            "poke": {
+                "metadata": {"display_name": "Poke Portal"},
                 "models": [
                     {"id": "anthropic/claude-opus-4.7"},
                     {"id": "moonshotai/kimi-k2.6"},
@@ -54,41 +54,41 @@ def _valid_manifest() -> dict:
 
 class TestValidation:
     def test_accepts_well_formed_manifest(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         assert _validate_manifest(_valid_manifest()) is True
 
     def test_rejects_non_dict(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         assert _validate_manifest("string") is False
         assert _validate_manifest([]) is False
         assert _validate_manifest(None) is False
 
     def test_rejects_missing_version(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         m = _valid_manifest()
         del m["version"]
         assert _validate_manifest(m) is False
 
     def test_rejects_future_version(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         m = _valid_manifest()
         m["version"] = 999
         assert _validate_manifest(m) is False
 
     def test_rejects_missing_providers(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         m = _valid_manifest()
         del m["providers"]
         assert _validate_manifest(m) is False
 
     def test_rejects_malformed_model_entry(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         m = _valid_manifest()
         m["providers"]["openrouter"]["models"][0] = {"id": ""}  # empty id
         assert _validate_manifest(m) is False
 
     def test_rejects_non_string_model_id(self, isolated_home):
-        from hermes_cli.model_catalog import _validate_manifest
+        from council_cli.model_catalog import _validate_manifest
         m = _valid_manifest()
         m["providers"]["openrouter"]["models"][0] = {"id": 42}
         assert _validate_manifest(m) is False
@@ -96,7 +96,7 @@ class TestValidation:
 
 class TestFetchSuccess:
     def test_fetch_and_cache_writes_disk(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         manifest = _valid_manifest()
         with patch.object(
             model_catalog, "_fetch_manifest", return_value=manifest
@@ -112,7 +112,7 @@ class TestFetchSuccess:
             assert json.load(fh) == manifest
 
     def test_second_call_uses_in_process_cache(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         manifest = _valid_manifest()
         with patch.object(
             model_catalog, "_fetch_manifest", return_value=manifest
@@ -122,7 +122,7 @@ class TestFetchSuccess:
         assert fetch.call_count == 1
 
     def test_force_refresh_always_refetches(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         manifest = _valid_manifest()
         with patch.object(
             model_catalog, "_fetch_manifest", return_value=manifest
@@ -134,13 +134,13 @@ class TestFetchSuccess:
 
 class TestFetchFailure:
     def test_network_failure_returns_empty_when_no_cache(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         with patch.object(model_catalog, "_fetch_manifest", return_value=None):
             result = model_catalog.get_catalog(force_refresh=True)
         assert result == {}
 
     def test_network_failure_falls_back_to_disk_cache(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         # Prime disk cache with a fresh copy.
         manifest = _valid_manifest()
         with patch.object(model_catalog, "_fetch_manifest", return_value=manifest):
@@ -154,7 +154,7 @@ class TestFetchFailure:
         assert result == manifest
 
     def test_fetch_failure_falls_back_to_stale_cache(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         manifest = _valid_manifest()
         # Write stale cache directly (mtime in the past).
         cache = model_catalog._cache_path()
@@ -180,14 +180,14 @@ class TestFallbackChain:
     releases (opus 4.8, etc.) never reach the picker.
     """
 
-    PRIMARY = "https://hermes-agent.nousresearch.com/docs/api/model-catalog.json"
+    PRIMARY = "https://ai-council.pokelabs.com/docs/api/model-catalog.json"
     FALLBACK = (
-        "https://raw.githubusercontent.com/NousResearch/hermes-agent"
+        "https://raw.githubusercontent.com/pokelabshq/council"
         "/main/website/static/api/model-catalog.json"
     )
 
     def test_uses_primary_when_it_succeeds(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         calls: list[str] = []
 
         def fake_fetch(url, timeout):
@@ -201,7 +201,7 @@ class TestFallbackChain:
         assert calls == [self.PRIMARY], "fallback URLs must not be touched on primary success"
 
     def test_falls_through_to_raw_github_on_primary_failure(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         calls: list[str] = []
 
         def fake_fetch(url, timeout):
@@ -217,7 +217,7 @@ class TestFallbackChain:
         assert calls == [self.PRIMARY, self.FALLBACK]
 
     def test_returns_none_when_all_urls_fail(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
 
         with patch.object(model_catalog, "_fetch_manifest", return_value=None) as fetch:
             result = model_catalog._fetch_manifest_with_fallback(self.PRIMARY, 5.0)
@@ -229,7 +229,7 @@ class TestFallbackChain:
     def test_dedupes_when_primary_equals_fallback(self, isolated_home):
         """Operator who configured ``model_catalog.url`` to the raw GitHub URL
         should not get a duplicate fetch from the fallback list."""
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
 
         with patch.object(model_catalog, "_fetch_manifest", return_value=None) as fetch:
             model_catalog._fetch_manifest_with_fallback(self.FALLBACK, 5.0)
@@ -239,7 +239,7 @@ class TestFallbackChain:
     def test_get_catalog_uses_fallback_chain(self, isolated_home):
         """End-to-end: ``get_catalog`` routes through the fallback helper so
         a primary URL failure transparently produces a working catalog."""
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         manifest = _valid_manifest()
         calls: list[str] = []
 
@@ -258,7 +258,7 @@ class TestFallbackChain:
 
 class TestCuratedAccessors:
     def test_openrouter_returns_tuples(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         with patch.object(
             model_catalog, "_fetch_manifest", return_value=_valid_manifest()
         ):
@@ -269,28 +269,28 @@ class TestCuratedAccessors:
             ("openrouter/elephant-alpha", "free"),
         ]
 
-    def test_nous_returns_ids(self, isolated_home):
-        from hermes_cli import model_catalog
+    def test_poke_returns_ids(self, isolated_home):
+        from council_cli import model_catalog
         with patch.object(
             model_catalog, "_fetch_manifest", return_value=_valid_manifest()
         ):
-            result = model_catalog.get_curated_nous_models()
+            result = model_catalog.get_curated_poke_models()
         assert result == ["anthropic/claude-opus-4.7", "moonshotai/kimi-k2.6"]
 
     def test_openrouter_returns_none_when_catalog_empty(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         with patch.object(model_catalog, "_fetch_manifest", return_value=None):
             assert model_catalog.get_curated_openrouter_models() is None
 
-    def test_nous_returns_none_when_catalog_empty(self, isolated_home):
-        from hermes_cli import model_catalog
+    def test_poke_returns_none_when_catalog_empty(self, isolated_home):
+        from council_cli import model_catalog
         with patch.object(model_catalog, "_fetch_manifest", return_value=None):
-            assert model_catalog.get_curated_nous_models() is None
+            assert model_catalog.get_curated_poke_models() is None
 
 
 class TestDisabled:
     def test_disabled_config_short_circuits(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         with patch.object(
             model_catalog,
             "_load_catalog_config",
@@ -309,7 +309,7 @@ class TestDisabled:
 
 class TestProviderOverride:
     def test_override_url_takes_precedence(self, isolated_home):
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
 
         override_payload = {
             "version": 1,
@@ -344,54 +344,54 @@ class TestProviderOverride:
 
 
 class TestIntegrationWithModelsModule:
-    """Exercise the fallback paths via the real callers in hermes_cli.models."""
+    """Exercise the fallback paths via the real callers in council_cli.models."""
 
-    def test_curated_nous_ids_falls_back_to_hardcoded_on_empty_catalog(
+    def test_curated_poke_ids_falls_back_to_hardcoded_on_empty_catalog(
         self, isolated_home
     ):
-        from hermes_cli import model_catalog
-        from hermes_cli.models import get_curated_nous_model_ids, _PROVIDER_MODELS
+        from council_cli import model_catalog
+        from council_cli.models import get_curated_poke_model_ids, _PROVIDER_MODELS
 
         with patch.object(model_catalog, "_fetch_manifest", return_value=None):
-            result = get_curated_nous_model_ids()
+            result = get_curated_poke_model_ids()
 
-        assert result == list(_PROVIDER_MODELS["nous"])
+        assert result == list(_PROVIDER_MODELS["poke"])
 
-    def test_curated_nous_ids_prefers_manifest(self, isolated_home):
-        from hermes_cli import model_catalog
-        from hermes_cli.models import get_curated_nous_model_ids
+    def test_curated_poke_ids_prefers_manifest(self, isolated_home):
+        from council_cli import model_catalog
+        from council_cli.models import get_curated_poke_model_ids
 
         with patch.object(
             model_catalog, "_fetch_manifest", return_value=_valid_manifest()
         ):
-            result = get_curated_nous_model_ids()
+            result = get_curated_poke_model_ids()
 
         assert result == ["anthropic/claude-opus-4.7", "moonshotai/kimi-k2.6"]
 
-    def test_picker_nous_row_uses_manifest(self, tmp_path, monkeypatch):
-        """The /model picker must surface the manifest's nous list, not the
-        in-repo _PROVIDER_MODELS["nous"] snapshot. Regression: before this
+    def test_picker_poke_row_uses_manifest(self, tmp_path, monkeypatch):
+        """The /model picker must surface the manifest's poke list, not the
+        in-repo _PROVIDER_MODELS["poke"] snapshot. Regression: before this
         fix, list_authenticated_providers() built the curated dict from
         _PROVIDER_MODELS only — so newly-added Portal models never reached
-        the slash-command picker until the next Hermes release.
+        the slash-command picker until the next Council release.
         """
         # We deliberately do NOT use the ``isolated_home`` fixture here:
         # that fixture monkeypatches ``Path.home`` to ``tmp_path``, which
         # trips the auth-store seat-belt in ``_auth_file_path()`` because
-        # ``HERMES_HOME / auth.json`` then resolves to the same path the
+        # ``COUNCIL_HOME / auth.json`` then resolves to the same path the
         # seat-belt thinks is the "real" user store. Use the autouse
-        # ``_hermetic_environment`` HERMES_HOME directly instead.
+        # ``_hermetic_environment`` COUNCIL_HOME directly instead.
         import importlib
-        from hermes_cli import model_catalog
+        from council_cli import model_catalog
         importlib.reload(model_catalog)
         try:
-            from hermes_cli.model_switch import list_picker_providers
+            from council_cli.model_switch import list_picker_providers
 
-            active_home = Path(os.environ["HERMES_HOME"])
+            active_home = Path(os.environ["COUNCIL_HOME"])
             (active_home / "auth.json").write_text(
                 json.dumps(
                     {
-                        "providers": {"nous": {"access_token": "fake"}},
+                        "providers": {"poke": {"access_token": "fake"}},
                         "credential_pool": {},
                     }
                 )
@@ -401,14 +401,14 @@ class TestIntegrationWithModelsModule:
                 model_catalog, "_fetch_manifest", return_value=_valid_manifest()
             ):
                 picker = list_picker_providers(
-                    current_provider="nous", max_models=99
+                    current_provider="poke", max_models=99
                 )
         finally:
             model_catalog.reset_cache()
 
-        nous_row = next((r for r in picker if r["slug"] == "nous"), None)
-        assert nous_row is not None, "nous row must appear when authed"
-        assert nous_row["models"] == [
+        poke_row = next((r for r in picker if r["slug"] == "poke"), None)
+        assert poke_row is not None, "poke row must appear when authed"
+        assert poke_row["models"] == [
             "anthropic/claude-opus-4.7",
             "moonshotai/kimi-k2.6",
         ]
@@ -418,7 +418,7 @@ class TestIntegrationWithModelsModule:
 # Drift guard — prevent the in-repo curated lists from going out of sync with
 # the docs-hosted manifest at website/static/api/model-catalog.json.
 #
-# History: qwen/qwen3.6-plus was added to _PROVIDER_MODELS["nous"] in commit
+# History: qwen/qwen3.6-plus was added to _PROVIDER_MODELS["poke"] in commit
 # 9dd6e5510 but website/static/api/model-catalog.json was not regenerated for
 # weeks, so free-tier users on a new install fetched a stale manifest and the
 # free-tier picker showed "No free models currently available." even though
@@ -463,7 +463,7 @@ class TestManifestMatchesInRepoLists:
 
         assert self._strip_volatile(actual) == self._strip_volatile(expected), (
             "website/static/api/model-catalog.json is out of sync with "
-            "_PROVIDER_MODELS['nous'] / OPENROUTER_MODELS. "
+            "_PROVIDER_MODELS['poke'] / OPENROUTER_MODELS. "
             "Run: python scripts/build_model_catalog.py && "
             "git add website/static/api/model-catalog.json"
         )

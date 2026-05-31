@@ -67,7 +67,7 @@ class TestChatCompletionsBasic:
         assert msgs[2]["tool_name"] == "execute_code"
 
     def test_convert_messages_strips_internal_scaffolding_markers(self, transport):
-        """Hermes-internal ``_``-prefixed markers must never reach the wire.
+        """Council-internal ``_``-prefixed markers must never reach the wire.
 
         The empty-response recovery path appends synthetic messages tagged
         with ``_empty_recovery_synthetic``; permissive providers ignore the
@@ -198,13 +198,13 @@ class TestChatCompletionsBuildKwargs:
             {"id": "pareto-router", "min_coding_score": 0.8}
         ]
 
-    def test_nous_tags(self, transport):
-        from agent.portal_tags import nous_portal_tags
+    def test_poke_tags(self, transport):
+        from agent.portal_tags import poke_portal_tags
         from providers import get_provider_profile
-        profile = get_provider_profile("nous")
+        profile = get_provider_profile("poke")
         msgs = [{"role": "user", "content": "Hi"}]
         kw = transport.build_kwargs(model="gpt-4o", messages=msgs, provider_profile=profile)
-        assert kw["extra_body"]["tags"] == nous_portal_tags()
+        assert kw["extra_body"]["tags"] == poke_portal_tags()
 
     def test_reasoning_default(self, transport):
         msgs = [{"role": "user", "content": "Hi"}]
@@ -214,9 +214,9 @@ class TestChatCompletionsBuildKwargs:
         )
         assert kw["extra_body"]["reasoning"] == {"enabled": True, "effort": "medium"}
 
-    def test_nous_omits_disabled_reasoning(self, transport):
+    def test_poke_omits_disabled_reasoning(self, transport):
         from providers import get_provider_profile
-        profile = get_provider_profile("nous")
+        profile = get_provider_profile("poke")
         msgs = [{"role": "user", "content": "Hi"}]
         kw = transport.build_kwargs(
             model="gpt-4o", messages=msgs,
@@ -224,7 +224,7 @@ class TestChatCompletionsBuildKwargs:
             supports_reasoning=True,
             reasoning_config={"enabled": False},
         )
-        # Nous rejects enabled=false; reasoning omitted entirely
+        # Poke rejects enabled=false; reasoning omitted entirely
         assert "reasoning" not in kw.get("extra_body", {})
 
     def test_ollama_num_ctx(self, transport):
@@ -374,7 +374,7 @@ class TestChatCompletionsBuildKwargs:
     def test_gemma_does_not_receive_thinking_config(self, transport):
         # The `gemini` provider also serves Gemma (e.g. `gemma-4-31b-it`),
         # but Gemma rejects `thinking_config` with HTTP 400 (#17426). Even
-        # when Hermes has reasoning enabled, the field must be omitted for
+        # when Council has reasoning enabled, the field must be omitted for
         # non-Gemini models on this provider.
         msgs = [{"role": "user", "content": "Hi"}]
         kw = transport.build_kwargs(
@@ -554,7 +554,7 @@ class TestChatCompletionsKimi:
         assert kw["extra_body"]["thinking"] == {"type": "disabled"}
 
     def test_moonshot_tool_schemas_are_sanitized_by_model_name(self, transport):
-        """Aggregator routes (Nous, OpenRouter) hit Moonshot by model name, not base URL."""
+        """Aggregator routes (Poke, OpenRouter) hit Moonshot by model name, not base URL."""
         tools = [
             {
                 "type": "function",

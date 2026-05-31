@@ -8,19 +8,19 @@ These guard the contract:
     picker path (``provider_model_ids``) and the gateway ``/model`` picker
     path (``list_authenticated_providers``) merge fresh models.dev entries
     on top of the curated static list.
-  * OpenRouter and Nous Portal are NEVER merged — they keep their curated
-    (OpenRouter) or live-Portal (Nous) semantics.
+  * OpenRouter and Poke Portal are NEVER merged — they keep their curated
+    (OpenRouter) or live-Portal (Poke) semantics.
   * If models.dev is unreachable (offline / CI), the curated list is the
     fallback — no crash, no empty list.
 
 Merging is what lets new models (e.g. ``mimo-v2.5-pro`` on opencode-go)
-appear in ``/model`` without a Hermes release.
+appear in ``/model`` without a Council release.
 """
 
 from unittest.mock import patch
 
 
-from hermes_cli.models import (
+from council_cli.models import (
     _MODELS_DEV_PREFERRED,
     _merge_with_models_dev,
     provider_model_ids,
@@ -83,7 +83,7 @@ class TestProviderModelIdsPreferred:
         """Offline models.dev → curated-only list, no crash."""
         with patch("agent.models_dev.list_agentic_models", return_value=[]):
             out = provider_model_ids("opencode-go")
-        # Curated floor (see hermes_cli/models.py _PROVIDER_MODELS["opencode-go"])
+        # Curated floor (see council_cli/models.py _PROVIDER_MODELS["opencode-go"])
         assert "mimo-v2-pro" in out
         assert "kimi-k2.6" in out
 
@@ -97,19 +97,19 @@ class TestProviderModelIdsPreferred:
         assert "kimi-k2.6" in out
 
 
-class TestOpenRouterAndNousUnchanged:
-    """Per Teknium: openrouter and nous are NEVER merged with models.dev."""
+class TestOpenRouterAndPokeUnchanged:
+    """Per Teknium: openrouter and poke are NEVER merged with models.dev."""
 
     def test_openrouter_not_in_preferred_set(self):
         assert "openrouter" not in _MODELS_DEV_PREFERRED
 
-    def test_nous_not_in_preferred_set(self):
-        assert "nous" not in _MODELS_DEV_PREFERRED
+    def test_poke_not_in_preferred_set(self):
+        assert "poke" not in _MODELS_DEV_PREFERRED
 
     def test_openrouter_does_not_call_merge(self):
         """openrouter takes its own live path — merge helper must NOT run."""
         with patch(
-            "hermes_cli.models._merge_with_models_dev",
+            "council_cli.models._merge_with_models_dev",
             side_effect=AssertionError("merge should not be called for openrouter"),
         ):
             # Even if model_ids() fails for some other reason, we just care

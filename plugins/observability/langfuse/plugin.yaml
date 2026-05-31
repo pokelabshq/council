@@ -1,10 +1,10 @@
 name: langfuse
 version: "1.0.0"
-description: "Optional Langfuse observability for Hermes — traces conversations, LLM calls, and tool usage. Opt-in via `hermes plugins enable observability/langfuse` (or check the box in `hermes plugins`)."
-author: NousResearch
+description: "Optional Langfuse observability for Council — traces conversations, LLM calls, and tool usage. Opt-in via `council plugins enable observability/langfuse` (or check the box in `council plugins`)."
+author: PokeLabs
 requires_env:
-  - HERMES_LANGFUSE_PUBLIC_KEY
-  - HERMES_LANGFUSE_SECRET_KEY
+  - COUNCIL_LANGFUSE_PUBLIC_KEY
+  - COUNCIL_LANGFUSE_SECRET_KEY
 hooks:
   - pre_api_request
   - post_api_request

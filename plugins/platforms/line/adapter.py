@@ -1,5 +1,5 @@
 """
-LINE Messaging API platform adapter for Hermes Agent.
+LINE Messaging API platform adapter for Poke Council.
 
 A bundled platform plugin that runs an aiohttp webhook server, accepts LINE
 webhook events (signature-verified), and relays messages to/from the agent
@@ -41,7 +41,7 @@ Synthesis credits
 -----------------
 
 This file is a synthesis of seven open community PRs adding LINE support
-to Hermes Agent. It deliberately ports the *strongest* idea from each into
+to Poke Council. It deliberately ports the *strongest* idea from each into
 a single plugin-form module that requires zero core edits:
 
 * PR #18153 (leepoweii)   — Template Buttons postback cache state machine,
@@ -1262,7 +1262,7 @@ class LineAdapter(BasePlatformAdapter):
         from trusted internal code, we recheck the resolved path against
         an allowed-roots set before serving. Sources allowed:
         ``tempfile.gettempdir()``, ``/tmp`` (which resolves to
-        ``/private/tmp`` on macOS), and ``HERMES_HOME``. PR #8398.
+        ``/private/tmp`` on macOS), and ``COUNCIL_HOME``. PR #8398.
         """
         from aiohttp import web
 
@@ -1281,15 +1281,15 @@ class LineAdapter(BasePlatformAdapter):
             return web.Response(status=404, text="not found")
 
         try:
-            from hermes_constants import get_hermes_home
-            hermes_home = Path(get_hermes_home()).resolve()
+            from council_constants import get_council_home
+            council_home = Path(get_council_home()).resolve()
         except Exception:
-            hermes_home = Path.home().joinpath(".hermes").resolve()
+            council_home = Path.home().joinpath(".council").resolve()
 
         allowed_roots = {
             Path(tempfile.gettempdir()).resolve(),
             Path("/tmp").resolve(),  # → /private/tmp on macOS
-            hermes_home,
+            council_home,
         }
         resolved = path.resolve()
         if not any(_is_relative_to(resolved, r) for r in allowed_roots):
@@ -1487,14 +1487,14 @@ def validate_config(config) -> bool:
 
 
 def is_connected(config) -> bool:
-    """Surface in ``hermes status`` even before the adapter is instantiated."""
+    """Surface in ``council status`` even before the adapter is instantiated."""
     return validate_config(config)
 
 
 def _env_enablement() -> Optional[Dict[str, Any]]:
     """Auto-seed PlatformConfig.extra from env-only setups.
 
-    Lets ``hermes status`` reflect a LINE configuration that lives entirely
+    Lets ``council status`` reflect a LINE configuration that lives entirely
     in ``.env`` without a ``platforms.line`` block in ``config.yaml``.
     Mirrors the IRC plugin's pattern.
     """
@@ -1561,10 +1561,10 @@ async def _standalone_send(
 
 
 def interactive_setup() -> None:
-    """Minimal stdin wizard for ``hermes setup line``.
+    """Minimal stdin wizard for ``council setup line``.
 
     Mirrors the irc/teams style: prompts for the two required vars, plus
-    one optional public URL. Writes to ``~/.hermes/.env`` via ``hermes_cli.config``.
+    one optional public URL. Writes to ``~/.council/.env`` via ``council_cli.config``.
     """
     print()
     print("LINE Messaging API setup")
@@ -1574,9 +1574,9 @@ def interactive_setup() -> None:
     print()
 
     try:
-        from hermes_cli.config import get_env_var, set_env_var
+        from council_cli.config import get_env_var, set_env_var
     except ImportError:
-        print("hermes_cli.config not available; set LINE_* vars manually in ~/.hermes/.env")
+        print("council_cli.config not available; set LINE_* vars manually in ~/.council/.env")
         return
 
     def _prompt(var: str, prompt: str, *, secret: bool = False) -> None:
@@ -1584,7 +1584,7 @@ def interactive_setup() -> None:
         suffix = " [keep current]" if existing else ""
         try:
             if secret:
-                from hermes_cli.secret_prompt import masked_secret_prompt
+                from council_cli.secret_prompt import masked_secret_prompt
                 value = masked_secret_prompt(f"{prompt}{suffix}: ")
             else:
                 value = input(f"{prompt}{suffix}: ").strip()
@@ -1603,7 +1603,7 @@ def interactive_setup() -> None:
 
 
 def register(ctx) -> None:
-    """Plugin entry point — called by the Hermes plugin system at startup."""
+    """Plugin entry point — called by the Council plugin system at startup."""
     ctx.register_platform(
         name="line",
         label="LINE",

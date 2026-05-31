@@ -1,4 +1,4 @@
-"""Tests for the Kanban DB layer (hermes_cli.kanban_db)."""
+"""Tests for the Kanban DB layer (council_cli.kanban_db)."""
 
 from __future__ import annotations
 
@@ -13,15 +13,15 @@ from pathlib import Path
 
 import pytest
 
-from hermes_cli import kanban_db as kb
+from council_cli import kanban_db as kb
 
 
 @pytest.fixture
 def kanban_home(tmp_path, monkeypatch):
-    """Isolated HERMES_HOME with an empty kanban DB."""
-    home = tmp_path / ".hermes"
+    """Isolated COUNCIL_HOME with an empty kanban DB."""
+    home = tmp_path / ".council"
     home.mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     kb.init_db()
     return home
@@ -59,7 +59,7 @@ def test_connect_honors_kanban_busy_timeout_env(kanban_home, monkeypatch):
     setup.  The timeout must be queryable via PRAGMA so CLI, gateway, and tool
     connections behave the same way.
     """
-    monkeypatch.setenv("HERMES_KANBAN_BUSY_TIMEOUT_MS", "123456")
+    monkeypatch.setenv("COUNCIL_KANBAN_BUSY_TIMEOUT_MS", "123456")
 
     with kb.connect() as conn:
         row = conn.execute("PRAGMA busy_timeout").fetchone()
@@ -90,11 +90,11 @@ def test_cross_process_init_lock_uses_windows_byte_range_lock(tmp_path, monkeypa
 
 def test_connect_rejects_tls_record_in_sqlite_header(tmp_path, monkeypatch):
     """Kanban should classify TLS-looking page-0 clobbers before WAL setup."""
-    home = tmp_path / ".hermes"
+    home = tmp_path / ".council"
     home.mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
-    monkeypatch.delenv("HERMES_KANBAN_DB", raising=False)
-    monkeypatch.delenv("HERMES_KANBAN_HOME", raising=False)
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
+    monkeypatch.delenv("COUNCIL_KANBAN_DB", raising=False)
+    monkeypatch.delenv("COUNCIL_KANBAN_HOME", raising=False)
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     corrupt = home / "kanban.db"
@@ -360,7 +360,7 @@ def test_claim_once_wins_second_loses(kanban_home):
 
 
 def test_claim_uses_env_default_ttl(kanban_home, monkeypatch):
-    monkeypatch.setenv("HERMES_KANBAN_CLAIM_TTL_SECONDS", "3600")
+    monkeypatch.setenv("COUNCIL_KANBAN_CLAIM_TTL_SECONDS", "3600")
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
         kb.claim_task(conn, t, claimer="host:1")
@@ -409,7 +409,7 @@ def test_unblock_scheduled_rechecks_parent_gate(kanban_home):
 
 def test_stale_claim_reclaimed(kanban_home, monkeypatch):
     import signal
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
@@ -443,7 +443,7 @@ def test_stale_claim_with_live_pid_extends_instead_of_reclaiming(
     ``DEFAULT_CLAIM_TTL_SECONDS`` inside a single tool-free LLM call;
     killing those healthy workers produces a respawn loop with zero
     progress."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
@@ -481,9 +481,9 @@ def test_stale_claim_with_live_pid_extends_instead_of_reclaiming(
 def test_stale_claim_with_live_pid_uses_env_ttl_override(
     kanban_home, monkeypatch,
 ):
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
-    monkeypatch.setenv("HERMES_KANBAN_CLAIM_TTL_SECONDS", "3600")
+    monkeypatch.setenv("COUNCIL_KANBAN_CLAIM_TTL_SECONDS", "3600")
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
@@ -513,7 +513,7 @@ def test_stale_claim_reclaim_event_records_diagnostic_payload(
     (#23025: previous payload only had ``stale_lock`` which gives no
     timing context)."""
     import json
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
@@ -547,7 +547,7 @@ def test_detect_crashed_workers_systemic_failure_fast_block(
     kanban_home, monkeypatch,
 ):
     """When many tasks crash with the same error, trip the breaker faster."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: False)
 
@@ -578,7 +578,7 @@ def test_detect_crashed_workers_isolated_failure_normal_retry(
     kanban_home, monkeypatch,
 ):
     """Below the systemic threshold, tasks retain normal retry budget."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: False)
 
@@ -609,10 +609,10 @@ def test_detect_crashed_workers_skips_freshly_claimed_tasks(
     kanban_home, monkeypatch,
 ):
     """Grace period prevents reclaim of freshly-started tasks."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: False)
-    monkeypatch.delenv("HERMES_KANBAN_CRASH_GRACE_SECONDS", raising=False)
+    monkeypatch.delenv("COUNCIL_KANBAN_CRASH_GRACE_SECONDS", raising=False)
 
     now = 1_000_000.0
     monkeypatch.setattr(_kb.time, "time", lambda: now)
@@ -640,11 +640,11 @@ def test_detect_crashed_workers_skips_freshly_claimed_tasks(
 def test_detect_crashed_workers_grace_period_env_override(
     kanban_home, monkeypatch,
 ):
-    """HERMES_KANBAN_CRASH_GRACE_SECONDS env var adjusts the window."""
-    import hermes_cli.kanban_db as _kb
+    """COUNCIL_KANBAN_CRASH_GRACE_SECONDS env var adjusts the window."""
+    import council_cli.kanban_db as _kb
 
     monkeypatch.setattr(_kb, "_pid_alive", lambda _pid: False)
-    monkeypatch.setenv("HERMES_KANBAN_CRASH_GRACE_SECONDS", "5")
+    monkeypatch.setenv("COUNCIL_KANBAN_CRASH_GRACE_SECONDS", "5")
 
     now = 2_000_000.0
 
@@ -669,10 +669,10 @@ def test_detect_crashed_workers_grace_period_env_override(
 
 def test_resolve_crash_grace_seconds_handles_bad_env(monkeypatch):
     """Bad env values fall back to DEFAULT_CRASH_GRACE_SECONDS."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     for bad_val in ("notanumber", "-5", ""):
-        monkeypatch.setenv("HERMES_KANBAN_CRASH_GRACE_SECONDS", bad_val)
+        monkeypatch.setenv("COUNCIL_KANBAN_CRASH_GRACE_SECONDS", bad_val)
         result = _kb._resolve_crash_grace_seconds()
         assert result == _kb.DEFAULT_CRASH_GRACE_SECONDS, (
             f"expected default for {bad_val!r}, got {result}"
@@ -742,7 +742,7 @@ def test_heartbeat_extends_claim(kanban_home):
 
 
 def test_heartbeat_uses_env_default_ttl(kanban_home, monkeypatch):
-    monkeypatch.setenv("HERMES_KANBAN_CLAIM_TTL_SECONDS", "3600")
+    monkeypatch.setenv("COUNCIL_KANBAN_CLAIM_TTL_SECONDS", "3600")
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x", assignee="a")
         claimer = "host:hb"
@@ -1283,7 +1283,7 @@ def test_dispatch_skips_nonspawnable_into_separate_bucket(kanban_home, monkeypat
     ``skipped_unassigned`` (which is operator-actionable) — they go in
     the dedicated ``skipped_nonspawnable`` bucket so health telemetry
     can suppress false-positive "stuck" warnings."""
-    from hermes_cli import profiles
+    from council_cli import profiles
     monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
     with kb.connect() as conn:
         t = kb.create_task(conn, title="for-terminal", assignee="orion-cc")
@@ -1297,7 +1297,7 @@ def test_has_spawnable_ready_false_when_only_terminal_lanes(kanban_home, monkeyp
     """``has_spawnable_ready`` returns False when every ready task is
     assigned to a control-plane lane — used by gateway/CLI dispatchers
     to silence the stuck-warn while terminals still have queued work."""
-    from hermes_cli import profiles
+    from council_cli import profiles
     monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
     with kb.connect() as conn:
         kb.create_task(conn, title="t1", assignee="orion-cc")
@@ -1307,15 +1307,15 @@ def test_has_spawnable_ready_false_when_only_terminal_lanes(kanban_home, monkeyp
 
 def test_has_spawnable_ready_true_when_real_profile_present(kanban_home, monkeypatch):
     """``has_spawnable_ready`` returns True as soon as ANY ready task
-    has an assignee that maps to a real Hermes profile — preserves the
+    has an assignee that maps to a real Council profile — preserves the
     real "stuck" signal when a daily/agent task is queued."""
-    from hermes_cli import profiles
+    from council_cli import profiles
     monkeypatch.setattr(
         profiles, "profile_exists", lambda name: name == "daily"
     )
     with kb.connect() as conn:
         kb.create_task(conn, title="terminal-task", assignee="orion-cc")
-        kb.create_task(conn, title="hermes-task", assignee="daily")
+        kb.create_task(conn, title="council-task", assignee="daily")
         assert kb.has_spawnable_ready(conn) is True
 
 
@@ -1694,7 +1694,7 @@ def test_dispatch_respawn_guard_emits_event_for_skipped_task(
 # Workspace resolution
 # ---------------------------------------------------------------------------
 
-def test_scratch_workspace_created_under_hermes_home(kanban_home):
+def test_scratch_workspace_created_under_council_home(kanban_home):
     with kb.connect() as conn:
         t = kb.create_task(conn, title="x")
         task = kb.get_task(conn, t)
@@ -1741,7 +1741,7 @@ def test_cleanup_workspace_removes_managed_scratch_dir(kanban_home):
         kb.set_workspace_path(conn, t, ws)
         assert ws.is_dir()
         kb.complete_task(conn, t, result="ok")
-    assert not ws.exists(), "Hermes-managed scratch dir should be cleaned up"
+    assert not ws.exists(), "Council-managed scratch dir should be cleaned up"
 
 
 def test_cleanup_workspace_refuses_path_outside_scratch_root(kanban_home, tmp_path):
@@ -1776,19 +1776,19 @@ def test_cleanup_workspace_refuses_path_outside_scratch_root(kanban_home, tmp_pa
 
 
 def test_cleanup_workspace_honors_workspaces_root_env_override(tmp_path, monkeypatch):
-    """``HERMES_KANBAN_WORKSPACES_ROOT`` extends the managed-scratch set.
+    """``COUNCIL_KANBAN_WORKSPACES_ROOT`` extends the managed-scratch set.
 
     Worker subprocesses run with this env var injected by the dispatcher. The
     cleanup containment check must treat paths under it as managed even when
     they sit outside the active kanban home.
     """
-    home = tmp_path / ".hermes"
+    home = tmp_path / ".council"
     home.mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
     workspaces_override = tmp_path / "ext-workspaces"
     workspaces_override.mkdir()
-    monkeypatch.setenv("HERMES_KANBAN_WORKSPACES_ROOT", str(workspaces_override))
+    monkeypatch.setenv("COUNCIL_KANBAN_WORKSPACES_ROOT", str(workspaces_override))
     kb.init_db()
 
     with kb.connect() as conn:
@@ -1820,13 +1820,13 @@ def test_is_managed_scratch_path_rejects_real_source_tree(kanban_home, tmp_path)
 
 
 def test_is_managed_scratch_path_rejects_kanban_metadata_subtrees(kanban_home):
-    """Hermes' own DB/metadata/log subtrees under ``<kanban_home>/kanban`` are NOT managed.
+    """Council' own DB/metadata/log subtrees under ``<kanban_home>/kanban`` are NOT managed.
 
     Regression guard for the Copilot finding on #28819: a scratch task whose
     ``workspace_path`` was mis-set to the kanban home, the logs dir, or a
     board's metadata dir (i.e. the board root itself, not its ``workspaces/``
     child) must be refused. Without this, the containment check would happily
-    ``shutil.rmtree`` Hermes' DB/metadata/logs on task completion.
+    ``shutil.rmtree`` Council' DB/metadata/logs on task completion.
     """
     kanban_root = kanban_home / "kanban"
     kanban_root.mkdir(parents=True, exist_ok=True)
@@ -1999,26 +1999,26 @@ def test_session_id_compose_with_tenant_filter(kanban_home):
 # Shared-board path resolution (issue #19348)
 #
 # The kanban board is a cross-profile coordination primitive: a worker
-# spawned with `hermes -p <profile>` must read/write the same kanban.db
+# spawned with `council -p <profile>` must read/write the same kanban.db
 # as the dispatcher that claimed the task. These tests exercise the
 # path-resolution layer directly and would have caught the regression
-# where `kanban_db_path()` resolved to the active profile's HERMES_HOME.
+# where `kanban_db_path()` resolved to the active profile's COUNCIL_HOME.
 # ---------------------------------------------------------------------------
 
 class TestSharedBoardPaths:
     """`kanban_home`/`kanban_db_path`/`workspaces_root`/`worker_log_path`
-    must anchor at the **shared root**, not the active profile's HERMES_HOME."""
+    must anchor at the **shared root**, not the active profile's COUNCIL_HOME."""
 
-    def _set_home(self, monkeypatch, tmp_path, hermes_home):
+    def _set_home(self, monkeypatch, tmp_path, council_home):
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(hermes_home))
-        monkeypatch.delenv("HERMES_KANBAN_HOME", raising=False)
+        monkeypatch.setenv("COUNCIL_HOME", str(council_home))
+        monkeypatch.delenv("COUNCIL_KANBAN_HOME", raising=False)
 
-    def test_default_install_anchors_at_home_dot_hermes(
+    def test_default_install_anchors_at_home_dot_council(
         self, tmp_path, monkeypatch
     ):
-        # Standard install: HERMES_HOME == ~/.hermes, no profile active.
-        default_home = tmp_path / ".hermes"
+        # Standard install: COUNCIL_HOME == ~/.council, no profile active.
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         self._set_home(monkeypatch, tmp_path, default_home)
 
@@ -2033,18 +2033,18 @@ class TestSharedBoardPaths:
     def test_profile_worker_resolves_to_shared_root(
         self, tmp_path, monkeypatch
     ):
-        # Reproduces the bug: dispatcher uses ~/.hermes/kanban.db,
+        # Reproduces the bug: dispatcher uses ~/.council/kanban.db,
         # worker spawned with -p <profile> previously resolved to
-        # ~/.hermes/profiles/<profile>/kanban.db. After the fix both
-        # converge on ~/.hermes/kanban.db.
-        default_home = tmp_path / ".hermes"
+        # ~/.council/profiles/<profile>/kanban.db. After the fix both
+        # converge on ~/.council/kanban.db.
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         profile_home = default_home / "profiles" / "nehemiahkanban"
         profile_home.mkdir(parents=True)
         self._set_home(monkeypatch, tmp_path, profile_home)
 
         # All four resolvers must anchor at the shared root, not the
-        # profile-local HERMES_HOME.
+        # profile-local COUNCIL_HOME.
         assert kb.kanban_home() == default_home
         assert kb.kanban_db_path() == default_home / "kanban.db"
         assert kb.workspaces_root() == default_home / "kanban" / "workspaces"
@@ -2061,9 +2061,9 @@ class TestSharedBoardPaths:
         self, tmp_path, monkeypatch
     ):
         # End-to-end convergence: resolve the path under each side's
-        # HERMES_HOME and confirm equality. This is the property the
+        # COUNCIL_HOME and confirm equality. This is the property the
         # dispatcher/worker handoff actually depends on.
-        default_home = tmp_path / ".hermes"
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         profile_home = default_home / "profiles" / "coder"
         profile_home.mkdir(parents=True)
@@ -2074,8 +2074,8 @@ class TestSharedBoardPaths:
         dispatcher_ws = kb.workspaces_root()
         dispatcher_log = kb.worker_log_path("t_handoff")
 
-        # Worker's perspective (profile activated by `hermes -p coder`).
-        monkeypatch.setenv("HERMES_HOME", str(profile_home))
+        # Worker's perspective (profile activated by `council -p coder`).
+        monkeypatch.setenv("COUNCIL_HOME", str(profile_home))
         worker_db = kb.kanban_db_path()
         worker_ws = kb.workspaces_root()
         worker_log = kb.worker_log_path("t_handoff")
@@ -2084,14 +2084,14 @@ class TestSharedBoardPaths:
         assert dispatcher_ws == worker_ws
         assert dispatcher_log == worker_log
 
-    def test_docker_custom_hermes_home_uses_env_path_directly(
+    def test_docker_custom_council_home_uses_env_path_directly(
         self, tmp_path, monkeypatch
     ):
-        # Docker / custom deployment: HERMES_HOME points outside ~/.hermes.
-        # `get_default_hermes_root()` returns env_home directly when it
+        # Docker / custom deployment: COUNCIL_HOME points outside ~/.council.
+        # `get_default_council_root()` returns env_home directly when it
         # is not a `<root>/profiles/<name>` shape and not under
-        # `Path.home() / ".hermes"`.
-        custom_root = tmp_path / "opt" / "hermes"
+        # `Path.home() / ".council"`.
+        custom_root = tmp_path / "opt" / "council"
         custom_root.mkdir(parents=True)
         self._set_home(monkeypatch, tmp_path, custom_root)
 
@@ -2101,10 +2101,10 @@ class TestSharedBoardPaths:
     def test_docker_profile_layout_uses_grandparent(
         self, tmp_path, monkeypatch
     ):
-        # Docker profile shape: HERMES_HOME=/opt/hermes/profiles/coder;
-        # `get_default_hermes_root()` walks up to /opt/hermes because
+        # Docker profile shape: COUNCIL_HOME=/opt/council/profiles/coder;
+        # `get_default_council_root()` walks up to /opt/council because
         # the immediate parent dir is named "profiles".
-        custom_root = tmp_path / "opt" / "hermes"
+        custom_root = tmp_path / "opt" / "council"
         profile = custom_root / "profiles" / "coder"
         profile.mkdir(parents=True)
         self._set_home(monkeypatch, tmp_path, profile)
@@ -2112,20 +2112,20 @@ class TestSharedBoardPaths:
         assert kb.kanban_home() == custom_root
         assert kb.kanban_db_path() == custom_root / "kanban.db"
 
-    def test_explicit_override_via_hermes_kanban_home(
+    def test_explicit_override_via_council_kanban_home(
         self, tmp_path, monkeypatch
     ):
-        # Explicit override: HERMES_KANBAN_HOME beats every other
+        # Explicit override: COUNCIL_KANBAN_HOME beats every other
         # resolution rule.
-        default_home = tmp_path / ".hermes"
+        default_home = tmp_path / ".council"
         profile_home = default_home / "profiles" / "any"
         profile_home.mkdir(parents=True)
         override = tmp_path / "shared-board"
         override.mkdir()
 
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(profile_home))
-        monkeypatch.setenv("HERMES_KANBAN_HOME", str(override))
+        monkeypatch.setenv("COUNCIL_HOME", str(profile_home))
+        monkeypatch.setenv("COUNCIL_KANBAN_HOME", str(override))
 
         assert kb.kanban_home() == override
         assert kb.kanban_db_path() == override / "kanban.db"
@@ -2133,11 +2133,11 @@ class TestSharedBoardPaths:
 
     def test_empty_override_falls_through(self, tmp_path, monkeypatch):
         # Empty/whitespace override is treated as unset.
-        default_home = tmp_path / ".hermes"
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(default_home))
-        monkeypatch.setenv("HERMES_KANBAN_HOME", "   ")
+        monkeypatch.setenv("COUNCIL_HOME", str(default_home))
+        monkeypatch.setenv("COUNCIL_KANBAN_HOME", "   ")
 
         assert kb.kanban_home() == default_home
 
@@ -2145,9 +2145,9 @@ class TestSharedBoardPaths:
         self, tmp_path, monkeypatch
     ):
         # Belt-and-suspenders: round-trip a task across the two
-        # HERMES_HOME perspectives via a real SQLite file. Without the
+        # COUNCIL_HOME perspectives via a real SQLite file. Without the
         # fix the worker would open a different file and see no rows.
-        default_home = tmp_path / ".hermes"
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         profile_home = default_home / "profiles" / "nehemiahkanban"
         profile_home.mkdir(parents=True)
@@ -2158,20 +2158,20 @@ class TestSharedBoardPaths:
         with kb.connect() as conn:
             task_id = kb.create_task(conn, title="cross-profile")
 
-        # Worker switches to the profile HERMES_HOME and reads.
-        monkeypatch.setenv("HERMES_HOME", str(profile_home))
+        # Worker switches to the profile COUNCIL_HOME and reads.
+        monkeypatch.setenv("COUNCIL_HOME", str(profile_home))
         with kb.connect() as conn:
             task = kb.get_task(conn, task_id)
         assert task is not None
         assert task.title == "cross-profile"
 
-    def test_hermes_kanban_db_pin_beats_kanban_home(
+    def test_council_kanban_db_pin_beats_kanban_home(
         self, tmp_path, monkeypatch
     ):
-        # HERMES_KANBAN_DB pins the file path directly and beats both
-        # HERMES_KANBAN_HOME and the `get_default_hermes_root()` path.
+        # COUNCIL_KANBAN_DB pins the file path directly and beats both
+        # COUNCIL_KANBAN_HOME and the `get_default_council_root()` path.
         # This is the env the dispatcher injects into workers.
-        default_home = tmp_path / ".hermes"
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         umbrella = tmp_path / "umbrella"
         umbrella.mkdir()
@@ -2179,20 +2179,20 @@ class TestSharedBoardPaths:
         pinned_db.parent.mkdir()
 
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(default_home))
-        monkeypatch.setenv("HERMES_KANBAN_HOME", str(umbrella))
-        monkeypatch.setenv("HERMES_KANBAN_DB", str(pinned_db))
+        monkeypatch.setenv("COUNCIL_HOME", str(default_home))
+        monkeypatch.setenv("COUNCIL_KANBAN_HOME", str(umbrella))
+        monkeypatch.setenv("COUNCIL_KANBAN_DB", str(pinned_db))
 
         assert kb.kanban_db_path() == pinned_db
-        # workspaces_root still follows HERMES_KANBAN_HOME -- the pins
+        # workspaces_root still follows COUNCIL_KANBAN_HOME -- the pins
         # are independent.
         assert kb.workspaces_root() == umbrella / "kanban" / "workspaces"
 
-    def test_hermes_kanban_workspaces_root_pin_beats_kanban_home(
+    def test_council_kanban_workspaces_root_pin_beats_kanban_home(
         self, tmp_path, monkeypatch
     ):
-        # HERMES_KANBAN_WORKSPACES_ROOT pins the workspaces root directly.
-        default_home = tmp_path / ".hermes"
+        # COUNCIL_KANBAN_WORKSPACES_ROOT pins the workspaces root directly.
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         umbrella = tmp_path / "umbrella"
         umbrella.mkdir()
@@ -2200,25 +2200,25 @@ class TestSharedBoardPaths:
         pinned_ws.mkdir()
 
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(default_home))
-        monkeypatch.setenv("HERMES_KANBAN_HOME", str(umbrella))
-        monkeypatch.setenv("HERMES_KANBAN_WORKSPACES_ROOT", str(pinned_ws))
+        monkeypatch.setenv("COUNCIL_HOME", str(default_home))
+        monkeypatch.setenv("COUNCIL_KANBAN_HOME", str(umbrella))
+        monkeypatch.setenv("COUNCIL_KANBAN_WORKSPACES_ROOT", str(pinned_ws))
 
         assert kb.workspaces_root() == pinned_ws
-        # kanban_db_path still follows HERMES_KANBAN_HOME.
+        # kanban_db_path still follows COUNCIL_KANBAN_HOME.
         assert kb.kanban_db_path() == umbrella / "kanban.db"
 
     def test_empty_per_path_overrides_fall_through(
         self, tmp_path, monkeypatch
     ):
         # Empty/whitespace pins are treated as unset, same as
-        # HERMES_KANBAN_HOME.
-        default_home = tmp_path / ".hermes"
+        # COUNCIL_KANBAN_HOME.
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(default_home))
-        monkeypatch.setenv("HERMES_KANBAN_DB", "   ")
-        monkeypatch.setenv("HERMES_KANBAN_WORKSPACES_ROOT", "")
+        monkeypatch.setenv("COUNCIL_HOME", str(default_home))
+        monkeypatch.setenv("COUNCIL_KANBAN_DB", "   ")
+        monkeypatch.setenv("COUNCIL_KANBAN_WORKSPACES_ROOT", "")
 
         assert kb.kanban_db_path() == default_home / "kanban.db"
         assert kb.workspaces_root() == default_home / "kanban" / "workspaces"
@@ -2226,11 +2226,11 @@ class TestSharedBoardPaths:
     def test_dispatcher_spawn_injects_kanban_db_and_workspaces_root(
         self, tmp_path, monkeypatch
     ):
-        # The dispatcher's `_default_spawn` must inject HERMES_KANBAN_DB
-        # and HERMES_KANBAN_WORKSPACES_ROOT into the worker env so the
+        # The dispatcher's `_default_spawn` must inject COUNCIL_KANBAN_DB
+        # and COUNCIL_KANBAN_WORKSPACES_ROOT into the worker env so the
         # worker converges on the dispatcher's paths even when the
-        # `-p <profile>` flag rewrites HERMES_HOME.
-        default_home = tmp_path / ".hermes"
+        # `-p <profile>` flag rewrites COUNCIL_HOME.
+        default_home = tmp_path / ".council"
         default_home.mkdir()
         self._set_home(monkeypatch, tmp_path, default_home)
 
@@ -2265,12 +2265,12 @@ class TestSharedBoardPaths:
         kb._default_spawn(task, str(tmp_path / "ws"))
 
         env = captured["env"]
-        assert env["HERMES_KANBAN_DB"] == str(default_home / "kanban.db")
-        assert env["HERMES_KANBAN_WORKSPACES_ROOT"] == str(
+        assert env["COUNCIL_KANBAN_DB"] == str(default_home / "kanban.db")
+        assert env["COUNCIL_KANBAN_WORKSPACES_ROOT"] == str(
             default_home / "kanban" / "workspaces"
         )
-        assert env["HERMES_KANBAN_TASK"] == "t_dispatch_env"
-        assert env["HERMES_KANBAN_BRANCH"] == "wt/t_dispatch_env"
+        assert env["COUNCIL_KANBAN_TASK"] == "t_dispatch_env"
+        assert env["COUNCIL_KANBAN_BRANCH"] == "wt/t_dispatch_env"
 
 
 # ---------------------------------------------------------------------------
@@ -2352,7 +2352,7 @@ def test_latest_summaries_batch_omits_tasks_without_summary(kanban_home):
 
 
 # ---------------------------------------------------------------------------
-# NFS / network-filesystem fallback (see hermes_state.apply_wal_with_fallback)
+# NFS / network-filesystem fallback (see council_state.apply_wal_with_fallback)
 # ---------------------------------------------------------------------------
 
 def test_connect_falls_back_to_delete_on_locking_protocol(tmp_path, monkeypatch, caplog):
@@ -2361,7 +2361,7 @@ def test_connect_falls_back_to_delete_on_locking_protocol(tmp_path, monkeypatch,
     Without this fallback, the gateway's kanban dispatcher crashes every
     60s and the kanban migration (``consecutive_failures`` ADD COLUMN) is
     retried forever — which is what the real-world user report shows
-    (see hermes-agent issue #22032).
+    (see ai-council issue #22032).
 
     NOTE: We do NOT use the ``kanban_home`` fixture here because that
     fixture pre-initializes the DB via ``kb.init_db()`` — putting the
@@ -2375,9 +2375,9 @@ def test_connect_falls_back_to_delete_on_locking_protocol(tmp_path, monkeypatch,
     import sqlite3 as _sqlite3
     from unittest.mock import patch as _patch
 
-    home = tmp_path / ".hermes"
+    home = tmp_path / ".council"
     home.mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
     monkeypatch.setattr(Path, "home", lambda: tmp_path)
 
     # Clear module cache so a fresh connect() is attempted
@@ -2396,8 +2396,8 @@ def test_connect_falls_back_to_delete_on_locking_protocol(tmp_path, monkeypatch,
             *args, factory=_WalBlockingConnection, **kwargs
         )
 
-    with _patch("hermes_cli.kanban_db.sqlite3.connect", side_effect=wal_blocking_connect):
-        with caplog.at_level("WARNING", logger="hermes_state"):
+    with _patch("council_cli.kanban_db.sqlite3.connect", side_effect=wal_blocking_connect):
+        with caplog.at_level("WARNING", logger="council_state"):
             conn = kb.connect()
 
     # One fallback warning, naming kanban.db
@@ -2424,7 +2424,7 @@ def test_unlink_tasks_triggers_recompute_ready(kanban_home):
     complete_task and unblock_task.
 
     Before the fix, child stayed 'todo' indefinitely after unlink; only the
-    next dispatcher tick or a manual 'hermes kanban recompute' would promote it.
+    next dispatcher tick or a manual 'council kanban recompute' would promote it.
     """
     with kb.connect() as conn:
         # A is done.
@@ -2558,172 +2558,172 @@ def test_migrate_add_optional_columns_tolerates_concurrent_migration(kanban_home
 
 
 # ---------------------------------------------------------------------------
-# Dispatcher spawn invocation — _resolve_hermes_argv()
+# Dispatcher spawn invocation — _resolve_council_argv()
 #
-# Workers spawned by the dispatcher must use a `hermes` invocation that does
+# Workers spawned by the dispatcher must use a `council` invocation that does
 # not depend on PATH being set up correctly. cron jobs, systemd User= services,
 # launchd jobs, and other detached processes routinely run with a stripped
-# $PATH that doesn't include the venv's bin/, so a bare `["hermes", ...]`
+# $PATH that doesn't include the venv's bin/, so a bare `["council", ...]`
 # spawn fails with FileNotFoundError and the task gets stuck. The resolver
 # prefers the PATH shim (familiar `ps` output) but falls back to the module
 # form so the spawn keeps working when PATH is missing the shim.
 # ---------------------------------------------------------------------------
 
 
-def test_resolve_hermes_argv_prefers_path_shim(monkeypatch):
-    """When `hermes` is on PATH, use the shim — preserves familiar ps output."""
+def test_resolve_council_argv_prefers_path_shim(monkeypatch):
+    """When `council` is on PATH, use the shim — preserves familiar ps output."""
     import shutil
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
-    monkeypatch.delenv("HERMES_BIN", raising=False)
-    monkeypatch.setattr(shutil, "which", lambda name: "/usr/local/bin/hermes")
-    argv = kb._resolve_hermes_argv()
-    assert argv == ["/usr/local/bin/hermes"]
+    monkeypatch.delenv("COUNCIL_BIN", raising=False)
+    monkeypatch.setattr(shutil, "which", lambda name: "/usr/local/bin/council")
+    argv = kb._resolve_council_argv()
+    assert argv == ["/usr/local/bin/council"]
 
 
-def test_resolve_hermes_argv_absolutizes_relative_exe_shim(monkeypatch, tmp_path):
+def test_resolve_council_argv_absolutizes_relative_exe_shim(monkeypatch, tmp_path):
     """A relative executable override must not remain workspace-cwd-dependent."""
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("HERMES_BIN", ".\\hermes.exe")
+    monkeypatch.setenv("COUNCIL_BIN", ".\\council.exe")
     monkeypatch.setattr(kb, "_IS_WINDOWS", True)
 
-    assert kb._resolve_hermes_argv() == [os.path.abspath(".\\hermes.exe")]
+    assert kb._resolve_council_argv() == [os.path.abspath(".\\council.exe")]
 
 
-def test_resolve_hermes_argv_avoids_implicit_windows_batch_shim(monkeypatch, tmp_path):
+def test_resolve_council_argv_avoids_implicit_windows_batch_shim(monkeypatch, tmp_path):
     """Implicit .cmd/.bat shims use the module fallback, not batch argv[0]."""
     import sys
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
-    (bin_dir / "hermes.CMD").write_text("@echo off\n", encoding="utf-8")
-    monkeypatch.delenv("HERMES_BIN", raising=False)
+    (bin_dir / "council.CMD").write_text("@echo off\n", encoding="utf-8")
+    monkeypatch.delenv("COUNCIL_BIN", raising=False)
     monkeypatch.setenv("PATH", str(bin_dir))
     monkeypatch.setenv("PATHEXT", ".CMD")
     monkeypatch.setattr(kb, "_IS_WINDOWS", True)
 
-    assert kb._resolve_hermes_argv() == [sys.executable, "-m", "hermes_cli.main"]
+    assert kb._resolve_council_argv() == [sys.executable, "-m", "council_cli.main"]
 
 
-def test_resolve_hermes_argv_honors_hermes_bin_path_override(monkeypatch, tmp_path):
-    """An explicit path-like HERMES_BIN lets service managers pin the executable."""
+def test_resolve_council_argv_honors_council_bin_path_override(monkeypatch, tmp_path):
+    """An explicit path-like COUNCIL_BIN lets service managers pin the executable."""
     import shutil
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
-    shim = tmp_path / "bin" / "hermes"
+    shim = tmp_path / "bin" / "council"
     shim.parent.mkdir()
     shim.write_text("#!/bin/sh\n", encoding="utf-8")
-    monkeypatch.setenv("HERMES_BIN", str(shim))
+    monkeypatch.setenv("COUNCIL_BIN", str(shim))
     monkeypatch.setattr(shutil, "which", lambda name: None)
 
-    assert kb._resolve_hermes_argv() == [str(shim)]
+    assert kb._resolve_council_argv() == [str(shim)]
 
 
-def test_resolve_hermes_argv_hermes_bin_bare_name_uses_path(monkeypatch, tmp_path):
-    """Bare HERMES_BIN values keep PATH semantics instead of cwd shadowing."""
+def test_resolve_council_argv_council_bin_bare_name_uses_path(monkeypatch, tmp_path):
+    """Bare COUNCIL_BIN values keep PATH semantics instead of cwd shadowing."""
     import stat
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
-    cwd_hermes = tmp_path / "hermes"
-    cwd_hermes.write_text("wrong\n", encoding="utf-8")
-    cwd_hermes.chmod(cwd_hermes.stat().st_mode | stat.S_IXUSR)
-    path_hermes = tmp_path / "bin" / "hermes"
-    path_hermes.parent.mkdir()
-    path_hermes.write_text("right\n", encoding="utf-8")
-    path_hermes.chmod(path_hermes.stat().st_mode | stat.S_IXUSR)
+    cwd_council = tmp_path / "council"
+    cwd_council.write_text("wrong\n", encoding="utf-8")
+    cwd_council.chmod(cwd_council.stat().st_mode | stat.S_IXUSR)
+    path_council = tmp_path / "bin" / "council"
+    path_council.parent.mkdir()
+    path_council.write_text("right\n", encoding="utf-8")
+    path_council.chmod(path_council.stat().st_mode | stat.S_IXUSR)
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setenv("PATH", str(path_hermes.parent))
-    monkeypatch.setenv("HERMES_BIN", "hermes")
+    monkeypatch.setenv("PATH", str(path_council.parent))
+    monkeypatch.setenv("COUNCIL_BIN", "council")
 
-    assert kb._resolve_hermes_argv() == [str(path_hermes)]
+    assert kb._resolve_council_argv() == [str(path_council)]
 
 
-def test_resolve_hermes_argv_hermes_bin_bare_name_ignores_cwd(monkeypatch, tmp_path):
-    """Bare HERMES_BIN does not accept current-directory shadow executables."""
+def test_resolve_council_argv_council_bin_bare_name_ignores_cwd(monkeypatch, tmp_path):
+    """Bare COUNCIL_BIN does not accept current-directory shadow executables."""
     import sys
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
-    (tmp_path / "hermes.exe").write_text("wrong\n", encoding="utf-8")
+    (tmp_path / "council.exe").write_text("wrong\n", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
     monkeypatch.setenv("PATH", "")
-    monkeypatch.setenv("HERMES_BIN", "hermes")
+    monkeypatch.setenv("COUNCIL_BIN", "council")
     monkeypatch.setattr(kb, "_IS_WINDOWS", True)
 
-    assert kb._resolve_hermes_argv() == [sys.executable, "-m", "hermes_cli.main"]
+    assert kb._resolve_council_argv() == [sys.executable, "-m", "council_cli.main"]
 
 
-def test_resolve_hermes_argv_hermes_bin_bare_cmd_uses_module_fallback(monkeypatch, tmp_path):
-    """A PATH-resolved HERMES_BIN batch shim is not used as worker argv[0]."""
+def test_resolve_council_argv_council_bin_bare_cmd_uses_module_fallback(monkeypatch, tmp_path):
+    """A PATH-resolved COUNCIL_BIN batch shim is not used as worker argv[0]."""
     import sys
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
     bin_dir = tmp_path / "bin"
     bin_dir.mkdir()
-    (bin_dir / "hermes.CMD").write_text("@echo off\n", encoding="utf-8")
+    (bin_dir / "council.CMD").write_text("@echo off\n", encoding="utf-8")
     monkeypatch.setenv("PATH", str(bin_dir))
     monkeypatch.setenv("PATHEXT", ".CMD")
-    monkeypatch.setenv("HERMES_BIN", "hermes")
+    monkeypatch.setenv("COUNCIL_BIN", "council")
     monkeypatch.setattr(kb, "_IS_WINDOWS", True)
 
-    assert kb._resolve_hermes_argv() == [sys.executable, "-m", "hermes_cli.main"]
+    assert kb._resolve_council_argv() == [sys.executable, "-m", "council_cli.main"]
 
 
-def test_resolve_hermes_argv_hermes_bin_unresolved_bare_name_falls_back(monkeypatch):
-    """Unresolved HERMES_BIN command names do not delegate cwd search to Popen."""
+def test_resolve_council_argv_council_bin_unresolved_bare_name_falls_back(monkeypatch):
+    """Unresolved COUNCIL_BIN command names do not delegate cwd search to Popen."""
     import sys
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
     monkeypatch.setenv("PATH", "")
-    monkeypatch.setenv("HERMES_BIN", "hermes")
+    monkeypatch.setenv("COUNCIL_BIN", "council")
 
-    assert kb._resolve_hermes_argv() == [sys.executable, "-m", "hermes_cli.main"]
+    assert kb._resolve_council_argv() == [sys.executable, "-m", "council_cli.main"]
 
 
-def test_resolve_hermes_argv_falls_back_to_module_form_when_no_path_shim(monkeypatch):
-    """When the shim is not on PATH, fall back to `python -m hermes_cli.main`.
+def test_resolve_council_argv_falls_back_to_module_form_when_no_path_shim(monkeypatch):
+    """When the shim is not on PATH, fall back to `python -m council_cli.main`.
 
-    Pins the correct module name (NOT `hermes` — there is no top-level
-    `hermes` package). Regression for #23198: the original PR shipped
-    `python -m hermes` which fails with `No module named hermes` on every
+    Pins the correct module name (NOT `council` — there is no top-level
+    `council` package). Regression for #23198: the original PR shipped
+    `python -m council` which fails with `No module named council` on every
     invocation.
     """
     import shutil
     import sys
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
 
-    monkeypatch.delenv("HERMES_BIN", raising=False)
+    monkeypatch.delenv("COUNCIL_BIN", raising=False)
     monkeypatch.setattr(shutil, "which", lambda name: None)
-    argv = kb._resolve_hermes_argv()
-    assert argv == [sys.executable, "-m", "hermes_cli.main"]
+    argv = kb._resolve_council_argv()
+    assert argv == [sys.executable, "-m", "council_cli.main"]
 
 
-def test_resolve_hermes_argv_module_actually_runs():
+def test_resolve_council_argv_module_actually_runs():
     """The fallback module name must be importable + runnable.
 
     A unit test that pins the literal string is necessary but not
-    sufficient — if `hermes_cli.main` ever loses `if __name__ == "__main__"`
-    handling or its argparse setup, `python -m hermes_cli.main --version`
+    sufficient — if `council_cli.main` ever loses `if __name__ == "__main__"`
+    handling or its argparse setup, `python -m council_cli.main --version`
     would fail and so would every dispatcher spawn that hits the fallback.
     Run it as a real subprocess to catch that regression.
     """
     import subprocess
-    import hermes_cli.kanban_db as kb
+    import council_cli.kanban_db as kb
     import shutil
     import unittest.mock as mock
 
     with mock.patch.dict(os.environ, {}, clear=False):
-        os.environ.pop("HERMES_BIN", None)
+        os.environ.pop("COUNCIL_BIN", None)
         with mock.patch.object(shutil, "which", return_value=None):
-            argv = kb._resolve_hermes_argv()
+            argv = kb._resolve_council_argv()
     r = subprocess.run(argv + ["--version"], capture_output=True, text=True, timeout=30)
     assert r.returncode == 0, (
         f"`{' '.join(argv)} --version` failed (rc={r.returncode}); "
         f"stderr={r.stderr[:200]!r}"
     )
-    assert "Hermes Agent" in r.stdout, f"unexpected output: {r.stdout[:200]!r}"
+    assert "Poke Council" in r.stdout, f"unexpected output: {r.stdout[:200]!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -2832,9 +2832,9 @@ def test_task_dict_survives_corrupt_created_at(tmp_path, monkeypatch):
     corrupt row doesn't turn the whole board response into an error.
     """
     # Set up an isolated kanban home so we can write a corrupt created_at.
-    home = tmp_path / ".hermes"
+    home = tmp_path / ".council"
     home.mkdir()
-    monkeypatch.setenv("HERMES_HOME", str(home))
+    monkeypatch.setenv("COUNCIL_HOME", str(home))
     monkeypatch.setattr("pathlib.Path.home", lambda: tmp_path)
     kb._INITIALIZED_PATHS.clear()
     kb.init_db()
@@ -3123,7 +3123,7 @@ def test_has_spawnable_review_false_when_only_terminal_lanes(
     kanban_home, monkeypatch,
 ):
     """has_spawnable_review returns False when review tasks are terminal lanes."""
-    from hermes_cli import profiles
+    from council_cli import profiles
     monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
     with kb.connect() as conn:
         t = kb.create_task(conn, title="review", assignee="orion-cc")
@@ -3133,7 +3133,7 @@ def test_has_spawnable_review_false_when_only_terminal_lanes(
 
 def test_dispatch_review_skips_nonspawnable(kanban_home, monkeypatch):
     """Review tasks with non-existent profiles go to skipped_nonspawnable."""
-    from hermes_cli import profiles
+    from council_cli import profiles
     monkeypatch.setattr(profiles, "profile_exists", lambda name: False)
     with kb.connect() as conn:
         t = kb.create_task(conn, title="review", assignee="orion-cc")
@@ -3163,7 +3163,7 @@ def test_dispatch_review_does_not_claim_ready_tasks(
 
 def test_detect_stale_returns_running_task_with_no_heartbeat(kanban_home, monkeypatch):
     """A task running > timeout with zero heartbeats gets reclaimed as stale."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="stale-no-hb", assignee="worker")
@@ -3195,7 +3195,7 @@ def test_detect_stale_returns_running_task_with_no_heartbeat(kanban_home, monkey
 
 def test_detect_stale_returns_task_with_stale_heartbeat(kanban_home, monkeypatch):
     """A task running > timeout with a heartbeat older than 1h gets reclaimed."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="stale-hb", assignee="worker")
@@ -3228,7 +3228,7 @@ def test_detect_stale_returns_task_with_stale_heartbeat(kanban_home, monkeypatch
 
 def test_detect_stale_skips_task_with_recent_heartbeat(kanban_home, monkeypatch):
     """A task running > timeout but with a recent heartbeat is NOT reclaimed."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="alive-hb", assignee="worker")
@@ -3259,7 +3259,7 @@ def test_detect_stale_skips_task_with_recent_heartbeat(kanban_home, monkeypatch)
 
 def test_detect_stale_skips_recently_started_task(kanban_home, monkeypatch):
     """A task started < timeout ago is NOT reclaimed even with no heartbeat."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="fresh", assignee="worker")
@@ -3314,7 +3314,7 @@ def test_detect_stale_skips_when_timeout_zero(kanban_home, monkeypatch):
 
 def test_detect_stale_skips_blocked_tasks(kanban_home, monkeypatch):
     """Blocked tasks are NOT reclaimed by stale detection."""
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="blocked-task", assignee="worker")
@@ -3353,7 +3353,7 @@ def test_detect_stale_does_not_tick_failure_counter(kanban_home, monkeypatch):
     task_events is the right audit surface; the consecutive_failures
     counter is reserved for spawn_failed / timed_out / crashed.
     """
-    import hermes_cli.kanban_db as _kb
+    import council_cli.kanban_db as _kb
 
     with kb.connect() as conn:
         t = kb.create_task(conn, title="stale-no-counter-tick", assignee="worker")
@@ -3562,7 +3562,7 @@ def test_maybe_emit_scratch_tip_fires_once_per_install(kanban_home, caplog):
     # Sentinel must not exist yet on a fresh install.
     assert not kb._scratch_tip_shown()
 
-    with caplog.at_level(logging.WARNING, logger="hermes_cli.kanban_db"):
+    with caplog.at_level(logging.WARNING, logger="council_cli.kanban_db"):
         with kb.connect() as conn:
             kb._maybe_emit_scratch_tip(conn, t1, "scratch")
 
@@ -3594,7 +3594,7 @@ def test_maybe_emit_scratch_tip_fires_once_per_install(kanban_home, caplog):
 
     # Second scratch materialization on the same install stays silent.
     caplog.clear()
-    with caplog.at_level(logging.WARNING, logger="hermes_cli.kanban_db"):
+    with caplog.at_level(logging.WARNING, logger="council_cli.kanban_db"):
         with kb.connect() as conn:
             kb._maybe_emit_scratch_tip(conn, t2, "scratch")
     tip_records2 = [
@@ -3626,7 +3626,7 @@ def test_maybe_emit_scratch_tip_skips_non_scratch_workspaces(kanban_home, caplog
 
     assert not kb._scratch_tip_shown()
 
-    with caplog.at_level(logging.WARNING, logger="hermes_cli.kanban_db"):
+    with caplog.at_level(logging.WARNING, logger="council_cli.kanban_db"):
         with kb.connect() as conn:
             kb._maybe_emit_scratch_tip(conn, t_wt, "worktree")
             kb._maybe_emit_scratch_tip(conn, t_dir, "dir")
@@ -3649,7 +3649,7 @@ def test_maybe_emit_scratch_tip_skips_non_scratch_workspaces(kanban_home, caplog
 
 
 # ---------------------------------------------------------------------------
-# Connection pragmas (secure_delete, cell_size_check, synchronous=FULL)
+# Connection pragmas (secure_delete, cell_size_check, synchropoke=FULL)
 # ---------------------------------------------------------------------------
 
 
@@ -3671,13 +3671,13 @@ def test_connect_sets_cell_size_check_on(tmp_path):
     assert row[0] == 1, f"expected cell_size_check=1, got {row[0]}"
 
 
-def test_connect_sets_synchronous_full(tmp_path):
-    """synchronous must be FULL (=2), not NORMAL (=1)."""
+def test_connect_sets_synchropoke_full(tmp_path):
+    """synchropoke must be FULL (=2), not NORMAL (=1)."""
     db_path = tmp_path / "kanban.db"
     kb._INITIALIZED_PATHS.discard(str(db_path.resolve()))
     with kb.connect(db_path=db_path) as conn:
-        row = conn.execute("PRAGMA synchronous").fetchone()
-    assert row[0] == 2, f"expected synchronous=2 (FULL), got {row[0]}"
+        row = conn.execute("PRAGMA synchropoke").fetchone()
+    assert row[0] == 2, f"expected synchropoke=2 (FULL), got {row[0]}"
 
 
 def test_connect_pragmas_applied_on_reconnect(tmp_path):
@@ -3693,7 +3693,7 @@ def test_connect_pragmas_applied_on_reconnect(tmp_path):
     with kb.connect(db_path=db_path) as conn:
         assert conn.execute("PRAGMA secure_delete").fetchone()[0] == 1
         assert conn.execute("PRAGMA cell_size_check").fetchone()[0] == 1
-        assert conn.execute("PRAGMA synchronous").fetchone()[0] == 2
+        assert conn.execute("PRAGMA synchropoke").fetchone()[0] == 2
 
 
 
@@ -3709,7 +3709,7 @@ def test_pragmas_not_accidentally_disabled_by_migrate_path(tmp_path):
     with kb.connect(db_path=db_path) as conn:
         assert conn.execute("PRAGMA secure_delete").fetchone()[0] == 1
         assert conn.execute("PRAGMA cell_size_check").fetchone()[0] == 1
-        assert conn.execute("PRAGMA synchronous").fetchone()[0] == 2
+        assert conn.execute("PRAGMA synchropoke").fetchone()[0] == 2
 
 # write_txn — rollback handler must not mask the original exception
 # ---------------------------------------------------------------------------
@@ -3770,7 +3770,7 @@ def test_write_txn_preserves_original_exception_when_rollback_fails(kanban_home)
     )
 def test_write_txn_healthy_commit_no_exception(tmp_path):
     """Normal commit does not trigger the torn-extend check."""
-    from hermes_cli.kanban_db import connect, write_txn
+    from council_cli.kanban_db import connect, write_txn
     db = tmp_path / "test.db"
     conn = connect(db_path=db)
     # Should not raise
@@ -3786,7 +3786,7 @@ def test_write_txn_healthy_commit_no_exception(tmp_path):
 
 def test_write_txn_raises_on_truncated_file(tmp_path):
     """A mocked smaller file size triggers the torn-extend check."""
-    from hermes_cli.kanban_db import connect, write_txn
+    from council_cli.kanban_db import connect, write_txn
     db = tmp_path / "test.db"
     conn = connect(db_path=db)
     # Get actual page size so we can fake a smaller file
@@ -3799,7 +3799,7 @@ def test_write_txn_raises_on_truncated_file(tmp_path):
         return max(0, real_size - page_size)
 
     with pytest.raises(sqlite3.DatabaseError, match="torn-extend|page count mismatch"):
-        with unittest.mock.patch("hermes_cli.kanban_db.os.path.getsize", side_effect=fake_getsize):
+        with unittest.mock.patch("council_cli.kanban_db.os.path.getsize", side_effect=fake_getsize):
             with write_txn(conn) as c:
                 c.execute(
                     "INSERT INTO tasks (id, title, assignee, status, priority, created_at) "
@@ -3810,8 +3810,8 @@ def test_write_txn_raises_on_truncated_file(tmp_path):
 
 def test_write_txn_post_commit_check_fires_every_call(tmp_path):
     """The invariant check runs on every write_txn call."""
-    from hermes_cli.kanban_db import connect, write_txn
-    import hermes_cli.kanban_db as kanban_db_module
+    from council_cli.kanban_db import connect, write_txn
+    import council_cli.kanban_db as kanban_db_module
     db = tmp_path / "test.db"
     conn = connect(db_path=db)
     call_count = 0
@@ -3835,7 +3835,7 @@ def test_write_txn_post_commit_check_fires_every_call(tmp_path):
 
 def test_connect_sets_wal_autocheckpoint_100(tmp_path):
     """connect() sets wal_autocheckpoint to 100."""
-    from hermes_cli.kanban_db import connect
+    from council_cli.kanban_db import connect
     db = tmp_path / "test.db"
     conn = connect(db_path=db)
     val = conn.execute("PRAGMA wal_autocheckpoint").fetchone()[0]
@@ -3846,7 +3846,7 @@ def test_connect_sets_wal_autocheckpoint_100(tmp_path):
 def test_write_txn_check_reads_correct_header_fields(tmp_path):
     """Synthetic DB file with mismatched header page_count triggers the check."""
     import struct
-    from hermes_cli.kanban_db import connect, _check_file_length_invariant
+    from council_cli.kanban_db import connect, _check_file_length_invariant
     db = tmp_path / "synthetic.db"
     conn = connect(db_path=db)
     page_size = conn.execute("PRAGMA page_size").fetchone()[0]
@@ -3890,8 +3890,8 @@ def test_reap_worker_zombies_returns_count():
             return p, 0
         return 0, 0
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
-        with patch("hermes_cli.kanban_db._record_worker_exit"):
+    with patch("council_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
+        with patch("council_cli.kanban_db._record_worker_exit"):
             pids = kb.reap_worker_zombies()
     assert pids == [12345, 67890, 11111]
 
@@ -3900,8 +3900,8 @@ def test_reap_worker_zombies_noop_on_windows(monkeypatch):
     """reap_worker_zombies() returns 0 and never calls os.waitpid on Windows."""
     from unittest.mock import patch
 
-    monkeypatch.setattr("hermes_cli.kanban_db.os.name", "nt")
-    with patch("hermes_cli.kanban_db.os.waitpid") as mock_waitpid:
+    monkeypatch.setattr("council_cli.kanban_db.os.name", "nt")
+    with patch("council_cli.kanban_db.os.waitpid") as mock_waitpid:
         result = kb.reap_worker_zombies()
     mock_waitpid.assert_not_called()
     assert result == []
@@ -3911,7 +3911,7 @@ def test_reap_worker_zombies_noop_no_children():
     """reap_worker_zombies() returns 0 without error when there are no children."""
     from unittest.mock import patch
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=ChildProcessError):
+    with patch("council_cli.kanban_db.os.waitpid", side_effect=ChildProcessError):
         result = kb.reap_worker_zombies()
     assert result == []
 
@@ -3929,9 +3929,9 @@ def test_reap_worker_zombies_records_exit_status():
             return 12345, 0
         return 0, 0
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
+    with patch("council_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
         with patch(
-            "hermes_cli.kanban_db._record_worker_exit",
+            "council_cli.kanban_db._record_worker_exit",
             side_effect=lambda p, s: calls.append((p, s)),
         ):
             kb.reap_worker_zombies()
@@ -3943,7 +3943,7 @@ def test_reap_worker_zombies_handles_waitpid_os_error():
     """reap_worker_zombies() does not propagate generic OSError from os.waitpid."""
     from unittest.mock import patch
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=OSError("test error")):
+    with patch("council_cli.kanban_db.os.waitpid", side_effect=OSError("test error")):
         result = kb.reap_worker_zombies()
     assert result == []
 
@@ -3960,8 +3960,8 @@ def test_zombie_reaper_runs_despite_board_connect_failure():
             return [12345, 67890][call_count[0] - 1], 0
         return 0, 0
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
-        with patch("hermes_cli.kanban_db._record_worker_exit"):
+    with patch("council_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
+        with patch("council_cli.kanban_db._record_worker_exit"):
             # Simulate a board tick failure before reaping
             try:
                 raise sqlite3.OperationalError("disk I/O error")
@@ -3996,9 +3996,9 @@ def test_zombie_reaper_survives_all_boards_failing():
     for tick in range(5):
         pids = [tick * 100 + 1, tick * 100 + 2]
         with patch(
-            "hermes_cli.kanban_db.os.waitpid", side_effect=make_fake_waitpid(pids)
+            "council_cli.kanban_db.os.waitpid", side_effect=make_fake_waitpid(pids)
         ):
-            with patch("hermes_cli.kanban_db._record_worker_exit"):
+            with patch("council_cli.kanban_db._record_worker_exit"):
                 pids = kb.reap_worker_zombies()
         total_reaped += len(pids)
 
@@ -4017,9 +4017,9 @@ def test_dispatch_once_still_reaps_via_extracted_fn(kanban_home):
             return 99999, 0
         return 0, 0
 
-    with patch("hermes_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
-        with patch("hermes_cli.kanban_db._record_worker_exit"):
-            with patch("hermes_cli.kanban_db.os.name", "posix"):
+    with patch("council_cli.kanban_db.os.waitpid", side_effect=fake_waitpid):
+        with patch("council_cli.kanban_db._record_worker_exit"):
+            with patch("council_cli.kanban_db.os.name", "posix"):
                 pids = kb.reap_worker_zombies()
 
     assert pids == [99999]

@@ -10,7 +10,7 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
 
     def test_auth_error_tries_fallback(self, tmp_path, monkeypatch):
         """When primary provider raises AuthError, fallback is attempted."""
-        from hermes_cli.auth import AuthError
+        from council_cli.auth import AuthError
 
         # Create a config with fallback
         config_path = tmp_path / "config.yaml"
@@ -20,7 +20,7 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
             "  model: meta-llama/llama-4-maverick\n"
         )
 
-        monkeypatch.setattr("gateway.run._hermes_home", tmp_path)
+        monkeypatch.setattr("gateway.run._council_home", tmp_path)
 
         call_count = {"n": 0}
 
@@ -43,7 +43,7 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
             }
 
         with patch(
-            "hermes_cli.runtime_provider.resolve_runtime_provider",
+            "council_cli.runtime_provider.resolve_runtime_provider",
             side_effect=_mock_resolve,
         ):
             from gateway.run import _resolve_runtime_agent_kwargs
@@ -56,15 +56,15 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
 
     def test_auth_error_no_fallback_raises(self, tmp_path, monkeypatch):
         """When primary fails and no fallback configured, RuntimeError is raised."""
-        from hermes_cli.auth import AuthError
+        from council_cli.auth import AuthError
 
         config_path = tmp_path / "config.yaml"
         config_path.write_text("model:\n  provider: openai-codex\n")
 
-        monkeypatch.setattr("gateway.run._hermes_home", tmp_path)
+        monkeypatch.setattr("gateway.run._council_home", tmp_path)
 
         with patch(
-            "hermes_cli.runtime_provider.resolve_runtime_provider",
+            "council_cli.runtime_provider.resolve_runtime_provider",
             side_effect=AuthError("token expired"),
         ):
             from gateway.run import _resolve_runtime_agent_kwargs
@@ -79,11 +79,11 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
             "  - provider: openrouter\n"
             "    model: anthropic/claude-sonnet-4.6\n"
             "fallback_model:\n"
-            "  provider: nous\n"
-            "  model: Hermes-4\n"
+            "  provider: poke\n"
+            "  model: Council-4\n"
         )
 
-        monkeypatch.setattr("gateway.run._hermes_home", tmp_path)
+        monkeypatch.setattr("gateway.run._council_home", tmp_path)
 
         calls = []
 
@@ -93,9 +93,9 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
             if requested == "openrouter":
                 raise RuntimeError("openrouter unavailable")
             return {
-                "api_key": "nous-key",
-                "base_url": "https://portal.nousresearch.com/v1",
-                "provider": "nous",
+                "api_key": "poke-key",
+                "base_url": "https://portal.pokelabs.com/v1",
+                "provider": "poke",
                 "api_mode": "chat_completions",
                 "command": None,
                 "args": None,
@@ -103,13 +103,13 @@ class TestResolveRuntimeAgentKwargsAuthFallback:
             }
 
         with patch(
-            "hermes_cli.runtime_provider.resolve_runtime_provider",
+            "council_cli.runtime_provider.resolve_runtime_provider",
             side_effect=_mock_resolve,
         ):
             from gateway.run import _try_resolve_fallback_provider
 
             result = _try_resolve_fallback_provider()
 
-        assert calls == ["openrouter", "nous"]
-        assert result["provider"] == "nous"
-        assert result["model"] == "Hermes-4"
+        assert calls == ["openrouter", "poke"]
+        assert result["provider"] == "poke"
+        assert result["model"] == "Council-4"

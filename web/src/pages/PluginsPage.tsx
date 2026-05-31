@@ -4,25 +4,25 @@ import type { Translations } from "@/i18n/types";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import type { HubAgentPluginRow, PluginsHubResponse } from "@/lib/api";
-import { Button } from "@nous-research/ui/ui/components/button";
-import { Badge } from "@nous-research/ui/ui/components/badge";
-import { Select, SelectOption } from "@nous-research/ui/ui/components/select";
-import { Switch } from "@nous-research/ui/ui/components/switch";
-import { Spinner } from "@nous-research/ui/ui/components/spinner";
-import { CommandBlock } from "@nous-research/ui/ui/components/command-block";
-import { Card, CardContent, CardHeader, CardTitle } from "@nous-research/ui/ui/components/card";
-import { ConfirmDialog } from "@nous-research/ui/ui/components/confirm-dialog";
-import { Input } from "@nous-research/ui/ui/components/input";
-import { Label } from "@nous-research/ui/ui/components/label";
-import { useToast } from "@nous-research/ui/hooks/use-toast";
-import { Toast } from "@nous-research/ui/ui/components/toast";
+import { Button } from "@pokelabs/ui/ui/components/button";
+import { Badge } from "@pokelabs/ui/ui/components/badge";
+import { Select, SelectOption } from "@pokelabs/ui/ui/components/select";
+import { Switch } from "@pokelabs/ui/ui/components/switch";
+import { Spinner } from "@pokelabs/ui/ui/components/spinner";
+import { CommandBlock } from "@pokelabs/ui/ui/components/command-block";
+import { Card, CardContent, CardHeader, CardTitle } from "@pokelabs/ui/ui/components/card";
+import { ConfirmDialog } from "@pokelabs/ui/ui/components/confirm-dialog";
+import { Input } from "@pokelabs/ui/ui/components/input";
+import { Label } from "@pokelabs/ui/ui/components/label";
+import { useToast } from "@pokelabs/ui/hooks/use-toast";
+import { Toast } from "@pokelabs/ui/ui/components/toast";
 import { useI18n } from "@/i18n";
 import { PluginSlot } from "@/plugins";
 import { cn } from "@/lib/utils";
 import { usePageHeader } from "@/contexts/usePageHeader";
 
 /** Select value for built-in memory (`config` uses empty string). Never use `""` — UI Select maps empty value to an empty label. */
-const MEMORY_PROVIDER_BUILTIN = "__hermes_memory_builtin__";
+const MEMORY_PROVIDER_BUILTIN = "__council_memory_builtin__";
 
 export default function PluginsPage() {
   const [hub, setHub] = useState<PluginsHubResponse | null>(null);

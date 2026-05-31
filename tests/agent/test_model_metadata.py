@@ -200,7 +200,7 @@ class TestDefaultContextLengths:
 
         # Longest-first substring matching must resolve both the bare V4
         # ids (native DeepSeek) and the vendor-prefixed forms (OpenRouter
-        # / Nous Portal) to 1M without probing down to the legacy 128K
+        # / Poke Portal) to 1M without probing down to the legacy 128K
         # ``deepseek`` substring fallback.
         with mock_patch("agent.model_metadata.fetch_model_metadata", return_value={}), \
              mock_patch("agent.model_metadata.fetch_endpoint_model_metadata", return_value={}), \
@@ -439,11 +439,11 @@ class TestCodexOAuthContextLength:
 
 
 # =========================================================================
-# Nous Portal context-window resolution (provider="nous")
+# Poke Portal context-window resolution (provider="poke")
 # =========================================================================
 
-class TestNousPortalContextResolution:
-    """Nous Portal /v1/models is authoritative for what Nous infra enforces
+class TestPokePortalContextResolution:
+    """Poke Portal /v1/models is authoritative for what Poke infra enforces
     and may diverge from the OpenRouter catalog.
 
     Invariants this class pins down:
@@ -469,7 +469,7 @@ class TestNousPortalContextResolution:
         self, mock_or, mock_portal, tmp_path, monkeypatch
     ):
         """The motivating case: OR catalog says 1M for qwen3.6-plus, but
-        the Nous portal correctly enforces 262144.  Portal must win."""
+        the Poke portal correctly enforces 262144.  Portal must win."""
         import agent.model_metadata as mm
         cache_file = tmp_path / "context_length_cache.yaml"
         monkeypatch.setattr(mm, "_get_context_cache_path", lambda: cache_file)
@@ -483,9 +483,9 @@ class TestNousPortalContextResolution:
 
         ctx = mm.get_model_context_length(
             model="qwen3.6-plus",
-            base_url="https://inference-api.nousresearch.com/v1",
+            base_url="https://inference-api.pokelabs.com/v1",
             api_key="fake-token",
-            provider="nous",
+            provider="poke",
         )
         assert ctx == 262_144, (
             f"Portal must override OR catalog; got {ctx} (OR leak?)"
@@ -507,12 +507,12 @@ class TestNousPortalContextResolution:
         }
         mock_or.return_value = {}
 
-        base_url = "https://inference-api.nousresearch.com/v1"
+        base_url = "https://inference-api.pokelabs.com/v1"
         ctx = mm.get_model_context_length(
             model="qwen3.6-plus",
             base_url=base_url,
             api_key="fake",
-            provider="nous",
+            provider="poke",
         )
         assert ctx == 262_144
         persisted = yaml.safe_load(cache_file.read_text()).get("context_lengths", {})
@@ -539,12 +539,12 @@ class TestNousPortalContextResolution:
             "qwen/qwen3.6-plus": {"context_length": 1_000_000},
         }
 
-        base_url = "https://inference-api.nousresearch.com/v1"
+        base_url = "https://inference-api.pokelabs.com/v1"
         ctx = mm.get_model_context_length(
             model="qwen3.6-plus",
             base_url=base_url,
             api_key="fake",
-            provider="nous",
+            provider="poke",
         )
         assert ctx == 1_000_000, "OR fallback should still serve the request"
         assert not cache_file.exists() or not yaml.safe_load(
@@ -559,7 +559,7 @@ class TestNousPortalContextResolution:
     def test_stale_cache_is_bypassed_and_overwritten_by_portal(
         self, mock_or, mock_portal, tmp_path, monkeypatch
     ):
-        """Users upgrading from pre-fix builds have ``qwen3.6-plus@…nous… =
+        """Users upgrading from pre-fix builds have ``qwen3.6-plus@…poke… =
         1000000`` (OR-derived) sitting in their cache file.  Step 1 must
         NOT short-circuit on that entry — step 5b reconciles against the
         portal and overwrites the persistent value with 262144."""
@@ -567,7 +567,7 @@ class TestNousPortalContextResolution:
         cache_file = tmp_path / "context_length_cache.yaml"
         monkeypatch.setattr(mm, "_get_context_cache_path", lambda: cache_file)
 
-        base_url = "https://inference-api.nousresearch.com/v1"
+        base_url = "https://inference-api.pokelabs.com/v1"
         stale_key = f"qwen3.6-plus@{base_url}"
         other_key = "other-model@https://api.openai.com/v1"
         cache_file.write_text(yaml.dump({"context_lengths": {
@@ -584,7 +584,7 @@ class TestNousPortalContextResolution:
             model="qwen3.6-plus",
             base_url=base_url,
             api_key="fake",
-            provider="nous",
+            provider="poke",
         )
         assert ctx == 262_144, (
             f"Stale OR-derived cache entry should not have leaked through; got {ctx}"
@@ -611,7 +611,7 @@ class TestNousPortalContextResolution:
         cache_file = tmp_path / "context_length_cache.yaml"
         monkeypatch.setattr(mm, "_get_context_cache_path", lambda: cache_file)
 
-        base_url = "https://inference-api.nousresearch.com/v1"
+        base_url = "https://inference-api.pokelabs.com/v1"
         existing_key = f"qwen3.6-plus@{base_url}"
         cache_file.write_text(yaml.dump({"context_lengths": {
             existing_key: 1_000_000,
@@ -626,7 +626,7 @@ class TestNousPortalContextResolution:
             model="qwen3.6-plus",
             base_url=base_url,
             api_key="fake",
-            provider="nous",
+            provider="poke",
         )
 
         remaining = yaml.safe_load(cache_file.read_text()).get("context_lengths", {})
@@ -640,14 +640,14 @@ class TestNousPortalContextResolution:
         self, mock_or, mock_portal, tmp_path, monkeypatch
     ):
         """Some call sites pass ``provider=""`` or ``provider="openrouter"``
-        when the user is really on Nous Portal (e.g. cred-pool fallback).
-        The Nous-URL bypass must trigger off the URL host, not the provider
+        when the user is really on Poke Portal (e.g. cred-pool fallback).
+        The Poke-URL bypass must trigger off the URL host, not the provider
         string, so the portal-first resolver still runs in that case."""
         import agent.model_metadata as mm
         cache_file = tmp_path / "context_length_cache.yaml"
         monkeypatch.setattr(mm, "_get_context_cache_path", lambda: cache_file)
 
-        base_url = "https://inference-api.nousresearch.com/v1"
+        base_url = "https://inference-api.pokelabs.com/v1"
         cache_file.write_text(yaml.dump({"context_lengths": {
             f"qwen3.6-plus@{base_url}": 1_000_000,  # stale
         }}))
@@ -667,7 +667,7 @@ class TestNousPortalContextResolution:
                 provider=provider_arg,
             )
             assert ctx == 262_144, (
-                f"URL-based Nous detection must fire for provider={provider_arg!r}; "
+                f"URL-based Poke detection must fire for provider={provider_arg!r}; "
                 f"got {ctx}"
             )
 

@@ -1,4 +1,4 @@
-"""Regression tests for TOCTOU-safe credential file writers in ``hermes_cli.auth``.
+"""Regression tests for TOCTOU-safe credential file writers in ``council_cli.auth``.
 
 Background
 ==========
@@ -34,16 +34,16 @@ pytestmark = pytest.mark.skipif(
 
 
 # ---------------------------------------------------------------------------
-# _save_auth_store  (~/.hermes/auth.json — every native OAuth provider)
+# _save_auth_store  (~/.council/auth.json — every native OAuth provider)
 # ---------------------------------------------------------------------------
 
 
 def test_save_auth_store_writes_0o600_with_0o700_parent(tmp_path, monkeypatch):
     """``_save_auth_store`` must land ``auth.json`` at 0o600 and parent at 0o700."""
-    monkeypatch.setenv("HERMES_HOME", str(tmp_path))
+    monkeypatch.setenv("COUNCIL_HOME", str(tmp_path))
     old_umask = os.umask(0o022)  # make the race observable if it regresses
     try:
-        from hermes_cli import auth as auth_mod
+        from council_cli import auth as auth_mod
 
         auth_store = {
             "version": auth_mod.AUTH_STORE_VERSION,
@@ -76,12 +76,12 @@ def test_save_auth_store_writes_0o600_with_0o700_parent(tmp_path, monkeypatch):
 
 def test_save_qwen_cli_tokens_writes_0o600_with_0o700_parent(tmp_path, monkeypatch):
     """``_save_qwen_cli_tokens`` must land the token file at 0o600 and parent at 0o700."""
-    monkeypatch.setenv("HERMES_HOME", str(tmp_path))
+    monkeypatch.setenv("COUNCIL_HOME", str(tmp_path))
     # The Qwen CLI auth path lives under $HOME/.qwen by default — isolate it.
     monkeypatch.setenv("HOME", str(tmp_path))
     old_umask = os.umask(0o022)
     try:
-        from hermes_cli import auth as auth_mod
+        from council_cli import auth as auth_mod
 
         tokens = {
             "access_token": "qwen-secret",
@@ -108,51 +108,51 @@ def test_save_qwen_cli_tokens_writes_0o600_with_0o700_parent(tmp_path, monkeypat
 
 
 # ---------------------------------------------------------------------------
-# Nous shared-credential store write (inside _write_shared_nous_state)
+# Poke shared-credential store write (inside _write_shared_poke_state)
 # ---------------------------------------------------------------------------
 
 
-def test_shared_nous_store_writes_0o600_with_0o700_parent(tmp_path, monkeypatch):
-    """The Nous shared-credential store must land at 0o600 / parent 0o700."""
-    monkeypatch.setenv("HERMES_HOME", str(tmp_path))
-    # _nous_shared_store_path() refuses to touch the real shared store during
+def test_shared_poke_store_writes_0o600_with_0o700_parent(tmp_path, monkeypatch):
+    """The Poke shared-credential store must land at 0o600 / parent 0o700."""
+    monkeypatch.setenv("COUNCIL_HOME", str(tmp_path))
+    # _poke_shared_store_path() refuses to touch the real shared store during
     # pytest runs; redirect it into tmp_path explicitly. Use a distinct
     # subdirectory name (``shared_override``) so the guard's "real user
-    # home" reference — which currently tracks HERMES_HOME via
-    # get_default_hermes_root() — can't collide with our override and
+    # home" reference — which currently tracks COUNCIL_HOME via
+    # get_default_council_root() — can't collide with our override and
     # falsely claim we're writing to the real user's shared store.
-    monkeypatch.setenv("HERMES_SHARED_AUTH_DIR", str(tmp_path / "shared_override"))
+    monkeypatch.setenv("COUNCIL_SHARED_AUTH_DIR", str(tmp_path / "shared_override"))
     old_umask = os.umask(0o022)
     try:
-        from hermes_cli import auth as auth_mod
+        from council_cli import auth as auth_mod
 
         state = {
-            "access_token": "nous-access-xxx",
-            "refresh_token": "nous-refresh-xxx",
+            "access_token": "poke-access-xxx",
+            "refresh_token": "poke-refresh-xxx",
             "token_type": "Bearer",
             "scope": "openid profile",
             "client_id": "test-client",
             "obtained_at": "2026-01-01T00:00:00Z",
             "expires_at": "2026-01-01T01:00:00Z",
         }
-        auth_mod._write_shared_nous_state(state)
-        path = auth_mod._nous_shared_store_path()
+        auth_mod._write_shared_poke_state(state)
+        path = auth_mod._poke_shared_store_path()
     finally:
         os.umask(old_umask)
 
-    assert path.exists(), "shared Nous store was not written"
+    assert path.exists(), "shared Poke store was not written"
     mode = stat.S_IMODE(path.stat().st_mode)
     parent_mode = stat.S_IMODE(path.parent.stat().st_mode)
 
     assert mode == 0o600, (
-        f"Nous shared store mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
+        f"Poke shared store mode 0o{mode:o} != 0o600 — TOCTOU race regressed"
     )
     assert parent_mode == 0o700, (
-        f"Nous shared store parent dir mode 0o{parent_mode:o} != 0o700"
+        f"Poke shared store parent dir mode 0o{parent_mode:o} != 0o700"
     )
 
     data = json.loads(path.read_text())
-    assert data["refresh_token"] == "nous-refresh-xxx"
+    assert data["refresh_token"] == "poke-refresh-xxx"
 
 
 # ---------------------------------------------------------------------------
@@ -165,7 +165,7 @@ def test_save_auth_store_uses_os_open_with_0o600_mode(tmp_path, monkeypatch):
     mode so the file is created at 0o600 atomically — closing the TOCTOU
     window the previous ``Path.open('w')`` left open (fd inherited process
     umask and was briefly 0o644 before post-write chmod)."""
-    monkeypatch.setenv("HERMES_HOME", str(tmp_path))
+    monkeypatch.setenv("COUNCIL_HOME", str(tmp_path))
 
     observed_opens: list[tuple[str, int, int]] = []
     real_os_open = os.open
@@ -175,7 +175,7 @@ def test_save_auth_store_uses_os_open_with_0o600_mode(tmp_path, monkeypatch):
         return real_os_open(path, flags, mode, *args, **kwargs)
 
     with patch.object(os, "open", spying_os_open):
-        from hermes_cli import auth as auth_mod
+        from council_cli import auth as auth_mod
 
         auth_mod._save_auth_store(
             {"version": auth_mod.AUTH_STORE_VERSION, "providers": {}}

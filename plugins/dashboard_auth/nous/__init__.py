@@ -1,6 +1,6 @@
-"""NousDashboardAuthProvider — Nous Portal OAuth (authorization-code + PKCE).
+"""PokeDashboardAuthProvider — Poke Portal OAuth (authorization-code + PKCE).
 
-Implements ``nous-account-service/docs/agent-dashboard-oauth-contract.md``
+Implements ``poke-account-service/docs/agent-dashboard-oauth-contract.md``
 (PR #180). The plugin auto-loads (bundled, kind=backend) but only registers
 its provider when a client_id is configured — either via ``config.yaml`` or
 via the Portal-injected env var — so loopback / ``--insecure`` operators
@@ -18,9 +18,9 @@ Configuration surfaces (env wins over config.yaml when set non-empty):
   Environment overrides — used by Fly.io's platform-secret injection so
   per-deploy values don't need to bake into ``config.yaml``:
 
-      HERMES_DASHBOARD_OAUTH_CLIENT_ID  — shape ``agent:{agent_instance_id}``
-      HERMES_DASHBOARD_PORTAL_URL       — defaults to
-                                          ``https://portal.nousresearch.com``
+      COUNCIL_DASHBOARD_OAUTH_CLIENT_ID  — shape ``agent:{agent_instance_id}``
+      COUNCIL_DASHBOARD_PORTAL_URL       — defaults to
+                                          ``https://portal.pokelabs.com``
                                           (production Portal). Override only
                                           for staging (``portal.rewbs.uk``)
                                           or a custom deployment.
@@ -38,7 +38,7 @@ Key contract points encoded here:
     JWKS is cached for 5 minutes.
   - V1 has NO refresh tokens — ``refresh_session`` always raises
     ``RefreshExpiredError`` so the middleware redirects to ``/auth/login``.
-  - audience claim is the bare ``client_id`` (no ``hermes-cli:`` prefix).
+  - audience claim is the bare ``client_id`` (no ``council-cli:`` prefix).
   - tolerant ``oauth_contract_version`` check: missing → warn + proceed;
     present and ``!= 1`` → refuse.
 
@@ -46,7 +46,7 @@ The cookie payload returned by ``start_login`` stashes the PKCE
 ``code_verifier`` and the OAuth ``state`` parameter for the
 ``/auth/callback`` handler to retrieve. The auth-route layer is the owner
 of cookie names; this provider just hands back ``{"code_verifier": …,
-"state": …}`` and the route serializes those into the ``hermes_session_pkce``
+"state": …}`` and the route serializes those into the ``council_session_pkce``
 cookie.
 
 Forward compatibility: if a future Portal contract starts issuing refresh
@@ -58,7 +58,7 @@ here.
 Skip reasons:
   The plugin exposes a module-level ``LAST_SKIP_REASON`` that the gate's
   fail-closed branch reads to surface a useful operator error message
-  ("Set HERMES_DASHBOARD_OAUTH_CLIENT_ID …") instead of the bare "no
+  ("Set COUNCIL_DASHBOARD_OAUTH_CLIENT_ID …") instead of the bare "no
   providers registered" the gate would otherwise emit.
 """
 
@@ -74,7 +74,7 @@ from typing import Any, Dict, Optional
 
 import httpx
 
-from hermes_cli.dashboard_auth import (
+from council_cli.dashboard_auth import (
     DashboardAuthProvider,
     InvalidCodeError,
     LoginStart,
@@ -90,10 +90,10 @@ logger = logging.getLogger(__name__)
 # Defaults
 # ---------------------------------------------------------------------------
 
-# Production Portal URL. Override via HERMES_DASHBOARD_PORTAL_URL for
+# Production Portal URL. Override via COUNCIL_DASHBOARD_PORTAL_URL for
 # staging (portal.rewbs.uk) or a custom deployment. Contract docs name
 # this as the production issuer.
-_DEFAULT_PORTAL_URL = "https://portal.nousresearch.com"
+_DEFAULT_PORTAL_URL = "https://portal.pokelabs.com"
 
 
 # ---------------------------------------------------------------------------
@@ -145,11 +145,11 @@ def _b64url_no_pad(raw: bytes) -> str:
 # ---------------------------------------------------------------------------
 
 
-class NousDashboardAuthProvider(DashboardAuthProvider):
-    """Nous Portal OAuth via authorization-code + PKCE (S256)."""
+class PokeDashboardAuthProvider(DashboardAuthProvider):
+    """Poke Portal OAuth via authorization-code + PKCE (S256)."""
 
-    name = "nous"
-    display_name = "Nous Research"
+    name = "poke"
+    display_name = "Poke Labs"
 
     def __init__(self, *, client_id: str, portal_url: str) -> None:
         if not client_id.startswith("agent:"):
@@ -190,12 +190,12 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
             "code_challenge_method": "S256",
         }
         redirect_url = f"{self._authorize_url}?{urllib.parse.urlencode(params)}"
-        # The auth-route layer expects ``cookie_payload[\"hermes_session_pkce\"]``
+        # The auth-route layer expects ``cookie_payload[\"council_session_pkce\"]``
         # as a single semicolon-delimited string of ``key=value`` segments,
         # matching the stub provider's shape. The route handler prepends
         # ``provider=`` so the callback knows which plugin to dispatch to.
         cookie_payload = {
-            "hermes_session_pkce": f"state={state};verifier={code_verifier}",
+            "council_session_pkce": f"state={state};verifier={code_verifier}",
         }
         return LoginStart(redirect_url=redirect_url, cookie_payload=cookie_payload)
 
@@ -209,7 +209,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
     ) -> Session:
         # ``state`` is verified by the auth-route layer before this call
         # (it checks the cookie-stashed state matches the query-param state);
-        # we just receive it for symmetry with the protocol. Nous Portal
+        # we just receive it for symmetry with the protocol. Poke Portal
         # doesn't re-check state at the token endpoint, so we ignore it here.
         _ = state
 
@@ -263,7 +263,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         # future Portal contract starts issuing them, this method needs to
         # be re-implemented; until then it's an unconditional refusal.
         raise RefreshExpiredError(
-            "Nous Portal does not issue refresh tokens in OAuth contract v1; "
+            "Poke Portal does not issue refresh tokens in OAuth contract v1; "
             "user must re-authenticate via /auth/login."
         )
 
@@ -369,7 +369,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         except jwt.InvalidTokenError as exc:
             # Surface the actual claim values that failed verification so
             # operators don't have to dig into the JWT to debug config drift
-            # between HERMES_DASHBOARD_PORTAL_URL / HERMES_DASHBOARD_OAUTH_CLIENT_ID
+            # between COUNCIL_DASHBOARD_PORTAL_URL / COUNCIL_DASHBOARD_OAUTH_CLIENT_ID
             # and what Portal is actually emitting. Decoding without verification
             # is safe here: we've already failed to verify, and we never trust
             # these values — they're surfaced for diagnostics only.
@@ -414,7 +414,7 @@ class NousDashboardAuthProvider(DashboardAuthProvider):
         contract_version = claims.get("oauth_contract_version")
         if contract_version is None:
             logger.warning(
-                "Nous Portal token missing oauth_contract_version claim "
+                "Poke Portal token missing oauth_contract_version claim "
                 "(contract says it should be %d); proceeding anyway.",
                 _EXPECTED_CONTRACT_VERSION,
             )
@@ -464,12 +464,12 @@ def _load_config_oauth_section() -> dict:
     through to ``{}`` so register() can rely on `.get(...)` access.
     """
     try:
-        from hermes_cli.config import cfg_get, load_config
+        from council_cli.config import cfg_get, load_config
 
         cfg = load_config()
     except Exception as exc:  # noqa: BLE001 — broad catch is intentional
         logger.debug(
-            "dashboard-auth-nous: load_config() raised %s; "
+            "dashboard-auth-poke: load_config() raised %s; "
             "falling back to env-only configuration",
             exc,
         )
@@ -482,14 +482,14 @@ def _resolve_client_id() -> str:
     """Resolve the OAuth client_id with env-overrides-config precedence.
 
     Order:
-      1. ``HERMES_DASHBOARD_OAUTH_CLIENT_ID`` env var (when non-empty
+      1. ``COUNCIL_DASHBOARD_OAUTH_CLIENT_ID`` env var (when non-empty
          after strip — empty values are treated as unset so a
          provisioned-but-not-populated Fly secret can't shadow a valid
          config.yaml entry).
       2. ``dashboard.oauth.client_id`` in ``config.yaml``.
       3. Empty string — signals "no client_id configured" to the caller.
     """
-    env = os.environ.get("HERMES_DASHBOARD_OAUTH_CLIENT_ID", "").strip()
+    env = os.environ.get("COUNCIL_DASHBOARD_OAUTH_CLIENT_ID", "").strip()
     if env:
         return env
     cfg_value = _load_config_oauth_section().get("client_id", "")
@@ -500,11 +500,11 @@ def _resolve_portal_url() -> str:
     """Resolve the Portal URL with env-overrides-config precedence.
 
     Order:
-      1. ``HERMES_DASHBOARD_PORTAL_URL`` env var (non-empty after strip).
+      1. ``COUNCIL_DASHBOARD_PORTAL_URL`` env var (non-empty after strip).
       2. ``dashboard.oauth.portal_url`` in ``config.yaml``.
       3. :data:`_DEFAULT_PORTAL_URL` (production Portal).
     """
-    env = os.environ.get("HERMES_DASHBOARD_PORTAL_URL", "").strip()
+    env = os.environ.get("COUNCIL_DASHBOARD_PORTAL_URL", "").strip()
     if env:
         return env
     cfg_value = str(
@@ -516,22 +516,22 @@ def _resolve_portal_url() -> str:
 def register(ctx) -> None:
     """Plugin entry — called by the plugin loader at startup.
 
-    Registers ``NousDashboardAuthProvider`` only when a client_id is
-    configured (either via ``HERMES_DASHBOARD_OAUTH_CLIENT_ID`` env var
+    Registers ``PokeDashboardAuthProvider`` only when a client_id is
+    configured (either via ``COUNCIL_DASHBOARD_OAUTH_CLIENT_ID`` env var
     or via ``dashboard.oauth.client_id`` in ``config.yaml``). The env
     var wins when set non-empty — Fly.io's platform-secret injection
     pushes the per-deploy value through this path.
 
     When skipping, writes a short human-readable reason to the module-
     level :data:`LAST_SKIP_REASON` so the dashboard's fail-closed branch
-    can surface "Set HERMES_DASHBOARD_OAUTH_CLIENT_ID …" instead of the
+    can surface "Set COUNCIL_DASHBOARD_OAUTH_CLIENT_ID …" instead of the
     bare "no providers registered" the gate would otherwise emit. The
     reason mentions BOTH configuration surfaces so operators don't
     guess wrong about which one to populate.
 
     Operator-owned dashboards (loopback / ``--insecure``) leave both
     surfaces unset, so this plugin is a no-op for them. The gate-
-    engagement layer (``hermes_cli.web_server.should_require_auth`` +
+    engagement layer (``council_cli.web_server.should_require_auth`` +
     the fail-closed check in ``start_server``) handles the "public bind
     with zero providers" case independently.
     """
@@ -543,40 +543,40 @@ def register(ctx) -> None:
 
     if not client_id:
         LAST_SKIP_REASON = (
-            "HERMES_DASHBOARD_OAUTH_CLIENT_ID is not set (and "
+            "COUNCIL_DASHBOARD_OAUTH_CLIENT_ID is not set (and "
             "dashboard.oauth.client_id in config.yaml is empty). The "
-            "Nous Portal provisions this env var (shape "
-            "'agent:{instance_id}') when it deploys a Hermes Agent "
+            "Poke Portal provisions this env var (shape "
+            "'agent:{instance_id}') when it deploys a Poke Council "
             "instance — set it to your provisioned client id (either "
             "as an env var or under dashboard.oauth.client_id in "
             "config.yaml), or pass --insecure to skip the OAuth gate "
             "entirely."
         )
-        logger.debug("dashboard-auth-nous: %s", LAST_SKIP_REASON)
+        logger.debug("dashboard-auth-poke: %s", LAST_SKIP_REASON)
         return
 
     if not client_id.startswith("agent:"):
         LAST_SKIP_REASON = (
-            f"HERMES_DASHBOARD_OAUTH_CLIENT_ID={client_id!r} doesn't match "
-            f"the contract shape 'agent:{{instance_id}}'. The Nous Portal "
+            f"COUNCIL_DASHBOARD_OAUTH_CLIENT_ID={client_id!r} doesn't match "
+            f"the contract shape 'agent:{{instance_id}}'. The Poke Portal "
             f"provisions this value at deploy time; check your Fly app's "
             f"secrets or override with the value from the Portal admin UI."
         )
-        logger.warning("dashboard-auth-nous: %s", LAST_SKIP_REASON)
+        logger.warning("dashboard-auth-poke: %s", LAST_SKIP_REASON)
         return
 
     try:
-        provider = NousDashboardAuthProvider(
+        provider = PokeDashboardAuthProvider(
             client_id=client_id, portal_url=portal_url
         )
     except ValueError as exc:
-        LAST_SKIP_REASON = f"NousDashboardAuthProvider construction failed: {exc}"
-        logger.warning("dashboard-auth-nous: %s", LAST_SKIP_REASON)
+        LAST_SKIP_REASON = f"PokeDashboardAuthProvider construction failed: {exc}"
+        logger.warning("dashboard-auth-poke: %s", LAST_SKIP_REASON)
         return
 
     ctx.register_dashboard_auth_provider(provider)
     logger.info(
-        "dashboard-auth-nous: registered provider (client_id=%s, portal=%s)",
+        "dashboard-auth-poke: registered provider (client_id=%s, portal=%s)",
         client_id,
         portal_url,
     )

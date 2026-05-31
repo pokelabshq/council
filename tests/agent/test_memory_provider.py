@@ -433,7 +433,7 @@ class TestPluginMemoryDiscovery:
 
 
 class TestUserInstalledProviderDiscovery:
-    """Memory providers installed to $HERMES_HOME/plugins/ should be found.
+    """Memory providers installed to $COUNCIL_HOME/plugins/ should be found.
 
     Regression test for issues #4956 and #9099: load_memory_provider() and
     discover_memory_providers() only scanned the bundled plugins/memory/
@@ -474,7 +474,7 @@ class TestUserInstalledProviderDiscovery:
         assert "holographic" in names  # bundled still found
 
     def test_load_user_plugin(self, tmp_path, monkeypatch):
-        """load_memory_provider() can load from $HERMES_HOME/plugins/."""
+        """load_memory_provider() can load from $COUNCIL_HOME/plugins/."""
         from plugins.memory import load_memory_provider
         self._make_user_memory_plugin(tmp_path, "myexternal")
         monkeypatch.setattr(
@@ -646,7 +646,7 @@ class TestSequentialDispatchRouting:
 
 class TestSetupFieldFiltering:
     """Test the 'when' clause and 'default_from' logic used by the
-    memory setup wizard in hermes_cli/memory_setup.py.
+    memory setup wizard in council_cli/memory_setup.py.
 
     These features are generic — any memory plugin can use them in
     get_config_schema(). Currently used by the hindsight plugin.
@@ -705,7 +705,7 @@ class TestSetupFieldFiltering:
     def test_when_clause_no_condition_always_shown(self):
         """Fields without 'when' are always included."""
         schema = [
-            {"key": "bank_id", "default": "hermes"},
+            {"key": "bank_id", "default": "council"},
             {"key": "budget", "default": "mid"},
         ]
         fields = self._filter_fields(schema, {"mode": "cloud"})
@@ -968,10 +968,10 @@ class TestOnMemoryWriteBridge:
     def test_memory_manager_tool_injection_deduplicates(self):
         """Memory manager tools already in self.tools (from plugin registry)
         must not be appended again.  Duplicate function names cause 400 errors
-        on providers that enforce unique names (e.g. Xiaomi MiMo via Nous Portal).
+        on providers that enforce unique names (e.g. Xiaomi MiMo via Poke Portal).
 
         Regression test for: duplicate mnemosyne_recall / mnemosyne_remember /
-        mnemosyne_stats in tools array → 400 from Nous Portal.
+        mnemosyne_stats in tools array → 400 from Poke Portal.
         """
         mgr = MemoryManager()
         p = FakeMemoryProvider("ext", tools=[

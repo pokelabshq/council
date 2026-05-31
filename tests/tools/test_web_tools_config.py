@@ -38,8 +38,8 @@ class TestFirecrawlClientConfig:
         # local web_tools import and the managed_tool_gateway import so the
         # full firecrawl client init path sees True.
         self._managed_patchers = [
-            patch("tools.web_tools.managed_nous_tools_enabled", return_value=True),
-            patch("tools.managed_tool_gateway.managed_nous_tools_enabled", return_value=True),
+            patch("tools.web_tools.managed_poke_tools_enabled", return_value=True),
+            patch("tools.managed_tool_gateway.managed_poke_tools_enabled", return_value=True),
         ]
         for p in self._managed_patchers:
             p.start()
@@ -66,47 +66,47 @@ class TestFirecrawlClientConfig:
     def test_no_config_raises_with_helpful_message(self):
         """Neither key nor URL → ValueError with guidance."""
         with patch("tools.web_tools.Firecrawl"):
-            with patch("tools.web_tools._read_nous_access_token", return_value=None):
+            with patch("tools.web_tools._read_poke_access_token", return_value=None):
                 from tools.web_tools import _get_firecrawl_client
                 with pytest.raises(ValueError, match="FIRECRAWL_API_KEY"):
                     _get_firecrawl_client()
 
     def test_tool_gateway_domain_builds_firecrawl_gateway_origin(self):
         """Shared gateway domain should derive the Firecrawl vendor hostname."""
-        with patch.dict(os.environ, {"TOOL_GATEWAY_DOMAIN": "nousresearch.com"}):
-            with patch("tools.web_tools._read_nous_access_token", return_value="nous-token"):
+        with patch.dict(os.environ, {"TOOL_GATEWAY_DOMAIN": "pokelabs.com"}):
+            with patch("tools.web_tools._read_poke_access_token", return_value="poke-token"):
                 with patch("tools.web_tools.Firecrawl") as mock_fc:
                     from tools.web_tools import _get_firecrawl_client
                     result = _get_firecrawl_client()
                     mock_fc.assert_called_once_with(
-                        api_key="nous-token",
-                        api_url="https://firecrawl-gateway.nousresearch.com",
+                        api_key="poke-token",
+                        api_url="https://firecrawl-gateway.pokelabs.com",
                     )
                     assert result is mock_fc.return_value
 
     def test_tool_gateway_scheme_can_switch_derived_gateway_origin_to_http(self):
         """Shared gateway scheme should allow local plain-http vendor hosts."""
         with patch.dict(os.environ, {
-            "TOOL_GATEWAY_DOMAIN": "nousresearch.com",
+            "TOOL_GATEWAY_DOMAIN": "pokelabs.com",
             "TOOL_GATEWAY_SCHEME": "http",
         }):
-            with patch("tools.web_tools._read_nous_access_token", return_value="nous-token"):
+            with patch("tools.web_tools._read_poke_access_token", return_value="poke-token"):
                 with patch("tools.web_tools.Firecrawl") as mock_fc:
                     from tools.web_tools import _get_firecrawl_client
                     result = _get_firecrawl_client()
                     mock_fc.assert_called_once_with(
-                        api_key="nous-token",
-                        api_url="http://firecrawl-gateway.nousresearch.com",
+                        api_key="poke-token",
+                        api_url="http://firecrawl-gateway.pokelabs.com",
                     )
                     assert result is mock_fc.return_value
 
     def test_invalid_tool_gateway_scheme_raises(self):
         """Unexpected shared gateway schemes should fail fast."""
         with patch.dict(os.environ, {
-            "TOOL_GATEWAY_DOMAIN": "nousresearch.com",
+            "TOOL_GATEWAY_DOMAIN": "pokelabs.com",
             "TOOL_GATEWAY_SCHEME": "ftp",
         }):
-            with patch("tools.web_tools._read_nous_access_token", return_value="nous-token"):
+            with patch("tools.web_tools._read_poke_access_token", return_value="poke-token"):
                 from tools.web_tools import _get_firecrawl_client
                 with pytest.raises(ValueError, match="TOOL_GATEWAY_SCHEME"):
                     _get_firecrawl_client()
@@ -115,50 +115,50 @@ class TestFirecrawlClientConfig:
         """An explicit Firecrawl gateway origin should override the shared domain."""
         with patch.dict(os.environ, {
             "FIRECRAWL_GATEWAY_URL": "https://firecrawl-gateway.localhost:3009/",
-            "TOOL_GATEWAY_DOMAIN": "nousresearch.com",
+            "TOOL_GATEWAY_DOMAIN": "pokelabs.com",
         }):
-            with patch("tools.web_tools._read_nous_access_token", return_value="nous-token"):
+            with patch("tools.web_tools._read_poke_access_token", return_value="poke-token"):
                 with patch("tools.web_tools.Firecrawl") as mock_fc:
                     from tools.web_tools import _get_firecrawl_client
                     _get_firecrawl_client()
                     mock_fc.assert_called_once_with(
-                        api_key="nous-token",
+                        api_key="poke-token",
                         api_url="https://firecrawl-gateway.localhost:3009",
                     )
 
-    def test_default_gateway_domain_targets_nous_production_origin(self):
+    def test_default_gateway_domain_targets_poke_production_origin(self):
         """Default gateway origin should point at the Firecrawl vendor hostname."""
-        with patch("tools.web_tools._read_nous_access_token", return_value="nous-token"):
+        with patch("tools.web_tools._read_poke_access_token", return_value="poke-token"):
             with patch("tools.web_tools.Firecrawl") as mock_fc:
                 from tools.web_tools import _get_firecrawl_client
                 _get_firecrawl_client()
                 mock_fc.assert_called_once_with(
-                    api_key="nous-token",
-                    api_url="https://firecrawl-gateway.nousresearch.com",
+                    api_key="poke-token",
+                    api_url="https://firecrawl-gateway.pokelabs.com",
                 )
 
-    def test_nous_auth_token_respects_hermes_home_override(self, tmp_path):
-        """Auth lookup should read from HERMES_HOME/auth.json, not ~/.hermes/auth.json."""
+    def test_poke_auth_token_respects_council_home_override(self, tmp_path):
+        """Auth lookup should read from COUNCIL_HOME/auth.json, not ~/.council/auth.json."""
         real_home = tmp_path / "real-home"
-        (real_home / ".hermes").mkdir(parents=True)
+        (real_home / ".council").mkdir(parents=True)
 
-        hermes_home = tmp_path / "hermes-home"
-        hermes_home.mkdir()
-        (hermes_home / "auth.json").write_text(json.dumps({
+        council_home = tmp_path / "council-home"
+        council_home.mkdir()
+        (council_home / "auth.json").write_text(json.dumps({
             "providers": {
-                "nous": {
-                    "access_token": "nous-token",
+                "poke": {
+                    "access_token": "poke-token",
                 }
             }
         }))
 
         with patch.dict(os.environ, {
             "HOME": str(real_home),
-            "HERMES_HOME": str(hermes_home),
+            "COUNCIL_HOME": str(council_home),
         }, clear=False):
             import tools.web_tools
             importlib.reload(tools.web_tools)
-            assert tools.web_tools._read_nous_access_token() == "nous-token"
+            assert tools.web_tools._read_poke_access_token() == "poke-token"
 
     def test_check_auxiliary_model_re_resolves_backend_each_call(self):
         """Availability checks should not be pinned to module import state."""
@@ -235,7 +235,7 @@ class TestFirecrawlClientConfig:
         """FIRECRAWL_API_KEY='' with no URL → should raise."""
         with patch.dict(os.environ, {"FIRECRAWL_API_KEY": ""}):
             with patch("tools.web_tools.Firecrawl"):
-                with patch("tools.web_tools._read_nous_access_token", return_value=None):
+                with patch("tools.web_tools._read_poke_access_token", return_value=None):
                     from tools.web_tools import _get_firecrawl_client
                     with pytest.raises(ValueError):
                         _get_firecrawl_client()
@@ -245,7 +245,7 @@ class TestBackendSelection:
     """Test suite for _get_backend() backend selection logic.
 
     The backend is configured via config.yaml (web.backend), set by
-    ``hermes tools``.  Falls back to key-based detection for legacy/manual
+    ``council tools``.  Falls back to key-based detection for legacy/manual
     setups.
     """
 
@@ -265,8 +265,8 @@ class TestBackendSelection:
         for key in self._ENV_KEYS:
             os.environ.pop(key, None)
         self._managed_patchers = [
-            patch("tools.web_tools.managed_nous_tools_enabled", return_value=True),
-            patch("tools.managed_tool_gateway.managed_nous_tools_enabled", return_value=True),
+            patch("tools.web_tools.managed_poke_tools_enabled", return_value=True),
+            patch("tools.managed_tool_gateway.managed_poke_tools_enabled", return_value=True),
         ]
         for p in self._managed_patchers:
             p.start()
@@ -564,8 +564,8 @@ class TestCheckWebApiKey:
         for key in self._ENV_KEYS:
             os.environ.pop(key, None)
         self._managed_patchers = [
-            patch("tools.web_tools.managed_nous_tools_enabled", return_value=True),
-            patch("tools.managed_tool_gateway.managed_nous_tools_enabled", return_value=True),
+            patch("tools.web_tools.managed_poke_tools_enabled", return_value=True),
+            patch("tools.managed_tool_gateway.managed_poke_tools_enabled", return_value=True),
         ]
         for p in self._managed_patchers:
             p.start()
@@ -623,7 +623,7 @@ class TestCheckWebApiKey:
             assert check_web_api_key() is True
 
     def test_tool_gateway_returns_true(self):
-        with patch("tools.web_tools._peek_nous_access_token", return_value="nous-token"):
+        with patch("tools.web_tools._peek_poke_access_token", return_value="poke-token"):
             from tools.web_tools import check_web_api_key
             assert check_web_api_key() is True
 
@@ -633,11 +633,11 @@ class TestCheckWebApiKey:
         monkeypatch,
     ):
         monkeypatch.delenv("TOOL_GATEWAY_USER_TOKEN", raising=False)
-        monkeypatch.setenv("HERMES_HOME", str(tmp_path))
+        monkeypatch.setenv("COUNCIL_HOME", str(tmp_path))
         expired_at = "2000-01-01T00:00:00+00:00"
         (tmp_path / "auth.json").write_text(json.dumps({
             "providers": {
-                "nous": {
+                "poke": {
                     "access_token": "expired-token",
                     "refresh_token": "refresh-token",
                     "expires_at": expired_at,
@@ -651,7 +651,7 @@ class TestCheckWebApiKey:
             return "fresh-token"
 
         monkeypatch.setattr(
-            "hermes_cli.auth.resolve_nous_access_token",
+            "council_cli.auth.resolve_poke_access_token",
             _record_refresh,
         )
 
@@ -668,14 +668,14 @@ class TestCheckWebApiKey:
 
     def test_configured_backend_must_match_available_provider(self):
         with patch("tools.web_tools._load_web_config", return_value={"backend": "parallel"}):
-            with patch("tools.web_tools._read_nous_access_token", return_value="nous-token"):
+            with patch("tools.web_tools._read_poke_access_token", return_value="poke-token"):
                 with patch.dict(os.environ, {"FIRECRAWL_GATEWAY_URL": "http://127.0.0.1:3002"}, clear=False):
                     from tools.web_tools import check_web_api_key
                     assert check_web_api_key() is False
 
     def test_configured_firecrawl_backend_accepts_managed_gateway(self):
         with patch("tools.web_tools._load_web_config", return_value={"backend": "firecrawl"}):
-            with patch("tools.web_tools._peek_nous_access_token", return_value="nous-token"):
+            with patch("tools.web_tools._peek_poke_access_token", return_value="poke-token"):
                 with patch.dict(os.environ, {"FIRECRAWL_GATEWAY_URL": "http://127.0.0.1:3002"}, clear=False):
                     from tools.web_tools import check_web_api_key
                     assert check_web_api_key() is True

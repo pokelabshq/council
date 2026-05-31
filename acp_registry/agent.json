@@ -1,16 +1,16 @@
 {
-  "id": "hermes-agent",
-  "name": "Hermes Agent",
+  "id": "ai-council",
+  "name": "Poke Council",
   "version": "0.15.1",
-  "description": "Self-improving open-source AI agent by Nous Research with ACP editor integration, persistent memory, skills, and rich tool support.",
-  "repository": "https://github.com/NousResearch/hermes-agent",
-  "website": "https://hermes-agent.nousresearch.com/docs/user-guide/features/acp",
-  "authors": ["Nous Research"],
+  "description": "Self-improving open-source AI agent by Poke Labs with ACP editor integration, persistent memory, skills, and rich tool support.",
+  "repository": "https://github.com/pokelabshq/council",
+  "website": "https://ai-council.pokelabs.com/docs/user-guide/features/acp",
+  "authors": ["Poke Labs"],
   "license": "MIT",
   "distribution": {
     "uvx": {
-      "package": "hermes-agent[acp]==0.15.1",
-      "args": ["hermes-acp"]
+      "package": "ai-council[acp]==0.15.1",
+      "args": ["council-acp"]
     }
   }
 }

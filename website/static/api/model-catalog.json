@@ -2,8 +2,8 @@
   "version": 1,
   "updated_at": "2026-05-29T11:20:16Z",
   "metadata": {
-    "source": "hermes-agent repo",
-    "docs": "https://hermes-agent.nousresearch.com/docs/reference/model-catalog"
+    "source": "ai-council repo",
+    "docs": "https://ai-council.pokelabs.com/docs/reference/model-catalog"
   },
   "providers": {
     "openrouter": {
@@ -146,10 +146,10 @@
         }
       ]
     },
-    "nous": {
+    "poke": {
       "metadata": {
-        "display_name": "Nous Portal",
-        "note": "Free-tier gating is determined live via Portal pricing (partition_nous_models_by_tier), not this manifest."
+        "display_name": "Poke Portal",
+        "note": "Free-tier gating is determined live via Portal pricing (partition_poke_models_by_tier), not this manifest."
       },
       "models": [
         {

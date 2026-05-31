@@ -9,7 +9,7 @@ import pytest
 
 pwd = pytest.importorskip("pwd")
 
-import hermes_cli.gateway as gateway_cli
+import council_cli.gateway as gateway_cli
 from gateway import status
 from gateway.restart import (
     DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT,
@@ -39,7 +39,7 @@ class TestUserSystemdPrivateSocketPreflight:
 
 class TestSystemdServiceRefresh:
     def test_systemd_install_repairs_outdated_unit_without_force(self, tmp_path, monkeypatch):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
@@ -62,7 +62,7 @@ class TestSystemdServiceRefresh:
         ]
 
     def test_systemd_start_refreshes_outdated_unit(self, tmp_path, monkeypatch):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
@@ -85,7 +85,7 @@ class TestSystemdServiceRefresh:
         ]
 
     def test_systemd_restart_refreshes_outdated_unit(self, tmp_path, monkeypatch):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
@@ -163,12 +163,12 @@ class TestSystemdServiceRefresh:
         assert markers == [321]
         output = capsys.readouterr().out
         assert "still stopping after 90s" in output
-        assert "hermes gateway status" in output
+        assert "council gateway status" in output
 
     def test_systemd_restart_timeout_prints_status_guidance(self, monkeypatch, capsys):
-        """`hermes gateway restart` must not surface a raw TimeoutExpired traceback.
+        """`council gateway restart` must not surface a raw TimeoutExpired traceback.
 
-        The dashboard spawns `hermes gateway restart` in the background; when a
+        The dashboard spawns `council gateway restart` in the background; when a
         wedged adapter websocket pushes drain past the 90s CLI timeout, the
         dashboard would previously show a Python traceback (issue #19937
         follow-up: the same failure mode applies to restart, not just stop).
@@ -202,13 +202,13 @@ class TestSystemdServiceRefresh:
 
         output = capsys.readouterr().out
         assert "still restarting after 90s" in output
-        assert "hermes gateway status" in output
+        assert "council gateway status" in output
 
     def test_run_gateway_refreshes_outdated_unit_on_boot(self, tmp_path, monkeypatch):
         """run_gateway() should refresh the systemd unit on boot so that
         restart settings take effect even when the process was respawned
-        via exit-code-75 (bypassing `hermes gateway restart`)."""
-        unit_path = tmp_path / "hermes-gateway.service"
+        via exit-code-75 (bypassing `council gateway restart`)."""
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
@@ -240,28 +240,28 @@ class TestSystemdServiceRefresh:
         """Defense in depth: ``refresh_systemd_unit_if_needed()`` runs every
         time ``run_gateway()`` starts. The user-scope unit path resolves
         under ``Path.home()`` (NOT sandboxed by conftest), and
-        ``generate_systemd_unit()`` bakes ``HERMES_HOME`` into the unit's
+        ``generate_systemd_unit()`` bakes ``COUNCIL_HOME`` into the unit's
         ``Environment=`` line. Without this guard, any test that drives
         ``run_gateway()`` end-to-end on a real Linux dev box silently
         rewrites the developer's installed gateway unit with a
-        ``/tmp/pytest-of-.../hermes_test`` HERMES_HOME — silently breaking
+        ``/tmp/pytest-of-.../council_test`` COUNCIL_HOME — silently breaking
         their gateway on the next boot. The guard sniffs the generated
         unit body for tmpdir markers and refuses the write. Tests that
         legitimately exercise the refresh flow patch
         ``generate_systemd_unit`` to return synthetic content that doesn't
         carry those markers.
         """
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("old unit\n", encoding="utf-8")
 
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
-        # Realistic generated unit referencing a pytest tmpdir HERMES_HOME
+        # Realistic generated unit referencing a pytest tmpdir COUNCIL_HOME
         polluted_unit = (
             "[Service]\n"
-            'Environment="HERMES_HOME=/tmp/pytest-of-alice/pytest-42/'
-            'popen-gw0/test_x/hermes_test"\n'
+            'Environment="COUNCIL_HOME=/tmp/pytest-of-alice/pytest-42/'
+            'popen-gw0/test_x/council_test"\n'
         )
         monkeypatch.setattr(
             gateway_cli,
@@ -291,7 +291,7 @@ class TestSystemdServiceRefresh:
 
 class TestRequireServiceInstalled:
     def test_exits_with_install_hint_when_unit_missing(self, tmp_path, monkeypatch, capsys):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
 
         with pytest.raises(SystemExit) as exc_info:
@@ -300,10 +300,10 @@ class TestRequireServiceInstalled:
         assert exc_info.value.code == 1
         out = capsys.readouterr().out
         assert "not installed" in out
-        assert "hermes gateway install" in out
+        assert "council gateway install" in out
 
     def test_passes_when_unit_exists(self, tmp_path, monkeypatch):
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("[Unit]\n", encoding="utf-8")
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path)
 
@@ -368,7 +368,7 @@ class TestGeneratedSystemdUnits:
             "_system_service_identity",
             lambda run_as_user=None: ("alice", "alice", "/home/alice"),
         )
-        monkeypatch.setattr(gateway_cli, "_hermes_home_for_target_user", lambda home: "/home/alice/.hermes")
+        monkeypatch.setattr(gateway_cli, "_council_home_for_target_user", lambda home: "/home/alice/.council")
         monkeypatch.setenv("PATH", "/usr/local/bin:/mnt/c/WINDOWS/system32")
         monkeypatch.setattr(gateway_cli.shutil, "which", lambda cmd: None)
 
@@ -399,7 +399,7 @@ class TestGatewayStopCleanup:
     def test_stop_only_kills_current_profile_by_default(self, tmp_path, monkeypatch):
         """Without --all, stop uses systemd (if available) and does NOT call
         the global kill_gateway_processes()."""
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
@@ -425,7 +425,7 @@ class TestGatewayStopCleanup:
 
     def test_stop_all_sweeps_all_gateway_processes(self, tmp_path, monkeypatch):
         """With --all, stop uses systemd AND calls the global kill_gateway_processes()."""
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         unit_path.write_text("unit\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
@@ -451,7 +451,7 @@ class TestGatewayStopCleanup:
 
 class TestLaunchdServiceRecovery:
     def test_get_restart_drain_timeout_prefers_env_then_config_then_default(self, monkeypatch):
-        monkeypatch.delenv("HERMES_RESTART_DRAIN_TIMEOUT", raising=False)
+        monkeypatch.delenv("COUNCIL_RESTART_DRAIN_TIMEOUT", raising=False)
         monkeypatch.setattr(gateway_cli, "read_raw_config", lambda: {})
 
         assert (
@@ -466,17 +466,17 @@ class TestLaunchdServiceRecovery:
         )
         assert gateway_cli._get_restart_drain_timeout() == 14.0
 
-        monkeypatch.setenv("HERMES_RESTART_DRAIN_TIMEOUT", "9")
+        monkeypatch.setenv("COUNCIL_RESTART_DRAIN_TIMEOUT", "9")
         assert gateway_cli._get_restart_drain_timeout() == 9.0
 
-        monkeypatch.setenv("HERMES_RESTART_DRAIN_TIMEOUT", "invalid")
+        monkeypatch.setenv("COUNCIL_RESTART_DRAIN_TIMEOUT", "invalid")
         assert (
             gateway_cli._get_restart_drain_timeout()
             == DEFAULT_GATEWAY_RESTART_DRAIN_TIMEOUT
         )
 
     def test_launchd_install_repairs_outdated_plist_without_force(self, tmp_path, monkeypatch):
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.council.gateway.plist"
         plist_path.write_text("<plist>old content</plist>", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -500,7 +500,7 @@ class TestLaunchdServiceRecovery:
         ]
 
     def test_launchd_start_reloads_unloaded_job_and_retries(self, tmp_path, monkeypatch):
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.council.gateway.plist"
         plist_path.write_text(gateway_cli.generate_launchd_plist(), encoding="utf-8")
         label = gateway_cli.get_launchd_label()
 
@@ -528,7 +528,7 @@ class TestLaunchdServiceRecovery:
 
     def test_launchd_start_reloads_on_kickstart_exit_code_113(self, tmp_path, monkeypatch):
         """Exit code 113 (\"Could not find service\") should also trigger bootstrap recovery."""
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.council.gateway.plist"
         plist_path.write_text(gateway_cli.generate_launchd_plist(), encoding="utf-8")
         label = gateway_cli.get_launchd_label()
 
@@ -661,7 +661,7 @@ class TestLaunchdServiceRecovery:
         assert wait_called[0] == {"timeout": 10.0, "force_after": 5.0}
 
     def test_launchd_status_reports_local_stale_plist_when_unloaded(self, tmp_path, monkeypatch, capsys):
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.council.gateway.plist"
         plist_path.write_text("<plist>old content</plist>", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "get_launchd_plist_path", lambda: plist_path)
@@ -934,7 +934,7 @@ class TestGatewaySystemServiceRouting:
         monkeypatch.setattr(gateway_cli, "_select_systemd_scope", lambda system=False: False)
         monkeypatch.setattr(gateway_cli, "get_systemd_unit_path", lambda system=False: unit)
         monkeypatch.setattr(gateway_cli, "has_conflicting_systemd_units", lambda: False)
-        monkeypatch.setattr(gateway_cli, "has_legacy_hermes_units", lambda: False)
+        monkeypatch.setattr(gateway_cli, "has_legacy_council_units", lambda: False)
         monkeypatch.setattr(gateway_cli, "systemd_unit_is_current", lambda system=False: True)
         monkeypatch.setattr(gateway_cli, "_runtime_health_lines", lambda: ["⚠ Last shutdown reason: Gateway restart requested"])
         monkeypatch.setattr(gateway_cli, "get_systemd_linger_status", lambda: (True, ""))
@@ -1015,7 +1015,7 @@ class TestGatewaySystemServiceRouting:
 
         out = capsys.readouterr().out
         assert "not supported on Termux" in out
-        assert "Run manually: hermes gateway" in out
+        assert "Run manually: council gateway" in out
 
     def test_gateway_status_prefers_system_service_when_only_system_unit_exists(self, monkeypatch):
         user_unit = SimpleNamespace(exists=lambda: False)
@@ -1088,11 +1088,11 @@ class TestGatewaySystemServiceRouting:
 
         out = capsys.readouterr().out
         assert "Gateway is not running" in out
-        assert "nohup hermes gateway" in out
+        assert "nohup council gateway" in out
         assert "install as user service" not in out
 
     def test_gateway_restart_does_not_fallback_to_foreground_when_launchd_restart_fails(self, tmp_path, monkeypatch):
-        plist_path = tmp_path / "ai.hermes.gateway.plist"
+        plist_path = tmp_path / "ai.council.gateway.plist"
         plist_path.write_text("plist\n", encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "is_linux", lambda: False)
@@ -1102,7 +1102,7 @@ class TestGatewaySystemServiceRouting:
             gateway_cli,
             "launchd_restart",
             lambda: (_ for _ in ()).throw(
-                gateway_cli.subprocess.CalledProcessError(5, ["launchctl", "kickstart", "-k", "gui/501/ai.hermes.gateway"])
+                gateway_cli.subprocess.CalledProcessError(5, ["launchctl", "kickstart", "-k", "gui/501/ai.council.gateway"])
             ),
         )
 
@@ -1179,13 +1179,13 @@ class TestDetectVenvDir:
         assert result is None
 
 
-class TestSystemUnitHermesHome:
-    """HERMES_HOME in system units must reference the target user, not root."""
+class TestSystemUnitCouncilHome:
+    """COUNCIL_HOME in system units must reference the target user, not root."""
 
     def test_system_unit_uses_target_user_home_not_calling_user(self, monkeypatch):
         # Simulate sudo: Path.home() returns /root, target user is alice
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/root")))
-        monkeypatch.delenv("HERMES_HOME", raising=False)
+        monkeypatch.delenv("COUNCIL_HOME", raising=False)
         monkeypatch.setattr(
             gateway_cli, "_system_service_identity",
             lambda run_as_user=None: ("alice", "alice", "/home/alice"),
@@ -1197,13 +1197,13 @@ class TestSystemUnitHermesHome:
 
         unit = gateway_cli.generate_systemd_unit(system=True, run_as_user="alice")
 
-        assert 'HERMES_HOME=/home/alice/.hermes' in unit
-        assert '/root/.hermes' not in unit
+        assert 'COUNCIL_HOME=/home/alice/.council' in unit
+        assert '/root/.council' not in unit
 
     def test_system_unit_remaps_profile_to_target_user(self, monkeypatch):
-        # Simulate sudo with a profile: HERMES_HOME was resolved under root
+        # Simulate sudo with a profile: COUNCIL_HOME was resolved under root
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/root")))
-        monkeypatch.setenv("HERMES_HOME", "/root/.hermes/profiles/coder")
+        monkeypatch.setenv("COUNCIL_HOME", "/root/.council/profiles/coder")
         monkeypatch.setattr(
             gateway_cli, "_system_service_identity",
             lambda run_as_user=None: ("alice", "alice", "/home/alice"),
@@ -1215,13 +1215,13 @@ class TestSystemUnitHermesHome:
 
         unit = gateway_cli.generate_systemd_unit(system=True, run_as_user="alice")
 
-        assert 'HERMES_HOME=/home/alice/.hermes/profiles/coder' in unit
+        assert 'COUNCIL_HOME=/home/alice/.council/profiles/coder' in unit
         assert '/root/' not in unit
 
-    def test_system_unit_preserves_custom_hermes_home(self, monkeypatch):
-        # Custom HERMES_HOME not under any user's home — keep as-is
+    def test_system_unit_preserves_custom_council_home(self, monkeypatch):
+        # Custom COUNCIL_HOME not under any user's home — keep as-is
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/root")))
-        monkeypatch.setenv("HERMES_HOME", "/opt/hermes-shared")
+        monkeypatch.setenv("COUNCIL_HOME", "/opt/council-shared")
         monkeypatch.setattr(
             gateway_cli, "_system_service_identity",
             lambda run_as_user=None: ("alice", "alice", "/home/alice"),
@@ -1233,46 +1233,46 @@ class TestSystemUnitHermesHome:
 
         unit = gateway_cli.generate_systemd_unit(system=True, run_as_user="alice")
 
-        assert 'HERMES_HOME=/opt/hermes-shared' in unit
+        assert 'COUNCIL_HOME=/opt/council-shared' in unit
 
     def test_user_unit_unaffected_by_change(self):
-        # User-scope units should still use the calling user's HERMES_HOME
+        # User-scope units should still use the calling user's COUNCIL_HOME
         unit = gateway_cli.generate_systemd_unit(system=False)
 
-        hermes_home = str(gateway_cli.get_hermes_home().resolve())
-        assert f'HERMES_HOME={hermes_home}' in unit
+        council_home = str(gateway_cli.get_council_home().resolve())
+        assert f'COUNCIL_HOME={council_home}' in unit
 
 
-class TestHermesHomeForTargetUser:
-    """Unit tests for _hermes_home_for_target_user()."""
+class TestCouncilHomeForTargetUser:
+    """Unit tests for _council_home_for_target_user()."""
 
     def test_remaps_default_home(self, monkeypatch):
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/root")))
-        monkeypatch.delenv("HERMES_HOME", raising=False)
+        monkeypatch.delenv("COUNCIL_HOME", raising=False)
 
-        result = gateway_cli._hermes_home_for_target_user("/home/alice")
-        assert result == "/home/alice/.hermes"
+        result = gateway_cli._council_home_for_target_user("/home/alice")
+        assert result == "/home/alice/.council"
 
     def test_remaps_profile_path(self, monkeypatch):
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/root")))
-        monkeypatch.setenv("HERMES_HOME", "/root/.hermes/profiles/coder")
+        monkeypatch.setenv("COUNCIL_HOME", "/root/.council/profiles/coder")
 
-        result = gateway_cli._hermes_home_for_target_user("/home/alice")
-        assert result == "/home/alice/.hermes/profiles/coder"
+        result = gateway_cli._council_home_for_target_user("/home/alice")
+        assert result == "/home/alice/.council/profiles/coder"
 
     def test_keeps_custom_path(self, monkeypatch):
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/root")))
-        monkeypatch.setenv("HERMES_HOME", "/opt/hermes")
+        monkeypatch.setenv("COUNCIL_HOME", "/opt/council")
 
-        result = gateway_cli._hermes_home_for_target_user("/home/alice")
-        assert result == "/opt/hermes"
+        result = gateway_cli._council_home_for_target_user("/home/alice")
+        assert result == "/opt/council"
 
     def test_noop_when_same_user(self, monkeypatch):
         monkeypatch.setattr(Path, "home", staticmethod(lambda: Path("/home/alice")))
-        monkeypatch.delenv("HERMES_HOME", raising=False)
+        monkeypatch.delenv("COUNCIL_HOME", raising=False)
 
-        result = gateway_cli._hermes_home_for_target_user("/home/alice")
-        assert result == "/home/alice/.hermes"
+        result = gateway_cli._council_home_for_target_user("/home/alice")
+        assert result == "/home/alice/.council"
 
 
 class TestGeneratedUnitUsesDetectedVenv:
@@ -1479,7 +1479,7 @@ class TestPreflightUserSystemd:
 
         msg = str(exc_info.value)
         assert "sudo loginctl enable-linger" in msg
-        assert "hermes gateway run" in msg  # foreground fallback mentioned
+        assert "council gateway run" in msg  # foreground fallback mentioned
         assert "Interactive authentication required" in msg
 
     def test_raises_when_loginctl_missing(self, monkeypatch):
@@ -1562,75 +1562,75 @@ class TestPreflightUserSystemd:
 class TestProfileArg:
     """Tests for _profile_arg — returns '--profile <name>' for named profiles."""
 
-    def test_default_hermes_home_returns_empty(self, tmp_path, monkeypatch):
-        """Default ~/.hermes should not produce a --profile flag."""
-        hermes_home = tmp_path / ".hermes"
-        hermes_home.mkdir()
+    def test_default_council_home_returns_empty(self, tmp_path, monkeypatch):
+        """Default ~/.council should not produce a --profile flag."""
+        council_home = tmp_path / ".council"
+        council_home.mkdir()
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(hermes_home))
-        result = gateway_cli._profile_arg(str(hermes_home))
+        monkeypatch.setenv("COUNCIL_HOME", str(council_home))
+        result = gateway_cli._profile_arg(str(council_home))
         assert result == ""
 
     def test_named_profile_returns_flag(self, tmp_path, monkeypatch):
-        """~/.hermes/profiles/mybot should return '--profile mybot'."""
-        profile_dir = tmp_path / ".hermes" / "profiles" / "mybot"
+        """~/.council/profiles/mybot should return '--profile mybot'."""
+        profile_dir = tmp_path / ".council" / "profiles" / "mybot"
         profile_dir.mkdir(parents=True)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(tmp_path / ".hermes"))
+        monkeypatch.setenv("COUNCIL_HOME", str(tmp_path / ".council"))
         result = gateway_cli._profile_arg(str(profile_dir))
         assert result == "--profile mybot"
 
     def test_hash_path_returns_empty(self, tmp_path, monkeypatch):
-        """Arbitrary non-profile HERMES_HOME should return empty string."""
-        custom_home = tmp_path / "custom" / "hermes"
+        """Arbitrary non-profile COUNCIL_HOME should return empty string."""
+        custom_home = tmp_path / "custom" / "council"
         custom_home.mkdir(parents=True)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(tmp_path / ".hermes"))
+        monkeypatch.setenv("COUNCIL_HOME", str(tmp_path / ".council"))
         result = gateway_cli._profile_arg(str(custom_home))
         assert result == ""
 
     def test_nested_profile_path_returns_empty(self, tmp_path, monkeypatch):
-        """~/.hermes/profiles/mybot/subdir should NOT match — too deep."""
-        nested = tmp_path / ".hermes" / "profiles" / "mybot" / "subdir"
+        """~/.council/profiles/mybot/subdir should NOT match — too deep."""
+        nested = tmp_path / ".council" / "profiles" / "mybot" / "subdir"
         nested.mkdir(parents=True)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(tmp_path / ".hermes"))
+        monkeypatch.setenv("COUNCIL_HOME", str(tmp_path / ".council"))
         result = gateway_cli._profile_arg(str(nested))
         assert result == ""
 
     def test_invalid_profile_name_returns_empty(self, tmp_path, monkeypatch):
         """Profile names with invalid chars should not match the regex."""
-        bad_profile = tmp_path / ".hermes" / "profiles" / "My Bot!"
+        bad_profile = tmp_path / ".council" / "profiles" / "My Bot!"
         bad_profile.mkdir(parents=True)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(tmp_path / ".hermes"))
+        monkeypatch.setenv("COUNCIL_HOME", str(tmp_path / ".council"))
         result = gateway_cli._profile_arg(str(bad_profile))
         assert result == ""
 
     def test_systemd_unit_includes_profile(self, tmp_path, monkeypatch):
         """generate_systemd_unit should include --profile in ExecStart for named profiles."""
-        profile_dir = tmp_path / ".hermes" / "profiles" / "mybot"
+        profile_dir = tmp_path / ".council" / "profiles" / "mybot"
         profile_dir.mkdir(parents=True)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(profile_dir))
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: profile_dir)
+        monkeypatch.setenv("COUNCIL_HOME", str(profile_dir))
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: profile_dir)
         unit = gateway_cli.generate_systemd_unit(system=False)
         assert "--profile mybot" in unit
         assert "gateway run --replace" in unit
 
     def test_launchd_plist_includes_profile(self, tmp_path, monkeypatch):
         """generate_launchd_plist should include --profile in ProgramArguments for named profiles."""
-        profile_dir = tmp_path / ".hermes" / "profiles" / "mybot"
+        profile_dir = tmp_path / ".council" / "profiles" / "mybot"
         profile_dir.mkdir(parents=True)
         monkeypatch.setattr(Path, "home", lambda: tmp_path)
-        monkeypatch.setenv("HERMES_HOME", str(profile_dir))
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: profile_dir)
+        monkeypatch.setenv("COUNCIL_HOME", str(profile_dir))
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: profile_dir)
         plist = gateway_cli.generate_launchd_plist()
         assert "<string>--profile</string>" in plist
         assert "<string>mybot</string>" in plist
 
     def test_launchd_plist_path_uses_real_user_home_not_profile_home(self, tmp_path, monkeypatch):
-        profile_dir = tmp_path / ".hermes" / "profiles" / "orcha"
+        profile_dir = tmp_path / ".council" / "profiles" / "orcha"
         profile_dir.mkdir(parents=True)
         machine_home = tmp_path / "machine-home"
         machine_home.mkdir()
@@ -1638,13 +1638,13 @@ class TestProfileArg:
         profile_home.mkdir()
 
         monkeypatch.setattr(Path, "home", lambda: profile_home)
-        monkeypatch.setenv("HERMES_HOME", str(profile_dir))
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: profile_dir)
+        monkeypatch.setenv("COUNCIL_HOME", str(profile_dir))
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: profile_dir)
         monkeypatch.setattr(pwd, "getpwuid", lambda uid: SimpleNamespace(pw_dir=str(machine_home)))
 
         plist_path = gateway_cli.get_launchd_plist_path()
 
-        assert plist_path == machine_home / "Library" / "LaunchAgents" / "ai.hermes.gateway-orcha.plist"
+        assert plist_path == machine_home / "Library" / "LaunchAgents" / "ai.council.gateway-orcha.plist"
 
 
 class TestRemapPathForUser:
@@ -1654,21 +1654,21 @@ class TestRemapPathForUser:
         monkeypatch.setattr(Path, "home", lambda: tmp_path / "root")
         (tmp_path / "root").mkdir()
         result = gateway_cli._remap_path_for_user(
-            str(tmp_path / "root" / ".hermes" / "hermes-agent"),
+            str(tmp_path / "root" / ".council" / "ai-council"),
             str(tmp_path / "alice"),
         )
-        assert result == str(tmp_path / "alice" / ".hermes" / "hermes-agent")
+        assert result == str(tmp_path / "alice" / ".council" / "ai-council")
 
     def test_keeps_system_path_unchanged(self, monkeypatch, tmp_path):
         monkeypatch.setattr(Path, "home", lambda: tmp_path / "root")
         (tmp_path / "root").mkdir()
-        result = gateway_cli._remap_path_for_user("/opt/hermes", str(tmp_path / "alice"))
-        assert result == "/opt/hermes"
+        result = gateway_cli._remap_path_for_user("/opt/council", str(tmp_path / "alice"))
+        assert result == "/opt/council"
 
     def test_noop_when_same_user(self, monkeypatch, tmp_path):
         monkeypatch.setattr(Path, "home", lambda: tmp_path / "alice")
         (tmp_path / "alice").mkdir()
-        original = str(tmp_path / "alice" / ".hermes" / "hermes-agent")
+        original = str(tmp_path / "alice" / ".council" / "ai-council")
         result = gateway_cli._remap_path_for_user(original, str(tmp_path / "alice"))
         assert result == original
 
@@ -1679,7 +1679,7 @@ class TestSystemUnitPathRemapping:
     def test_system_unit_has_no_root_paths(self, monkeypatch, tmp_path):
         root_home = tmp_path / "root"
         root_home.mkdir()
-        project = root_home / ".hermes" / "hermes-agent"
+        project = root_home / ".council" / "ai-council"
         project.mkdir(parents=True)
         venv_bin = project / "venv" / "bin"
         venv_bin.mkdir(parents=True)
@@ -1688,8 +1688,8 @@ class TestSystemUnitPathRemapping:
         target_home = "/home/alice"
 
         monkeypatch.setattr(Path, "home", lambda: root_home)
-        monkeypatch.setenv("HERMES_HOME", str(root_home / ".hermes"))
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: root_home / ".hermes")
+        monkeypatch.setenv("COUNCIL_HOME", str(root_home / ".council"))
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: root_home / ".council")
         monkeypatch.setattr(gateway_cli, "PROJECT_ROOT", project)
         monkeypatch.setattr(gateway_cli, "_detect_venv_dir", lambda: project / "venv")
         monkeypatch.setattr(gateway_cli, "get_python_path", lambda: str(venv_bin / "python"))
@@ -1704,12 +1704,12 @@ class TestSystemUnitPathRemapping:
         assert str(root_home) not in unit
         # Target user paths should be present
         assert "/home/alice" in unit
-        # WorkingDirectory is anchored at the target user's HERMES_HOME (stable,
+        # WorkingDirectory is anchored at the target user's COUNCIL_HOME (stable,
         # always exists) — NOT the source checkout under it. Pinning cwd to the
         # checkout is the rot bug fixed alongside this: a relocated/removed
         # checkout would crash-loop the unit on CHDIR (status=200).
-        assert "WorkingDirectory=/home/alice/.hermes" in unit
-        assert "WorkingDirectory=/home/alice/.hermes/hermes-agent" not in unit
+        assert "WorkingDirectory=/home/alice/.council" in unit
+        assert "WorkingDirectory=/home/alice/.council/ai-council" not in unit
 
 
 class TestDockerAwareGateway:
@@ -1725,7 +1725,7 @@ class TestDockerAwareGateway:
         monkeypatch.setattr(gateway_cli.subprocess, "run", fake_run)
 
         with pytest.raises(RuntimeError, match="systemctl is not available"):
-            gateway_cli._run_systemctl(["start", "hermes-gateway"])
+            gateway_cli._run_systemctl(["start", "council-gateway"])
 
     def test_run_systemctl_passes_through_on_success(self, monkeypatch):
         """_run_systemctl delegates to subprocess.run when systemctl exists."""
@@ -1737,13 +1737,13 @@ class TestDockerAwareGateway:
 
         monkeypatch.setattr(gateway_cli.subprocess, "run", fake_run)
 
-        result = gateway_cli._run_systemctl(["status", "hermes-gateway"])
+        result = gateway_cli._run_systemctl(["status", "council-gateway"])
         assert result.returncode == 0
         assert len(calls) == 1
         assert "status" in calls[0]
 
     def test_install_in_container_prints_docker_guidance(self, monkeypatch, capsys):
-        """'hermes gateway install' inside Docker exits 0 with container guidance."""
+        """'council gateway install' inside Docker exits 0 with container guidance."""
         import pytest
 
         monkeypatch.setattr(gateway_cli, "is_managed", lambda: False)
@@ -1763,7 +1763,7 @@ class TestDockerAwareGateway:
         assert "restart" in out.lower()
 
     def test_uninstall_in_container_prints_docker_guidance(self, monkeypatch, capsys):
-        """'hermes gateway uninstall' inside Docker exits 0 with container guidance."""
+        """'council gateway uninstall' inside Docker exits 0 with container guidance."""
         import pytest
 
         monkeypatch.setattr(gateway_cli, "is_managed", lambda: False)
@@ -1781,7 +1781,7 @@ class TestDockerAwareGateway:
         assert "docker" in out.lower()
 
     def test_start_in_container_prints_docker_guidance(self, monkeypatch, capsys):
-        """'hermes gateway start' inside Docker exits 0 with container guidance."""
+        """'council gateway start' inside Docker exits 0 with container guidance."""
         import pytest
 
         monkeypatch.setattr(gateway_cli, "is_termux", lambda: False)
@@ -1797,27 +1797,27 @@ class TestDockerAwareGateway:
         assert exc_info.value.code == 0
         out = capsys.readouterr().out
         assert "docker" in out.lower()
-        assert "hermes gateway run" in out
+        assert "council gateway run" in out
 
 
-class TestLegacyHermesUnitDetection:
-    """Tests for _find_legacy_hermes_units / has_legacy_hermes_units.
+class TestLegacyCouncilUnitDetection:
+    """Tests for _find_legacy_council_units / has_legacy_council_units.
 
     These guard against the scenario that tripped Luis in April 2026: an
-    older install left a ``hermes.service`` unit behind when the service was
-    renamed to ``hermes-gateway.service``. After PR #5646 (signal recovery
+    older install left a ``council.service`` unit behind when the service was
+    renamed to ``council-gateway.service``. After PR #5646 (signal recovery
     via systemd), the two services began SIGTERM-flapping over the same
     Telegram bot token in a 30-second cycle.
 
-    The detector must flag ``hermes.service`` ONLY when it actually runs our
+    The detector must flag ``council.service`` ONLY when it actually runs our
     gateway, and must NEVER flag profile units
-    (``hermes-gateway-<profile>.service``) or unrelated third-party services.
+    (``council-gateway-<profile>.service``) or unrelated third-party services.
     """
 
     # Minimal ExecStart that looks like our gateway
     _OUR_UNIT_TEXT = (
-        "[Unit]\nDescription=Hermes Gateway\n[Service]\n"
-        "ExecStart=/usr/bin/python -m hermes_cli.main gateway run --replace\n"
+        "[Unit]\nDescription=Council Gateway\n[Service]\n"
+        "ExecStart=/usr/bin/python -m council_cli.main gateway run --replace\n"
     )
 
     @staticmethod
@@ -1834,90 +1834,90 @@ class TestLegacyHermesUnitDetection:
         )
         return user_dir, system_dir
 
-    def test_detects_legacy_hermes_service_in_user_scope(self, tmp_path, monkeypatch):
+    def test_detects_legacy_council_service_in_user_scope(self, tmp_path, monkeypatch):
         user_dir, _ = self._setup_search_paths(tmp_path, monkeypatch)
-        legacy = user_dir / "hermes.service"
+        legacy = user_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        results = gateway_cli._find_legacy_hermes_units()
+        results = gateway_cli._find_legacy_council_units()
 
         assert len(results) == 1
         name, path, is_system = results[0]
-        assert name == "hermes.service"
+        assert name == "council.service"
         assert path == legacy
         assert is_system is False
-        assert gateway_cli.has_legacy_hermes_units() is True
+        assert gateway_cli.has_legacy_council_units() is True
 
-    def test_detects_legacy_hermes_service_in_system_scope(self, tmp_path, monkeypatch):
+    def test_detects_legacy_council_service_in_system_scope(self, tmp_path, monkeypatch):
         _, system_dir = self._setup_search_paths(tmp_path, monkeypatch)
-        legacy = system_dir / "hermes.service"
+        legacy = system_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        results = gateway_cli._find_legacy_hermes_units()
+        results = gateway_cli._find_legacy_council_units()
 
         assert len(results) == 1
         name, path, is_system = results[0]
-        assert name == "hermes.service"
+        assert name == "council.service"
         assert path == legacy
         assert is_system is True
 
-    def test_ignores_profile_unit_hermes_gateway_coder(self, tmp_path, monkeypatch):
+    def test_ignores_profile_unit_council_gateway_coder(self, tmp_path, monkeypatch):
         """CRITICAL: profile units must NOT be flagged as legacy.
 
-        Teknium's concern — ``hermes-gateway-coder.service`` is our standard
+        Teknium's concern — ``council-gateway-coder.service`` is our standard
         naming for the ``coder`` profile. The legacy detector is an explicit
         allowlist, not a glob, so profile units are safe.
         """
         user_dir, system_dir = self._setup_search_paths(tmp_path, monkeypatch)
         # Drop profile units in BOTH scopes with our ExecStart
         for base in (user_dir, system_dir):
-            (base / "hermes-gateway-coder.service").write_text(
+            (base / "council-gateway-coder.service").write_text(
                 self._OUR_UNIT_TEXT, encoding="utf-8"
             )
-            (base / "hermes-gateway-orcha.service").write_text(
+            (base / "council-gateway-orcha.service").write_text(
                 self._OUR_UNIT_TEXT, encoding="utf-8"
             )
-            (base / "hermes-gateway.service").write_text(
+            (base / "council-gateway.service").write_text(
                 self._OUR_UNIT_TEXT, encoding="utf-8"
             )
 
-        results = gateway_cli._find_legacy_hermes_units()
+        results = gateway_cli._find_legacy_council_units()
 
         assert results == []
-        assert gateway_cli.has_legacy_hermes_units() is False
+        assert gateway_cli.has_legacy_council_units() is False
 
-    def test_ignores_unrelated_hermes_service(self, tmp_path, monkeypatch):
-        """Third-party ``hermes.service`` that isn't ours stays untouched.
+    def test_ignores_unrelated_council_service(self, tmp_path, monkeypatch):
+        """Third-party ``council.service`` that isn't ours stays untouched.
 
-        If a user has some other package named ``hermes`` installed as a
+        If a user has some other package named ``council`` installed as a
         service, we must not flag it.
         """
         user_dir, _ = self._setup_search_paths(tmp_path, monkeypatch)
-        (user_dir / "hermes.service").write_text(
-            "[Unit]\nDescription=Some Other Hermes\n[Service]\n"
-            "ExecStart=/opt/other-hermes/bin/daemon --foreground\n",
+        (user_dir / "council.service").write_text(
+            "[Unit]\nDescription=Some Other Council\n[Service]\n"
+            "ExecStart=/opt/other-council/bin/daemon --foreground\n",
             encoding="utf-8",
         )
 
-        results = gateway_cli._find_legacy_hermes_units()
+        results = gateway_cli._find_legacy_council_units()
 
         assert results == []
-        assert gateway_cli.has_legacy_hermes_units() is False
+        assert gateway_cli.has_legacy_council_units() is False
 
     def test_returns_empty_when_no_legacy_files_exist(self, tmp_path, monkeypatch):
         self._setup_search_paths(tmp_path, monkeypatch)
 
-        assert gateway_cli._find_legacy_hermes_units() == []
-        assert gateway_cli.has_legacy_hermes_units() is False
+        assert gateway_cli._find_legacy_council_units() == []
+        assert gateway_cli.has_legacy_council_units() is False
 
     def test_detects_both_scopes_simultaneously(self, tmp_path, monkeypatch):
         """When a user has BOTH user-scope and system-scope legacy units,
         both are reported so the migration step can remove them together."""
         user_dir, system_dir = self._setup_search_paths(tmp_path, monkeypatch)
-        (user_dir / "hermes.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
-        (system_dir / "hermes.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
+        (user_dir / "council.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
+        (system_dir / "council.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        results = gateway_cli._find_legacy_hermes_units()
+        results = gateway_cli._find_legacy_council_units()
 
         scopes = sorted(is_system for _, _, is_system in results)
         assert scopes == [False, True]
@@ -1926,26 +1926,26 @@ class TestLegacyHermesUnitDetection:
         """Older installs may have used different python invocations.
 
         ExecStart variants we've seen in the wild:
-          - python -m hermes_cli.main gateway run
-          - python path/to/hermes_cli/main.py gateway run
-          - hermes gateway run   (direct binary)
+          - python -m council_cli.main gateway run
+          - python path/to/council_cli/main.py gateway run
+          - council gateway run   (direct binary)
           - python path/to/gateway/run.py
         """
         user_dir, _ = self._setup_search_paths(tmp_path, monkeypatch)
         variants = [
-            "ExecStart=/venv/bin/python -m hermes_cli.main gateway run --replace",
-            "ExecStart=/venv/bin/python /opt/hermes/hermes_cli/main.py gateway run",
-            "ExecStart=/usr/local/bin/hermes gateway run --replace",
-            "ExecStart=/venv/bin/python /opt/hermes/gateway/run.py",
+            "ExecStart=/venv/bin/python -m council_cli.main gateway run --replace",
+            "ExecStart=/venv/bin/python /opt/council/council_cli/main.py gateway run",
+            "ExecStart=/usr/local/bin/council gateway run --replace",
+            "ExecStart=/venv/bin/python /opt/council/gateway/run.py",
         ]
         for i, execstart in enumerate(variants):
-            name = f"hermes.service" if i == 0 else f"hermes.service"  # same name
+            name = f"council.service" if i == 0 else f"council.service"  # same name
             # Test each variant fresh
-            (user_dir / "hermes.service").write_text(
-                f"[Unit]\nDescription=Old Hermes\n[Service]\n{execstart}\n",
+            (user_dir / "council.service").write_text(
+                f"[Unit]\nDescription=Old Council\n[Service]\n{execstart}\n",
                 encoding="utf-8",
             )
-            results = gateway_cli._find_legacy_hermes_units()
+            results = gateway_cli._find_legacy_council_units()
             assert len(results) == 1, f"Variant {i} not detected: {execstart!r}"
 
     def test_print_legacy_unit_warning_is_noop_when_empty(self, tmp_path, monkeypatch, capsys):
@@ -1958,19 +1958,19 @@ class TestLegacyHermesUnitDetection:
 
     def test_print_legacy_unit_warning_shows_migration_hint(self, tmp_path, monkeypatch, capsys):
         user_dir, _ = self._setup_search_paths(tmp_path, monkeypatch)
-        (user_dir / "hermes.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
+        (user_dir / "council.service").write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
         gateway_cli.print_legacy_unit_warning()
         out = capsys.readouterr().out
 
         assert "Legacy" in out
-        assert "hermes.service" in out
-        assert "hermes gateway migrate-legacy" in out
+        assert "council.service" in out
+        assert "council gateway migrate-legacy" in out
 
     def test_handles_unreadable_unit_file_gracefully(self, tmp_path, monkeypatch):
         """A permission error reading a unit file must not crash detection."""
         user_dir, _ = self._setup_search_paths(tmp_path, monkeypatch)
-        unreadable = user_dir / "hermes.service"
+        unreadable = user_dir / "council.service"
         unreadable.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
         # Simulate a read failure — monkeypatch Path.read_text to raise
         original_read_text = gateway_cli.Path.read_text
@@ -1983,16 +1983,16 @@ class TestLegacyHermesUnitDetection:
         monkeypatch.setattr(gateway_cli.Path, "read_text", raising_read_text)
 
         # Should not raise
-        results = gateway_cli._find_legacy_hermes_units()
+        results = gateway_cli._find_legacy_council_units()
         assert results == []
 
 
-class TestRemoveLegacyHermesUnits:
-    """Tests for remove_legacy_hermes_units (the migration action)."""
+class TestRemoveLegacyCouncilUnits:
+    """Tests for remove_legacy_council_units (the migration action)."""
 
     _OUR_UNIT_TEXT = (
-        "[Unit]\nDescription=Hermes Gateway\n[Service]\n"
-        "ExecStart=/usr/bin/python -m hermes_cli.main gateway run --replace\n"
+        "[Unit]\nDescription=Council Gateway\n[Service]\n"
+        "ExecStart=/usr/bin/python -m council_cli.main gateway run --replace\n"
     )
 
     @staticmethod
@@ -2020,7 +2020,7 @@ class TestRemoveLegacyHermesUnits:
     def test_returns_zero_when_no_legacy_units(self, tmp_path, monkeypatch, capsys):
         self._setup(tmp_path, monkeypatch)
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=False)
 
         assert removed == 0
         assert remaining == []
@@ -2028,10 +2028,10 @@ class TestRemoveLegacyHermesUnits:
 
     def test_dry_run_lists_without_removing(self, tmp_path, monkeypatch, capsys):
         user_dir, _, calls = self._setup(tmp_path, monkeypatch)
-        legacy = user_dir / "hermes.service"
+        legacy = user_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(
+        removed, remaining = gateway_cli.remove_legacy_council_units(
             interactive=False, dry_run=True
         )
 
@@ -2044,39 +2044,39 @@ class TestRemoveLegacyHermesUnits:
 
     def test_removes_user_scope_legacy_unit(self, tmp_path, monkeypatch, capsys):
         user_dir, _, calls = self._setup(tmp_path, monkeypatch)
-        legacy = user_dir / "hermes.service"
+        legacy = user_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=False)
 
         assert removed == 1
         assert remaining == []
         assert not legacy.exists()
         # Must have invoked stop → disable → daemon-reload on user scope
         cmds_joined = [" ".join(c) for c in calls]
-        assert any("--user stop hermes.service" in c for c in cmds_joined)
-        assert any("--user disable hermes.service" in c for c in cmds_joined)
+        assert any("--user stop council.service" in c for c in cmds_joined)
+        assert any("--user disable council.service" in c for c in cmds_joined)
         assert any("--user daemon-reload" in c for c in cmds_joined)
 
     def test_system_scope_without_root_defers_removal(self, tmp_path, monkeypatch, capsys):
         _, system_dir, calls = self._setup(tmp_path, monkeypatch, as_root=False)
-        legacy = system_dir / "hermes.service"
+        legacy = system_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=False)
 
         assert removed == 0
         assert remaining == [legacy]
         assert legacy.exists()  # Not removed — requires sudo
         out = capsys.readouterr().out
-        assert "sudo hermes gateway migrate-legacy" in out
+        assert "sudo council gateway migrate-legacy" in out
 
     def test_system_scope_with_root_removes(self, tmp_path, monkeypatch, capsys):
         _, system_dir, calls = self._setup(tmp_path, monkeypatch, as_root=True)
-        legacy = system_dir / "hermes.service"
+        legacy = system_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=False)
 
         assert removed == 1
         assert remaining == []
@@ -2084,20 +2084,20 @@ class TestRemoveLegacyHermesUnits:
         cmds_joined = [" ".join(c) for c in calls]
         # System-scope uses plain "systemctl" (no --user)
         assert any(
-            c.startswith("systemctl stop hermes.service") for c in cmds_joined
+            c.startswith("systemctl stop council.service") for c in cmds_joined
         )
         assert any(
-            c.startswith("systemctl disable hermes.service") for c in cmds_joined
+            c.startswith("systemctl disable council.service") for c in cmds_joined
         )
 
     def test_removes_both_scopes_with_root(self, tmp_path, monkeypatch, capsys):
         user_dir, system_dir, _ = self._setup(tmp_path, monkeypatch, as_root=True)
-        user_legacy = user_dir / "hermes.service"
-        system_legacy = system_dir / "hermes.service"
+        user_legacy = user_dir / "council.service"
+        system_legacy = system_dir / "council.service"
         user_legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
         system_legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=False)
 
         assert removed == 2
         assert remaining == []
@@ -2107,16 +2107,16 @@ class TestRemoveLegacyHermesUnits:
     def test_does_not_touch_profile_units_during_migration(
         self, tmp_path, monkeypatch, capsys
     ):
-        """Teknium's constraint: profile units (hermes-gateway-coder.service)
+        """Teknium's constraint: profile units (council-gateway-coder.service)
         must survive a migration call, even if we somehow include them in the
         search dir."""
         user_dir, _, _ = self._setup(tmp_path, monkeypatch, as_root=True)
-        profile_unit = user_dir / "hermes-gateway-coder.service"
+        profile_unit = user_dir / "council-gateway-coder.service"
         profile_unit.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
-        default_unit = user_dir / "hermes-gateway.service"
+        default_unit = user_dir / "council-gateway.service"
         default_unit.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=False)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=False)
 
         assert removed == 0
         assert remaining == []
@@ -2127,12 +2127,12 @@ class TestRemoveLegacyHermesUnits:
     def test_interactive_prompt_no_skips_removal(self, tmp_path, monkeypatch, capsys):
         """When interactive=True and user answers no, no removal happens."""
         user_dir, _, _ = self._setup(tmp_path, monkeypatch)
-        legacy = user_dir / "hermes.service"
+        legacy = user_dir / "council.service"
         legacy.write_text(self._OUR_UNIT_TEXT, encoding="utf-8")
 
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", lambda *a, **k: False)
 
-        removed, remaining = gateway_cli.remove_legacy_hermes_units(interactive=True)
+        removed, remaining = gateway_cli.remove_legacy_council_units(interactive=True)
 
         assert removed == 0
         assert remaining == [legacy]
@@ -2140,27 +2140,27 @@ class TestRemoveLegacyHermesUnits:
 
 
 class TestMigrateLegacyCommand:
-    """Tests for the `hermes gateway migrate-legacy` subcommand dispatch."""
+    """Tests for the `council gateway migrate-legacy` subcommand dispatch."""
 
     def test_migrate_legacy_subparser_accepts_dry_run_and_yes(self):
         """Verify the argparse subparser is registered and parses flags."""
-        import hermes_cli.main as cli_main
+        import council_cli.main as cli_main
 
         parser = cli_main.build_parser() if hasattr(cli_main, "build_parser") else None
         # Fall back to calling main's setup helper if direct access isn't exposed
         # The key thing: the subparser must exist. We verify by constructing
         # a namespace through argparse directly — but if build_parser isn't
-        # public, just confirm that `hermes gateway --help` shows it.
+        # public, just confirm that `council gateway --help` shows it.
         import subprocess
         import sys
 
         project_root = cli_main.PROJECT_ROOT if hasattr(cli_main, "PROJECT_ROOT") else None
         if project_root is None:
-            import hermes_cli.gateway as gw
+            import council_cli.gateway as gw
             project_root = gw.PROJECT_ROOT
 
         result = subprocess.run(
-            [sys.executable, "-m", "hermes_cli.main", "gateway", "--help"],
+            [sys.executable, "-m", "council_cli.main", "gateway", "--help"],
             cwd=str(project_root),
             capture_output=True,
             text=True,
@@ -2180,7 +2180,7 @@ class TestMigrateLegacyCommand:
             called["dry_run"] = dry_run
             return 0, []
 
-        monkeypatch.setattr(gateway_cli, "remove_legacy_hermes_units", fake_remove)
+        monkeypatch.setattr(gateway_cli, "remove_legacy_council_units", fake_remove)
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
         monkeypatch.setattr(gateway_cli, "is_macos", lambda: False)
 
@@ -2198,7 +2198,7 @@ class TestGatewayStatusParser:
         import sys
 
         result = subprocess.run(
-            [sys.executable, "-m", "hermes_cli.main", "gateway", "status", "-l", "--help"],
+            [sys.executable, "-m", "council_cli.main", "gateway", "status", "-l", "--help"],
             cwd=str(gateway_cli.PROJECT_ROOT),
             capture_output=True,
             text=True,
@@ -2218,7 +2218,7 @@ class TestGatewayStatusParser:
             called["dry_run"] = dry_run
             return 0, []
 
-        monkeypatch.setattr(gateway_cli, "remove_legacy_hermes_units", fake_remove)
+        monkeypatch.setattr(gateway_cli, "remove_legacy_council_units", fake_remove)
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
         monkeypatch.setattr(gateway_cli, "is_macos", lambda: False)
 
@@ -2259,15 +2259,15 @@ class TestSystemdInstallOffersLegacyRemoval:
             remove_called["interactive"] = interactive
             return 1, []
 
-        # has_legacy_hermes_units must return True
-        monkeypatch.setattr(gateway_cli, "has_legacy_hermes_units", lambda: True)
-        monkeypatch.setattr(gateway_cli, "remove_legacy_hermes_units", fake_remove)
+        # has_legacy_council_units must return True
+        monkeypatch.setattr(gateway_cli, "has_legacy_council_units", lambda: True)
+        monkeypatch.setattr(gateway_cli, "remove_legacy_council_units", fake_remove)
         monkeypatch.setattr(gateway_cli, "print_legacy_unit_warning", lambda: None)
         # Answer "yes" to the legacy-removal prompt
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", lambda *a, **k: True)
 
         # Mock the rest of the install flow
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
@@ -2299,12 +2299,12 @@ class TestSystemdInstallOffersLegacyRemoval:
             remove_called["invoked"] = True
             return 0, []
 
-        monkeypatch.setattr(gateway_cli, "has_legacy_hermes_units", lambda: True)
-        monkeypatch.setattr(gateway_cli, "remove_legacy_hermes_units", fake_remove)
+        monkeypatch.setattr(gateway_cli, "has_legacy_council_units", lambda: True)
+        monkeypatch.setattr(gateway_cli, "remove_legacy_council_units", fake_remove)
         monkeypatch.setattr(gateway_cli, "print_legacy_unit_warning", lambda: None)
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", lambda *a, **k: False)
 
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
@@ -2344,11 +2344,11 @@ class TestSystemdInstallOffersLegacyRemoval:
             remove_called["invoked"] = True
             return 0, []
 
-        monkeypatch.setattr(gateway_cli, "has_legacy_hermes_units", lambda: False)
-        monkeypatch.setattr(gateway_cli, "remove_legacy_hermes_units", fake_remove)
+        monkeypatch.setattr(gateway_cli, "has_legacy_council_units", lambda: False)
+        monkeypatch.setattr(gateway_cli, "remove_legacy_council_units", fake_remove)
         monkeypatch.setattr(gateway_cli, "prompt_yes_no", counting_prompt)
 
-        unit_path = tmp_path / "hermes-gateway.service"
+        unit_path = tmp_path / "council-gateway.service"
         monkeypatch.setattr(
             gateway_cli, "get_systemd_unit_path", lambda system=False: unit_path
         )
@@ -2425,13 +2425,13 @@ class TestSystemScopeWizardPreCheck:
         sys_dir.mkdir()
         usr_dir.mkdir()
         if system_present:
-            (sys_dir / "hermes-gateway.service").write_text("[Unit]\n")
+            (sys_dir / "council-gateway.service").write_text("[Unit]\n")
         if user_present:
-            (usr_dir / "hermes-gateway.service").write_text("[Unit]\n")
+            (usr_dir / "council-gateway.service").write_text("[Unit]\n")
         monkeypatch.setattr(
             gateway_cli,
             "get_systemd_unit_path",
-            lambda system=False: (sys_dir if system else usr_dir) / "hermes-gateway.service",
+            lambda system=False: (sys_dir if system else usr_dir) / "council-gateway.service",
         )
 
     def test_non_root_with_only_system_unit_returns_true(self, tmp_path, monkeypatch):
@@ -2460,7 +2460,7 @@ class TestSystemScopeWizardPreCheck:
         assert gateway_cli._system_scope_wizard_would_need_root() is False
 
     def test_non_root_with_explicit_system_arg_returns_true(self, tmp_path, monkeypatch):
-        # Caller passed system=True explicitly (e.g. ``hermes gateway start --system``).
+        # Caller passed system=True explicitly (e.g. ``council gateway start --system``).
         self._setup_units(tmp_path, monkeypatch, system_present=False, user_present=False)
         monkeypatch.setattr(gateway_cli.os, "geteuid", lambda: 1000)
 
@@ -2473,38 +2473,38 @@ class TestSystemScopeRemediationOutput:
     """
 
     def test_start_remediation_mentions_sudo_systemctl_and_uninstall(self, capsys, monkeypatch):
-        monkeypatch.setattr(gateway_cli, "get_service_name", lambda: "hermes-gateway")
+        monkeypatch.setattr(gateway_cli, "get_service_name", lambda: "council-gateway")
 
         gateway_cli._print_system_scope_remediation("start")
         out = capsys.readouterr().out
 
         assert "system-wide service" in out
         assert "start requires root" in out
-        assert "sudo systemctl start hermes-gateway" in out
-        assert "sudo hermes gateway uninstall --system" in out
-        assert "hermes gateway install" in out
+        assert "sudo systemctl start council-gateway" in out
+        assert "sudo council gateway uninstall --system" in out
+        assert "council gateway install" in out
 
     def test_restart_remediation_uses_systemctl_restart(self, capsys, monkeypatch):
-        monkeypatch.setattr(gateway_cli, "get_service_name", lambda: "hermes-gateway")
+        monkeypatch.setattr(gateway_cli, "get_service_name", lambda: "council-gateway")
 
         gateway_cli._print_system_scope_remediation("restart")
         out = capsys.readouterr().out
 
         assert "restart requires root" in out
-        assert "sudo systemctl restart hermes-gateway" in out
+        assert "sudo systemctl restart council-gateway" in out
 
     def test_stop_remediation_uses_systemctl_stop(self, capsys, monkeypatch):
-        monkeypatch.setattr(gateway_cli, "get_service_name", lambda: "hermes-gateway")
+        monkeypatch.setattr(gateway_cli, "get_service_name", lambda: "council-gateway")
 
         gateway_cli._print_system_scope_remediation("stop")
         out = capsys.readouterr().out
 
         assert "stop requires root" in out
-        assert "sudo systemctl stop hermes-gateway" in out
+        assert "sudo systemctl stop council-gateway" in out
 
 
 class TestGatewayCommandCatchesSystemScopeError:
-    """The direct CLI path (``hermes gateway start --system`` etc.) must
+    """The direct CLI path (``council gateway start --system`` etc.) must
     still exit 1 with a clean message when non-root. The top-level
     ``gateway_command`` catches ``SystemScopeRequiresRootError`` and
     converts it back to ``sys.exit(1)``, preserving existing CLI behavior.
@@ -2515,11 +2515,11 @@ class TestGatewayCommandCatchesSystemScopeError:
         usr_dir = tmp_path / "usr"
         sys_dir.mkdir()
         usr_dir.mkdir()
-        (sys_dir / "hermes-gateway.service").write_text("[Unit]\n")
+        (sys_dir / "council-gateway.service").write_text("[Unit]\n")
         monkeypatch.setattr(
             gateway_cli,
             "get_systemd_unit_path",
-            lambda system=False: (sys_dir if system else usr_dir) / "hermes-gateway.service",
+            lambda system=False: (sys_dir if system else usr_dir) / "council-gateway.service",
         )
         monkeypatch.setattr(gateway_cli.os, "geteuid", lambda: 1000)
         monkeypatch.setattr(gateway_cli, "supports_systemd_services", lambda: True)
@@ -2540,26 +2540,26 @@ class TestGatewayCommandCatchesSystemScopeError:
 
 class TestServiceWorkingDirIsStable:
     """The gateway service must anchor WorkingDirectory at a stable path
-    (HERMES_HOME), never the source checkout / worktree, so a relocated or
+    (COUNCIL_HOME), never the source checkout / worktree, so a relocated or
     deleted checkout can't crash-loop the unit on CHDIR (status=200).
     """
 
-    def test_stable_working_dir_uses_hermes_home(self, tmp_path, monkeypatch):
-        home = tmp_path / ".hermes"
+    def test_stable_working_dir_uses_council_home(self, tmp_path, monkeypatch):
+        home = tmp_path / ".council"
         home.mkdir()
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: home)
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: home)
         assert Path(gateway_cli._stable_service_working_dir()) == home.resolve()
 
     def test_stable_working_dir_falls_back_to_project_root(self, tmp_path, monkeypatch):
-        # HERMES_HOME points somewhere that does not exist -> fall back.
-        missing = tmp_path / "does-not-exist" / ".hermes"
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: missing)
+        # COUNCIL_HOME points somewhere that does not exist -> fall back.
+        missing = tmp_path / "does-not-exist" / ".council"
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: missing)
         assert gateway_cli._stable_service_working_dir() == str(gateway_cli.PROJECT_ROOT)
 
-    def test_user_unit_workingdirectory_is_hermes_home_not_checkout(self, tmp_path, monkeypatch):
-        home = tmp_path / ".hermes"
+    def test_user_unit_workingdirectory_is_council_home_not_checkout(self, tmp_path, monkeypatch):
+        home = tmp_path / ".council"
         home.mkdir()
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: home)
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: home)
         unit = gateway_cli.generate_systemd_unit(system=False)
         wd = [l for l in unit.splitlines() if l.startswith("WorkingDirectory=")]
         assert wd, "unit has no WorkingDirectory line"
@@ -2568,12 +2568,12 @@ class TestServiceWorkingDirIsStable:
         # The bug class: never pin cwd inside a transient worktree checkout.
         assert "/.worktrees/" not in value
 
-    def test_launchd_workingdirectory_is_hermes_home(self, tmp_path, monkeypatch):
+    def test_launchd_workingdirectory_is_council_home(self, tmp_path, monkeypatch):
         import re
 
-        home = tmp_path / ".hermes"
+        home = tmp_path / ".council"
         home.mkdir()
-        monkeypatch.setattr(gateway_cli, "get_hermes_home", lambda: home)
+        monkeypatch.setattr(gateway_cli, "get_council_home", lambda: home)
         plist = gateway_cli.generate_launchd_plist()
         m = re.search(r"<key>WorkingDirectory</key>\s*<string>(.*?)</string>", plist)
         assert m, "plist has no WorkingDirectory entry"
