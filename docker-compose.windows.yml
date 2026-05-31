@@ -1,0 +1,38 @@
+#
+# docker-compose.windows.yml — Windows Docker Desktop compatible
+#
+# Differences from docker-compose.yml:
+#   - Removes `network_mode: host` (not supported on Docker Desktop for Windows)
+#   - Uses explicit port mappings instead
+#   - Uses Windows-style volume path for ~/.council
+#
+# Usage:
+#   docker compose -f docker-compose.windows.yml up -d
+#
+services:
+  gateway:
+    image: pokelabshq/council:latest
+    container_name: council
+    restart: unless-stopped
+    volumes:
+      - ${USERPROFILE}/.council:/opt/data
+    environment:
+      - COUNCIL_UID=10000
+      - COUNCIL_GID=10000
+    command: ["gateway", "run"]
+
+  dashboard:
+    image: pokelabshq/council:latest
+    container_name: council-dashboard
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    volumes:
+      - ${USERPROFILE}/.council:/opt/data
+    environment:
+      - COUNCIL_UID=10000
+      - COUNCIL_GID=10000
+      - COUNCIL_DASHBOARD_HOST=0.0.0.0
+    ports:
+      - "127.0.0.1:9119:9119"
+    command: ["dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open", "--insecure"]

@@ -1,0 +1,5 @@
+name: poke-provider
+kind: model-provider
+version: 1.0.0
+description: Poke Labs Portal
+author: Poke Labs

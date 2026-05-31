@@ -1,0 +1,6 @@
+name: council-fanout
+version: 0.1.0
+description: "AI Council fan-out plugin — intercepts incoming messages and fans them out to all enabled council members"
+author: "Poke Labs"
+hooks:
+  - pre_gateway_dispatch

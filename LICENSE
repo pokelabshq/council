@@ -1,6 +1,10 @@
 MIT License
 
+<<<<<<< HEAD
 Copyright (c) 2026 Poke Labs
+=======
+Copyright (c) 2025 Poke Labs
+>>>>>>> 1dd58d8b2 (feat: council package — plugin, commands, templates, tests)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
