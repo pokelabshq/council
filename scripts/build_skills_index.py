@@ -108,23 +108,40 @@ def crawl_skills_sh(source: SkillsShSource) -> list:
     return list(all_skills.values())
 
 
+
+def _retry_with_backoff(func, retries=3, base_delay=2.0):
+    """Call func() with exponential backoff on failure."""
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            last_err = e
+            if attempt < retries:
+                delay = base_delay * (2 ** attempt)
+                print(f"  Retry {attempt+1}/{retries} after {delay:.0f}s: {e}", flush=True)
+                import time
+                time.sleep(delay)
+    print(f"  Failed after {retries+1} retries: {last_err}", flush=True)
+    raise last_err
+
 def _fetch_repo_tree(repo: str, auth: GitHubAuth) -> list:
     """Fetch the recursive tree for a repo. Returns list of tree entries."""
     headers = auth.get_headers()
     try:
-        resp = httpx.get(
+        resp = _retry_with_backoff(lambda: httpx.get(
             f"https://api.github.com/repos/{repo}",
             headers=headers, timeout=15, follow_redirects=True,
-        )
+        ))
         if resp.status_code != 200:
             return []
         branch = resp.json().get("default_branch", "main")
 
-        resp = httpx.get(
+        resp = _retry_with_backoff(lambda: httpx.get(
             f"https://api.github.com/repos/{repo}/git/trees/{branch}",
             params={"recursive": "1"},
             headers=headers, timeout=30, follow_redirects=True,
-        )
+        ))
         if resp.status_code != 200:
             return []
         data = resp.json()
