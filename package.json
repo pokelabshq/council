@@ -4,7 +4,7 @@
   "description": "An AI agent with advanced tool-calling capabilities, featuring a flexible toolsets system for organizing and managing tools.",
   "private": true,
   "scripts": {
-    "postinstall": "echo '✅ Browser tools ready. Run: python run_agent.py --help'"
+    "postinstall": "echo '\u2705 Browser tools ready. Run: python run_agent.py --help'"
   },
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
   },
   "homepage": "https://github.com/PokeLabs/Council-Agent#readme",
   "dependencies": {
-    "agent-browser": "^0.26.0"
+    "agent-browser": "^0.27.1"
   },
   "overrides": {
     "lodash": "4.18.1"
