@@ -457,22 +457,40 @@ export default function SkillsDashboard() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      try {
-        const [sk, mt] = await Promise.all([
-          fetch(SKILLS_URL).then((r) => {
-            if (!r.ok) throw new Error(`skills.json HTTP ${r.status}`);
-            return r.json();
-          }),
-          fetch(META_URL).then((r) => (r.ok ? r.json() : {})).catch(() => ({})),
-        ]);
+      const MAX_RETRIES = 3;
+      const BASE_DELAY_MS = 1000;
+      let lastErr: Error | null = null;
+
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
         if (cancelled) return;
-        const skillsArr = Array.isArray(sk) ? (sk as Skill[]) : [];
-        // Stamp the precomputed search haystack onto each row.
-        for (const s of skillsArr) s._search = buildSearchHaystack(s);
-        setData({ skills: skillsArr, meta: mt || {} });
-      } catch (err) {
-        if (cancelled) return;
-        setLoadError(err instanceof Error ? err.message : String(err));
+        if (attempt > 0) {
+          // Exponential backoff: 1s, 2s, 4s
+          await new Promise((r) => setTimeout(r, BASE_DELAY_MS * Math.pow(2, attempt - 1)));
+        }
+        try {
+          const [sk, mt] = await Promise.all([
+            fetch(SKILLS_URL, { cache: attempt > 0 ? "no-cache" : "default" }).then((r) => {
+              if (!r.ok) throw new Error(`skills.json HTTP ${r.status}`);
+              return r.json();
+            }),
+            fetch(META_URL, { cache: attempt > 0 ? "no-cache" : "default" })
+              .then((r) => (r.ok ? r.json() : {}))
+              .catch(() => ({})),
+          ]);
+          if (cancelled) return;
+          const skillsArr = Array.isArray(sk) ? (sk as Skill[]) : [];
+          // Stamp the precomputed search haystack onto each row.
+          for (const s of skillsArr) s._search = buildSearchHaystack(s);
+          setData({ skills: skillsArr, meta: mt || {} });
+          setLoadError(null);
+          return; // success — exit retry loop
+        } catch (err) {
+          lastErr = err instanceof Error ? err : new Error(String(err));
+        }
+      }
+      // All retries exhausted
+      if (!cancelled) {
+        setLoadError(lastErr?.message ?? "Failed to load skills catalog after retries");
       }
     })();
     return () => {
