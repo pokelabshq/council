@@ -12,7 +12,7 @@ on:
       - '.github/workflows/skills-index.yml'
 
 permissions:
-  contents: read
+  contents: write  # changed from read to write — needed to commit the index
   actions: write   # to trigger deploy-site.yml on schedule
 
 jobs:
@@ -35,16 +35,19 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/build_skills_index.py
 
-      - name: Upload index artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
-        with:
-          name: skills-index
-          path: website/static/api/skills-index.json
-          retention-days: 7
+      - name: Commit skills index to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add website/static/api/skills-index.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update skills-index.json [skip ci]"
+            git push
+          fi
 
   # Re-trigger the docs deploy so the refreshed index lands on the live site.
-  # The deploy itself is owned by deploy-site.yml (which crawls and deploys
-  # everything in one pipeline); we just kick it on a schedule.
   trigger-deploy:
     needs: build-index
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

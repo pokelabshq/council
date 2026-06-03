@@ -20,6 +20,7 @@ import json
 import os
 import sys
 import time
+from functools import wraps
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
@@ -47,6 +48,26 @@ import httpx
 
 OUTPUT_PATH = os.path.join(REPO_ROOT, "website", "static", "api", "skills-index.json")
 INDEX_VERSION = 1
+
+def retry_with_backoff(max_retries=3, base_delay=1.0):
+    """Decorator that retries a function with exponential backoff."""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(max_retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exc = e
+                    if attempt < max_retries:
+                        delay = base_delay * (2 ** attempt)
+                        print(f"  Retry {attempt+1}/{max_retries} after {delay}s: {e}", flush=True)
+                        time.sleep(delay)
+            raise last_exc
+        return wrapper
+    return decorator
+
 
 
 def _meta_to_dict(meta: SkillMeta) -> dict:
@@ -91,7 +112,21 @@ def crawl_skills_sh(source: SkillsShSource) -> list:
     start = time.time()
 
     try:
-        results = source.search("", limit=0)  # 0 = no cap, return the whole catalog
+        # Retry the sitemap fetch — transient network errors are common
+        last_err = None
+        for attempt in range(3):
+            try:
+                results = source.search("", limit=0)  # 0 = no cap, return the whole catalog
+                break
+            except Exception as e:
+                last_err = e
+                if attempt < 2:
+                    delay = 2 ** attempt
+                    print(f"  skills.sh fetch attempt {attempt+1} failed, retrying in {delay}s: {e}", flush=True)
+                    time.sleep(delay)
+        else:
+            print(f"    Warning: skills.sh sitemap walk failed after 3 attempts: {last_err}", file=sys.stderr)
+            results = []
     except Exception as e:
         print(f"    Warning: skills.sh sitemap walk failed: {e}", file=sys.stderr)
         results = []
