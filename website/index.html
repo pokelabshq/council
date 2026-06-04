@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poke Labs — Free Micro-Services API</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--accent:#7c6aef;--accent2:#6a9bef;--text:#e0e0f0;--muted:#6a6a8a;--green:#4ade80}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.container{max-width:1100px;margin:0 auto;padding:0 20px}
+header{padding:60px 0 40px;text-align:center;background:linear-gradient(180deg,rgba(124,106,239,.08) 0%,transparent 100%)}
+header h1{font-size:2.2rem;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{font-size:1.1rem;color:var(--muted);margin-top:12px}
+.badges{display:flex;gap:8px;justify-content:center;margin:20px 0;flex-wrap:wrap}
+.badge{background:var(--card);border:1px solid var(--border);padding:4px 14px;border-radius:20px;font-size:.85rem;color:var(--muted)}
+.section{padding:40px 0}
+.services{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.svc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;transition:border-color .2s}
+.svc:hover{border-color:var(--accent)}
+.svc h3{font-size:1.1rem;margin-bottom:6px}
+.svc p{color:var(--muted);font-size:.9rem}
+.port{color:var(--accent);font-family:monospace;font-size:.8rem}
+pre{background:var(--bg);padding:16px;border-radius:8px;font-size:.85rem;overflow-x:auto;margin-top:20px;border:1px solid var(--border)}
+footer{text-align:center;padding:40px 0;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border);margin-top:40px}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header><div class="container">
+  <h1>Poke Labs</h1>
+  <p>Free, open-source micro-services API platform. No sign-up required.</p>
+  <p style="font-size:.9rem">Built by Alexander (age 13, Toronto)</p>
+  <div class="badges">
+    <span class="badge">MIT License</span>
+    <span class="badge">x402 Payments</span>
+    <span class="badge">Base Chain</span>
+    <span class="badge">17 Services</span>
+  </div>
+</div></header>
+<div class="container">
+  <div class="section">
+    <h2>Active Services</h2>
+    <div class="services">
+      <div class="svc"><h3>Link Preview <span class="port">:8765</span></h3><p>Extract title, description, image from any URL</p></div>
+      <div class="svc"><h3>Keywords <span class="port">:8766</span></h3><p>Extract keywords and key phrases from text</p></div>
+      <div class="svc"><h3>QR Generator <span class="port">:8767</span></h3><p>Generate QR codes for URLs and text</p></div>
+      <div class="svc"><h3>DNS Lookup <span class="port">:8768</span></h3><p>Resolve A, MX, TXT, CNAME records</p></div>
+      <div class="svc"><h3>Colors <span class="port">:8769</span></h3><p>Generate color palettes, convert HEX/RGB/HSL</p></div>
+      <div class="svc"><h3>Text Summary <span class="port">:8770</span></h3><p>Summarize articles and long-form text</p></div>
+      <div class="svc"><h3>URL Shortener <span class="port">:8771</span></h3><p>Shorten long URLs with custom aliases</p></div>
+      <div class="svc"><h3>Password Gen <span class="port">:8772</span></h3><p>Generate secure passwords</p></div>
+      <div class="svc"><h3>Timestamp <span class="port">:8773</span></h3><p>Convert Unix timestamps to dates</p></div>
+      <div class="svc"><h3>JSON Formatter <span class="port">:8774</span></h3><p>Format, validate, minify JSON</p></div>
+      <div class="svc"><h3>Base64 <span class="port">:8775</span></h3><p>Encode and decode Base64</p></div>
+      <div class="svc"><h3>Markdown <span class="port">:8776</span></h3><p>Render Markdown to HTML</p></div>
+      <div class="svc"><h3>Sentiment <span class="port">:8764</span></h3><p>Analyze text sentiment (positive/negative/neutral)</p></div>
+      <div class="svc"><h3>Hash Gen <span class="port">:8779</span></h3><p>MD5, SHA256, SHA512 hashes</p></div>
+      <div class="svc"><h3>UUID Gen <span class="port">:8780</span></h3><p>UUID v1, v4, v7</p></div>
+      <div class="svc"><h3>Time Convert <span class="port">:8781</span></h3><p>Unix / ISO8601 / RFC2822</p></div>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Quick Start</h2>
+    <pre>curl -X POST http://localhost:8765/api/preview \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://github.com"}'</pre>
+  </div>
+</div>
+<footer>
+  <p>Built by <a href="https://github.com/TheAlxLabs">Alexander Wondwossen</a> - MIT Licensed</p>
+  <p>GitHub: <a href="https://github.com/pokelabshq">pokelabshq</a></p>
+</footer>
+</body>
+</html>
