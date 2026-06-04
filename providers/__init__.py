@@ -2,7 +2,7 @@
 
 Provider profiles can live in two places:
 
-1. Bundled plugins: ``plugins/model-providers/<name>/`` (shipped with ai-council)
+1. Bundled plugins: ``plugins/model-providers/<name>/`` (shipped with pokelabs-council)
 2. User plugins: ``$COUNCIL_HOME/plugins/model-providers/<name>/``
 
 Each plugin directory contains:
@@ -153,7 +153,7 @@ def _discover_providers() -> None:
         return
     _discovered = True
 
-    # 1. Bundled plugins — shipped with ai-council.
+    # 1. Bundled plugins — shipped with pokelabs-council.
     if _BUNDLED_PLUGINS_DIR.is_dir():
         for child in sorted(_BUNDLED_PLUGINS_DIR.iterdir()):
             if not child.is_dir() or child.name.startswith(("_", ".")):

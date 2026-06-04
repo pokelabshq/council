@@ -144,7 +144,7 @@ def reap_orphan_containers(
 
     Targets containers that match all of:
 
-    * ``label=ai-council=1`` (created by this codebase)
+    * ``label=pokelabs-council=1`` (created by this codebase)
     * ``status=exited`` (running containers are NEVER reaped — they may
       belong to a sibling Council process whose reuse path will pick them
       up; killing them would crash the sibling mid-command)
@@ -168,7 +168,7 @@ def reap_orphan_containers(
     pair.
     """
     docker = docker_exe or find_docker() or "docker"
-    filters = ["--filter", "label=ai-council=1", "--filter", "status=exited"]
+    filters = ["--filter", "label=pokelabs-council=1", "--filter", "status=exited"]
     if profile_filter:
         filters.extend(["--filter", f"label=council-profile={_sanitize_label_value(profile_filter)}"])
 
@@ -702,21 +702,21 @@ class DockerEnvironment(BaseEnvironment):
         # Start the container directly via `docker run -d`.
         container_name = f"council-{uuid.uuid4().hex[:8]}"
         # Labels make council-created containers identifiable to:
-        #   * the orphan reaper (`ai-council=1` for the global sweep filter)
+        #   * the orphan reaper (`pokelabs-council=1` for the global sweep filter)
         #   * future cross-process reuse (`council-task-id`, `council-profile`)
-        #   * operators running `docker ps --filter label=ai-council=1`
+        #   * operators running `docker ps --filter label=pokelabs-council=1`
         # Values are limited to the safe character set defined by
         # _sanitize_label_value(); the active Council profile is captured at
         # container-start time and never changes for the container's lifetime.
         profile_name = _sanitize_label_value(_get_active_profile_name())
         task_label = _sanitize_label_value(task_id)
         label_args = [
-            "--label", "ai-council=1",
+            "--label", "pokelabs-council=1",
             "--label", f"council-task-id={task_label}",
             "--label", f"council-profile={profile_name}",
         ]
         self._labels = {
-            "ai-council": "1",
+            "pokelabs-council": "1",
             "council-task-id": task_label,
             "council-profile": profile_name,
         }
@@ -904,7 +904,7 @@ class DockerEnvironment(BaseEnvironment):
             result = subprocess.run(
                 [
                     self._docker_exe, "ps", "-a",
-                    "--filter", "label=ai-council=1",
+                    "--filter", "label=pokelabs-council=1",
                     "--filter", f"label=council-task-id={task_label}",
                     "--filter", f"label=council-profile={profile_label}",
                     "--format", "{{.ID}}\t{{.State}}",

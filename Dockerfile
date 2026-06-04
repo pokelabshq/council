@@ -182,7 +182,7 @@ RUN chmod -R a+rX /opt/council && \
 # `s6-setuidgid council` in its run script. If COUNCIL_UID is unset, services
 # run as the default council user (UID 10000).
 
-# ---------- Link ai-council itself (editable) ----------
+# ---------- Link pokelabs-council itself (editable) ----------
 # Deps are already installed in the cached layer above; `--no-deps` makes
 # this a fast (~1s) egg-link creation with no resolution or downloads.
 RUN uv pip install --no-cache-dir --no-deps -e "."

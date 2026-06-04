@@ -300,7 +300,7 @@ class AIAgent:
     """
 
     _TOOL_CALL_ARGUMENTS_CORRUPTION_MARKER = (
-        "[ai-council: tool call arguments were corrupted in this session and "
+        "[pokelabs-council: tool call arguments were corrupted in this session and "
         "have been dropped to keep the conversation alive. See issue #15236.]"
     )
 
@@ -1101,7 +1101,7 @@ class AIAgent:
         This helper substitutes an actionable hint into the stale-timeout
         warning when the request matches a known silent-reject pattern.
         Currently flagged: ``gpt-5.5`` family on the Codex backend.  See
-        ai-council #21444 for the symptom history.  The upstream backend
+        pokelabs-council #21444 for the symptom history.  The upstream backend
         behavior has historically come and gone with ChatGPT entitlement
         changes — the heuristic stays in place as future-proofing even when
         the symptom is dormant.
@@ -1137,7 +1137,7 @@ class AIAgent:
             "Workaround: try `gpt-5.4` on the same OAuth profile, or `gpt-5.3-codex`, "
             "or switch to a different model/provider in your fallback chain. "
             "Some ChatGPT Codex accounts do not support `gpt-5.4-codex`. "
-            "See ai-council#21444 for symptom history."
+            "See pokelabs-council#21444 for symptom history."
         )
 
     def _is_openrouter_url(self) -> bool:

@@ -298,7 +298,7 @@ def quick() -> Dict[str, Any]:
     _PROTECTED_TOP_LEVEL = {
         "logs", "memories", "sessions", "cron", "cronjobs",
         "cache", "skills", "plugins", "disk-cleanup", "optional-skills",
-        "ai-council", "backups", "profiles", ".worktrees",
+        "pokelabs-council", "backups", "profiles", ".worktrees",
     }
     empty_removed = 0
     try:
@@ -477,7 +477,7 @@ def guess_category(path: Path) -> Optional[str]:
         if top in {
             "disk-cleanup", "logs", "memories", "sessions", "config.yaml",
             "skills", "plugins", ".env", "USER.md", "MEMORY.md", "SOUL.md",
-            "auth.json", "ai-council",
+            "auth.json", "pokelabs-council",
         }:
             return None
         if top == "cron" or top == "cronjobs":

@@ -60,7 +60,7 @@ PYTHON_VERSION="3.11"
 NODE_VERSION="22"
 
 # FHS-style root install layout (set by resolve_install_layout when applicable):
-#   code at /usr/local/lib/ai-council, command at /usr/local/bin/council,
+#   code at /usr/local/lib/pokelabs-council, command at /usr/local/bin/council,
 #   data still at /root/.council (COUNCIL_HOME).  Matches Claude Code / Codex CLI
 #   and keeps Docker bind-mounted /root/ volumes lean.
 ROOT_FHS_LAYOUT=false
@@ -130,19 +130,19 @@ while [[ $# -gt 0 ]]; do
             echo "  --skip-browser Skip Playwright/Chromium install (browser tools won't work)"
             echo "  --branch NAME  Git branch to install (default: main)"
             echo "  --dir PATH     Installation directory"
-            echo "                   default (non-root):  ~/.council/ai-council"
-            echo "                   default (root, Linux): /usr/local/lib/ai-council"
+            echo "                   default (non-root):  ~/.council/pokelabs-council"
+            echo "                   default (root, Linux): /usr/local/lib/pokelabs-council"
             echo "  --council-home PATH  Data directory (default: ~/.council, or \$COUNCIL_HOME)"
             echo "  -h, --help     Show this help"
             echo ""
             echo "Notes:"
             echo "  When running as root on Linux, Council installs the code under"
-            echo "  /usr/local/lib/ai-council and links the command into"
+            echo "  /usr/local/lib/pokelabs-council and links the command into"
             echo "  /usr/local/bin/council (FHS layout — matches Claude Code / Codex CLI)."
             echo "  Data, config, sessions, and logs still live in \$COUNCIL_HOME"
             echo "  (default /root/.council).  This keeps Docker bind-mounted volumes"
             echo "  small and ensures the command is on PATH for all shells."
-            echo "  Existing installs at \$COUNCIL_HOME/ai-council are preserved in-place."
+            echo "  Existing installs at \$COUNCIL_HOME/pokelabs-council are preserved in-place."
             echo "  --ensure DEPS  Install only specified deps (comma-separated)"
             echo "                   Supported: node, browser, ripgrep, ffmpeg"
             echo "                   Does NOT clone repo or create venv"
@@ -234,14 +234,14 @@ is_termux() {
 # symlink goes.  Called after detect_os so $OS/$DISTRO are known.
 #
 # Defaults:
-#   - Non-root, any OS:       INSTALL_DIR = $COUNCIL_HOME/ai-council
+#   - Non-root, any OS:       INSTALL_DIR = $COUNCIL_HOME/pokelabs-council
 #                             command link in $HOME/.local/bin
-#   - Termux (any uid):       INSTALL_DIR = $COUNCIL_HOME/ai-council
+#   - Termux (any uid):       INSTALL_DIR = $COUNCIL_HOME/pokelabs-council
 #                             command link in $PREFIX/bin (already on PATH)
-#   - Root on Linux (new):    INSTALL_DIR = /usr/local/lib/ai-council
+#   - Root on Linux (new):    INSTALL_DIR = /usr/local/lib/pokelabs-council
 #                             command link in /usr/local/bin
 #                             (unless a legacy install already exists at
-#                              $COUNCIL_HOME/ai-council — then preserve it)
+#                              $COUNCIL_HOME/pokelabs-council — then preserve it)
 #
 # Always no-op when the user set --dir or $COUNCIL_INSTALL_DIR.
 resolve_install_layout() {
@@ -252,7 +252,7 @@ resolve_install_layout() {
 
     # Termux: package manager manages /data/data/..., keep code in COUNCIL_HOME.
     if is_termux; then
-        INSTALL_DIR="$COUNCIL_HOME/ai-council"
+        INSTALL_DIR="$COUNCIL_HOME/pokelabs-council"
         return 0
     fi
 
@@ -260,13 +260,13 @@ resolve_install_layout() {
     # macOS root installs keep the legacy layout because /usr/local/ on macOS
     # is Homebrew territory and we don't want to fight that.
     if [ "$OS" = "linux" ] && [ "$(id -u)" -eq 0 ]; then
-        if [ -d "$COUNCIL_HOME/ai-council/.git" ]; then
-            INSTALL_DIR="$COUNCIL_HOME/ai-council"
+        if [ -d "$COUNCIL_HOME/pokelabs-council/.git" ]; then
+            INSTALL_DIR="$COUNCIL_HOME/pokelabs-council"
             log_info "Existing install detected at $INSTALL_DIR — keeping legacy layout"
-            log_info "  (new root installs use /usr/local/lib/ai-council)"
+            log_info "  (new root installs use /usr/local/lib/pokelabs-council)"
             return 0
         fi
-        INSTALL_DIR="/usr/local/lib/ai-council"
+        INSTALL_DIR="/usr/local/lib/pokelabs-council"
         ROOT_FHS_LAYOUT=true
         # Place uv-managed Python under /usr/local/share so the venv interpreter
         # is world-readable.  Default uv paths land in /root/.local/share/uv,
@@ -284,7 +284,7 @@ resolve_install_layout() {
     fi
 
     # Default: non-root, non-Termux → legacy user-scoped layout.
-    INSTALL_DIR="$COUNCIL_HOME/ai-council"
+    INSTALL_DIR="$COUNCIL_HOME/pokelabs-council"
 }
 
 get_command_link_dir() {
@@ -1240,7 +1240,7 @@ try:
     specs = data["project"]["optional-dependencies"]["all"]
     extras = []
     for s in specs:
-        m = re.search(r"ai-council\[([\w-]+)\]", s)
+        m = re.search(r"pokelabs-council\[([\w-]+)\]", s)
         if m:
             extras.append(m.group(1))
     print(",".join(extras))

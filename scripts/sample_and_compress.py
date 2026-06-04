@@ -32,7 +32,7 @@ DEFAULT_DATASETS = [
     "pokelabshq/council-megascience-sft1",
     "PokeLabs/Council-Agent-Thinking-GLM-4.7-SFT2",
     "PokeLabs/Council-Agent-Thinking-GLM-4.7-SFT1",
-    "PokeLabs/terminal-tasks-glm-ai-council"
+    "PokeLabs/terminal-tasks-glm-pokelabs-council"
 ]
 
 

@@ -1,4 +1,4 @@
-"""Shared utility functions for ai-council."""
+"""Shared utility functions for pokelabs-council."""
 
 import json
 import logging

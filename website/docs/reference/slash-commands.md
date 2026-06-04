@@ -133,7 +133,7 @@ User-defined quick commands map a short slash command to either a shell command 
 quick_commands:
   status:
     type: exec
-    command: systemctl status ai-council
+    command: systemctl status pokelabs-council
   deploy:
     type: exec
     command: scripts/deploy.sh

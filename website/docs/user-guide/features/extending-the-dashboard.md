@@ -731,7 +731,7 @@ Plugin API routes bypass session-token authentication since the dashboard server
 
 #### Accessing Council internals
 
-Backend routes run inside the dashboard process, so they can import from the ai-council codebase directly:
+Backend routes run inside the dashboard process, so they can import from the pokelabs-council codebase directly:
 
 ```python
 from fastapi import APIRouter

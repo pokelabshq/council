@@ -2,7 +2,7 @@
 
 Official skills maintained by Poke Labs that are **not activated by default**.
 
-These skills ship with the ai-council repository but are not copied to
+These skills ship with the pokelabs-council repository but are not copied to
 `~/.council/skills/` during setup. They are discoverable via the Skills Hub:
 
 ```bash

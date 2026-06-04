@@ -59,13 +59,13 @@ def remove_path_from_shell_configs():
             content = config_path.read_text()
             original_content = content
             
-            # Remove lines containing ai-council or council PATH entries
+            # Remove lines containing pokelabs-council or council PATH entries
             new_lines = []
             skip_next = False
             
             for line in content.split('\n'):
                 # Skip the "# Poke Council" comment and following line
-                if '# Poke Council' in line or '# ai-council' in line:
+                if '# Poke Council' in line or '# pokelabs-council' in line:
                     skip_next = True
                     continue
                 if skip_next and ('council' in line.lower() and 'PATH' in line):
@@ -108,7 +108,7 @@ def remove_wrapper_script():
             try:
                 # Check if it's our wrapper (contains council_cli reference)
                 content = wrapper.read_text()
-                if 'council_cli' in content or 'ai-council' in content:
+                if 'council_cli' in content or 'pokelabs-council' in content:
                     wrapper.unlink()
                     removed.append(wrapper)
             except Exception as e:
@@ -307,8 +307,8 @@ def _council_path_markers(council_home: Path) -> list[str]:
     """Path-entry substrings that identify Council-owned User-PATH entries."""
     root = str(council_home).rstrip("\\/")
     # Match on prefix so sub-entries (git\cmd, git\bin, git\usr\bin, node, etc.)
-    # all get swept.  Also match the bare ai-council install dir.
-    markers = [root + "\\ai-council", root + "\\git", root + "\\node", root + "\\venv"]
+    # all get swept.  Also match the bare pokelabs-council install dir.
+    markers = [root + "\\pokelabs-council", root + "\\git", root + "\\node", root + "\\venv"]
     # Also match if COUNCIL_HOME was customised to somewhere else — find-and-nuke
     # any entry whose path component contains "council".  We don't want to catch
     # unrelated entries like "ccouncil-foo" or "ephermeral", so we look for
@@ -656,7 +656,7 @@ def run_uninstall(args):
     # We need to be careful here
     try:
         if project_root.exists():
-            # If the install is inside ~/.council/, just remove the ai-council subdir
+            # If the install is inside ~/.council/, just remove the pokelabs-council subdir
             if council_home in project_root.parents or project_root.parent == council_home:
                 shutil.rmtree(project_root)
                 log_success(f"Removed {project_root}")

@@ -615,7 +615,7 @@ terminal:
 # ~/.council/.env
 TERMINAL_SSH_HOST=agent-worker.local
 TERMINAL_SSH_USER=council
-TERMINAL_SSH_KEY=~/.ssh/ai_council_key
+TERMINAL_SSH_KEY=~/.ssh/pokelabs_council_key
 ```
 
 The SSH connection details live in `.env` (not `config.yaml`) so they aren't checked in or shared along with profile exports. This keeps the gateway's messaging connections separate from the agent's command execution.
@@ -642,7 +642,7 @@ The check itself is stdlib-only and runs from one `importlib.metadata.version()`
 
 ### Lazy install of optional dependencies
 
-Many features (Mistral TTS, ElevenLabs, Honcho memory, Bedrock, Slack, Matrix, …) depend on Python packages that not every user needs. Council installs these **lazily** on first use rather than eagerly under `ai-council[all]`. The implementation lives in `tools/lazy_deps.py`.
+Many features (Mistral TTS, ElevenLabs, Honcho memory, Bedrock, Slack, Matrix, …) depend on Python packages that not every user needs. Council installs these **lazily** on first use rather than eagerly under `pokelabs-council[all]`. The implementation lives in `tools/lazy_deps.py`.
 
 The trade-off this fixes:
 

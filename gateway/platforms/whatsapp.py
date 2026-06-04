@@ -244,7 +244,7 @@ class WhatsAppAdapter(BasePlatformAdapter):
     MAX_MESSAGE_LENGTH = 4096
     DEFAULT_REPLY_PREFIX = "⚕ *Poke Council*\n────────────\n"
     
-    # Default bridge location relative to the ai-council install
+    # Default bridge location relative to the pokelabs-council install
     _DEFAULT_BRIDGE_DIR = Path(__file__).resolve().parents[2] / "scripts" / "whatsapp-bridge"
 
     def __init__(self, config: PlatformConfig):

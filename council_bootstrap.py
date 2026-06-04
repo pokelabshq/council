@@ -14,7 +14,7 @@ Python on Windows has two long-standing text-encoding footguns:
 
 This module fixes both on Windows *only* — POSIX is untouched.  It
 should be imported at the very top of every Council entry point
-(``council``, ``ai-council``, ``council-acp``, ``python -m gateway.run``,
+(``council``, ``pokelabs-council``, ``council-acp``, ``python -m gateway.run``,
 ``batch_runner.py``, ``cron/scheduler.py``) before any other imports
 that might do file I/O or print to stdout.
 

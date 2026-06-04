@@ -91,7 +91,7 @@
 
 ### Discord
 - **Allowed channels whitelist** config — @jarvis-phw ([#7044](https://github.com/pokelabshq/council/pull/7044))
-- **Forum channel topic inheritance** in thread sessions — @ai-council-dhabibi ([#6377](https://github.com/pokelabshq/council/pull/6377))
+- **Forum channel topic inheritance** in thread sessions — @pokelabs-council-dhabibi ([#6377](https://github.com/pokelabshq/council/pull/6377))
 - **DISCORD_REPLY_TO_MODE** setting ([#6333](https://github.com/pokelabshq/council/pull/6333))
 - Accept `.log` attachments, raise document size limit — @kira-ariaki ([#6467](https://github.com/pokelabshq/council/pull/6467))
 - Decouple readiness from slash sync ([#8016](https://github.com/pokelabshq/council/pull/8016))
@@ -306,7 +306,7 @@
 - **@Hygaard** — Session-scoped gateway model override fix
 - **@jarvis-phw** — Discord allowed_channels whitelist
 - **@Kathie-yu** — Honcho initOnSessionStart for tools mode
-- **@ai-council-dhabibi** — Discord forum channel topic inheritance
+- **@pokelabs-council-dhabibi** — Discord forum channel topic inheritance
 - **@kira-ariaki** — Discord .log attachments and size limit
 - **@cherifya** — Codex fallback auth-store lookup
 - **@Cafexss** — Security: auth for session continuation

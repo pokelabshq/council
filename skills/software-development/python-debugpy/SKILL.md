@@ -151,7 +151,7 @@ For long-lived processes: Council gateway, tui_gateway, a daemon, a process that
 ### Setup
 
 ```bash
-source /home/bb/ai-council/.venv/bin/activate
+source /home/bb/pokelabs-council/.venv/bin/activate
 pip install debugpy
 ```
 
@@ -248,7 +248,7 @@ This is fine for one-off automation but painful as an interactive UX.
   "connect": { "host": "127.0.0.1", "port": 5678 },
   "justMyCode": false,
   "pathMappings": [
-    { "localRoot": "${workspaceFolder}", "remoteRoot": "/home/bb/ai-council" }
+    { "localRoot": "${workspaceFolder}", "remoteRoot": "/home/bb/pokelabs-council" }
   ]
 }
 ```

@@ -115,7 +115,7 @@ jobs:
           # ``dev`` extra pulls in pytest, pytest-asyncio, pytest-timeout —
           # everything tests/docker/ needs.  We deliberately avoid ``all``
           # here because the docker tests only drive the container via
-          # subprocess and don't import ai_council's optional deps.
+          # subprocess and don't import pokelabs_council's optional deps.
           uv pip install -e ".[dev]"
 
       - name: Run docker integration tests

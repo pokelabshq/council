@@ -42,7 +42,7 @@ If you installed Council with the standard install script, MCP support is alread
 If you installed without extras and need to add MCP separately:
 
 ```bash
-cd ~/.council/ai-council
+cd ~/.council/pokelabs-council
 uv pip install -e ".[mcp]"
 ```
 

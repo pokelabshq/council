@@ -1,7 +1,7 @@
 ---
 sidebar_position: 8
 title: "Programmatic Integration"
-description: "Three protocols for driving ai-council from external programs: ACP, the TUI gateway JSON-RPC, and the OpenAI-compatible HTTP API"
+description: "Three protocols for driving pokelabs-council from external programs: ACP, the TUI gateway JSON-RPC, and the OpenAI-compatible HTTP API"
 ---
 
 # Programmatic Integration
@@ -94,7 +94,7 @@ GET  /v1/runs/{id}/events        SSE stream of lifecycle events
 POST /v1/runs/{id}/approval      Resolve a pending approval
 POST /v1/runs/{id}/stop          Interrupt the run
 GET  /v1/capabilities            Machine-readable feature flags
-GET  /v1/models                  Lists ai-council
+GET  /v1/models                  Lists pokelabs-council
 GET  /health, /health/detailed
 ```
 

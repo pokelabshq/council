@@ -7,7 +7,7 @@ license: MIT
 metadata:
   council:
     tags: [kanban, codex, worktrees, autonomous-agents, prediction-market-bot]
-    related_skills: [kanban-worker, codex, ai-council]
+    related_skills: [kanban-worker, codex, pokelabs-council]
 ---
 
 # Kanban Codex Lane

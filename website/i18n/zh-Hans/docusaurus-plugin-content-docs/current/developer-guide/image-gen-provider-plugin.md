@@ -18,7 +18,7 @@ Council 在三个位置扫描图像生成后端：
 
 1. **内置** — `<repo>/plugins/image_gen/<name>/`（以 `kind: backend` 自动加载，始终可用）
 2. **用户** — `~/.council/plugins/image_gen/<name>/`（通过 `plugins.enabled` 选择启用）
-3. **Pip** — 声明了 `ai_council.plugins` 入口点的包
+3. **Pip** — 声明了 `pokelabs_council.plugins` 入口点的包
 
 每个插件的 `register(ctx)` 函数调用 `ctx.register_image_gen_provider(...)` — 将其注册到 `agent/image_gen_registry.py` 中的注册表。活跃 provider 由 `config.yaml` 中的 `image_gen.provider` 指定；`council tools` 会引导用户完成选择。
 
@@ -275,7 +275,7 @@ council -z "Generate an image of a corgi in a spacesuit"
 
 ```toml
 # pyproject.toml
-[project.entry-points."ai_council.plugins"]
+[project.entry-points."pokelabs_council.plugins"]
 my-backend-imggen = "my_backend_imggen_package"
 ```
 

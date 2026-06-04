@@ -82,7 +82,7 @@ This isn't a quality bar — it's a coupling-and-maintenance decision. Memory pr
 
 ```bash
 git clone --recurse-submodules https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 
 # Create venv with Python 3.11
 uv venv venv --python 3.11
@@ -134,7 +134,7 @@ pytest tests/ -v
 ## Project Structure
 
 ```
-ai-council/
+pokelabs-council/
 ├── run_agent.py              # AIAgent class — core conversation loop, tool dispatch, session persistence
 ├── cli.py                    # CouncilCLI class — interactive TUI, prompt_toolkit integration
 ├── model_tools.py            # Tool orchestration (thin layer over tools/registry.py)
@@ -194,7 +194,7 @@ ai-council/
 ├── skills/                   # Bundled skills (copied to ~/.council/skills/ on install)
 ├── optional-skills/          # Official optional skills (discoverable via hub, not activated by default)
 ├── tests/                    # Test suite
-├── website/                  # Documentation site (ai-council.pokelabs.com)
+├── website/                  # Documentation site (pokelabs-council.pokelabs.com)
 │
 ├── cli-config.yaml.example   # Example configuration (copied to ~/.council/config.yaml)
 └── AGENTS.md                 # Development guide for AI coding assistants

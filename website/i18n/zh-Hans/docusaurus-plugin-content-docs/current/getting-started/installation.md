@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/pokelabshq/council/main/scripts/ins
 iex (irm https://raw.githubusercontent.com/pokelabshq/council/main/scripts/install.ps1)
 ```
 
-安装程序处理**一切**：`uv`、Python 3.11、Node.js 22、`ripgrep`、`ffmpeg`，**以及一个便携式 Git Bash**（PortableGit——一个自包含的 Git-for-Windows 发行版，附带 `bash.exe` 和 Council 用于 shell 命令的完整 POSIX 工具链；在 32 位 Windows 上安装程序会回退到 MinGit，后者缺少 bash，终端工具和 agent 浏览器功能将被禁用）。它将仓库克隆到 `%LOCALAPPDATA%\council\ai-council`，创建虚拟环境，并将 `council` 添加到**用户 PATH**。安装完成后请重启终端（或打开新的 PowerShell 窗口）以使 PATH 生效。
+安装程序处理**一切**：`uv`、Python 3.11、Node.js 22、`ripgrep`、`ffmpeg`，**以及一个便携式 Git Bash**（PortableGit——一个自包含的 Git-for-Windows 发行版，附带 `bash.exe` 和 Council 用于 shell 命令的完整 POSIX 工具链；在 32 位 Windows 上安装程序会回退到 MinGit，后者缺少 bash，终端工具和 agent 浏览器功能将被禁用）。它将仓库克隆到 `%LOCALAPPDATA%\council\pokelabs-council`，创建虚拟环境，并将 `council` 添加到**用户 PATH**。安装完成后请重启终端（或打开新的 PowerShell 窗口）以使 PATH 生效。
 
 **Git 的处理方式：**
 1. 如果 `git` 已在你的 PATH 中，安装程序将使用现有安装。
@@ -85,8 +85,8 @@ curl -fsSL https://raw.githubusercontent.com/pokelabshq/council/main/scripts/ins
 | 安装方式 | 代码位置 | `council` 二进制 | 数据目录 |
 |---|---|---|---|
 | pip install | Python site-packages | `~/.local/bin/council`（console_scripts） | `~/.council/` |
-| 用户级（git 安装程序） | `~/.council/ai-council/` | `~/.local/bin/council`（符号链接） | `~/.council/` |
-| Root 模式（`sudo curl … \| sudo bash`） | `/usr/local/lib/ai-council/` | `/usr/local/bin/council` | `/root/.council/`（或 `$COUNCIL_HOME`） |
+| 用户级（git 安装程序） | `~/.council/pokelabs-council/` | `~/.local/bin/council`（符号链接） | `~/.council/` |
+| Root 模式（`sudo curl … \| sudo bash`） | `/usr/local/lib/pokelabs-council/` | `/usr/local/bin/council` | `/root/.council/`（或 `$COUNCIL_HOME`） |
 
 Root 模式的 **FHS 布局**（`/usr/local/lib/…`、`/usr/local/bin/council`）与其他系统级开发工具在 Linux 上的安装位置一致。适用于共享机器部署场景，一次系统安装可服务所有用户。每个用户的个人配置（认证、技能、会话）仍位于各自的 `~/.council/` 或显式指定的 `COUNCIL_HOME` 下。
 
@@ -177,10 +177,10 @@ council setup --portal
    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
    # 方案 B — 系统级符号链接（以管理员身份运行）
-   sudo ln -s /home/council/.council/ai-council/venv/bin/council /usr/local/bin/council
+   sudo ln -s /home/council/.council/pokelabs-council/venv/bin/council /usr/local/bin/council
    ```
 
-4. **验证：** `council doctor` 现在应能正常运行。如果出现 `ModuleNotFoundError: No module named 'dotenv'`，说明你在用系统 Python 调用仓库源码中的 `council` 文件（`~/.council/ai-council/council`），而非 venv 启动器（`~/.council/ai-council/venv/bin/council`）——请修正步骤 3。
+4. **验证：** `council doctor` 现在应能正常运行。如果出现 `ModuleNotFoundError: No module named 'dotenv'`，说明你在用系统 Python 调用仓库源码中的 `council` 文件（`~/.council/pokelabs-council/council`），而非 venv 启动器（`~/.council/pokelabs-council/venv/bin/council`）——请修正步骤 3。
 
 同样的方式适用于 Arch（安装程序使用 pacman，具有相同的 sudo 检测逻辑）、Fedora/RHEL 和 openSUSE——这些发行版完全不支持 `--with-deps`，因此管理员始终需要单独安装系统库。安装程序会打印相应的 `dnf`/`zypper` 命令。
 
@@ -198,4 +198,4 @@ council setup --portal
 
 ## 安装方式自动检测
 
-Council 会自动检测安装方式（`pip`、git 安装程序、Homebrew 或 NixOS），`council update` 会打印对应路径的更新命令。无需设置任何环境变量——检测基于安装目录结构（Python site-packages、`~/.council/ai-council/`、Homebrew 前缀或 Nix store 路径）。`council doctor` 也会在其环境摘要中显示检测到的安装方式。
+Council 会自动检测安装方式（`pip`、git 安装程序、Homebrew 或 NixOS），`council update` 会打印对应路径的更新命令。无需设置任何环境变量——检测基于安装目录结构（Python site-packages、`~/.council/pokelabs-council/`、Homebrew 前缀或 Nix store 路径）。`council doctor` 也会在其环境摘要中显示检测到的安装方式。

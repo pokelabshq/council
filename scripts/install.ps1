@@ -24,7 +24,7 @@ param(
     [string]$Commit = "",
     [string]$Tag = "",
     [string]$CouncilHome = "$env:LOCALAPPDATA\council",
-    [string]$InstallDir = "$env:LOCALAPPDATA\council\ai-council",
+    [string]$InstallDir = "$env:LOCALAPPDATA\council\pokelabs-council",
 
     # --- Stage protocol (additive; default invocation behaves as before) ----
     # See the "Stage protocol" section near the bottom of the file for the
@@ -1064,8 +1064,8 @@ function Install-Repository {
                     $zipUrl = "https://github.com/pokelabshq/council/archive/refs/heads/$Branch.zip"
                     $zipLabel = $Branch
                 }
-                $zipPath = "$env:TEMP\ai-council-$zipLabel.zip"
-                $extractPath = "$env:TEMP\ai-council-extract"
+                $zipPath = "$env:TEMP\pokelabs-council-$zipLabel.zip"
+                $extractPath = "$env:TEMP\pokelabs-council-extract"
 
                 Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath -UseBasicParsing
                 if (Test-Path $extractPath) { Remove-Item -Recurse -Force $extractPath }
@@ -1258,7 +1258,7 @@ try:
     specs = data['project']['optional-dependencies']['all']
     out = []
     for s in specs:
-        m = re.search(r'ai-council\[([\w-]+)\]', s)
+        m = re.search(r'pokelabs-council\[([\w-]+)\]', s)
         if m: out.append(m.group(1))
     print(','.join(out))
 except Exception:
@@ -1296,7 +1296,7 @@ except Exception:
         }
     }
     if (-not $installed) {
-        throw "Failed to install ai-council package even with no extras. Inspect the uv pip install output above."
+        throw "Failed to install pokelabs-council package even with no extras. Inspect the uv pip install output above."
     }
 
     # Baseline-import gate. Even if a tier reported success above, the
@@ -1957,7 +1957,7 @@ function Write-Completion {
     Write-Host "   Data:      " -NoNewline -ForegroundColor Yellow
     Write-Host "$CouncilHome\cron\, sessions\, logs\"
     Write-Host "   Code:      " -NoNewline -ForegroundColor Yellow
-    Write-Host "$CouncilHome\ai-council\"
+    Write-Host "$CouncilHome\pokelabs-council\"
     Write-Host ""
     
     Write-Host "---------------------------------------------------------" -ForegroundColor Cyan

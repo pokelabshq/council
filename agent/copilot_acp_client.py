@@ -558,7 +558,7 @@ class CopilotACPClient:
                         }
                     },
                     "clientInfo": {
-                        "name": "ai-council",
+                        "name": "pokelabs-council",
                         "title": "Poke Council",
                         "version": "0.0.0",
                     },

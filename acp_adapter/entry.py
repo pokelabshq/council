@@ -1,4 +1,4 @@
-"""CLI entry point for the ai-council ACP adapter.
+"""CLI entry point for the pokelabs-council ACP adapter.
 
 Loads environment variables from ``~/.council/.env``, configures logging
 to write to stderr (so stdout is reserved for ACP JSON-RPC transport),
@@ -231,7 +231,7 @@ def main(argv: list[str] | None = None) -> None:
     _load_env()
 
     logger = logging.getLogger(__name__)
-    logger.info("Starting ai-council ACP adapter")
+    logger.info("Starting pokelabs-council ACP adapter")
 
     # Ensure the project root is on sys.path so ``from run_agent import AIAgent`` works
     project_root = str(Path(__file__).resolve().parent.parent)

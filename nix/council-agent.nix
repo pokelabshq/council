@@ -1,9 +1,9 @@
-# nix/ai-council.nix — Overridable Poke Council package
+# nix/pokelabs-council.nix — Overridable Poke Council package
 #
 # callPackage auto-wires nixpkgs args; flake inputs are passed explicitly.
 # Users override via:
-#   pkgs.ai-council.override { extraPythonPackages = [...]; }
-#   pkgs.ai-council.override { extraDependencyGroups = [ "hindsight" ]; }
+#   pkgs.pokelabs-council.override { extraPythonPackages = [...]; }
+#   pkgs.pokelabs-council.override { extraDependencyGroups = [ "hindsight" ]; }
 {
   lib,
   stdenv,
@@ -137,7 +137,7 @@ let
   '';
 in
 stdenv.mkDerivation {
-  pname = "ai-council";
+  pname = "pokelabs-council";
   version = (fromTOML (builtins.readFile ../pyproject.toml)).project.version;
 
   dontUnpack = true;
@@ -147,10 +147,10 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
 
-    mkdir -p $out/share/ai-council $out/bin
-    cp -r ${bundledSkills} $out/share/ai-council/skills
-    cp -r ${bundledPlugins} $out/share/ai-council/plugins
-    cp -r ${councilWeb} $out/share/ai-council/web_dist
+    mkdir -p $out/share/pokelabs-council $out/bin
+    cp -r ${bundledSkills} $out/share/pokelabs-council/skills
+    cp -r ${bundledPlugins} $out/share/pokelabs-council/plugins
+    cp -r ${councilWeb} $out/share/pokelabs-council/web_dist
 
     mkdir -p $out/ui-tui
     cp -r ${councilTui}/lib/council-tui/* $out/ui-tui/
@@ -159,9 +159,9 @@ stdenv.mkDerivation {
       (name: ''
         makeWrapper ${councilVenv}/bin/${name} $out/bin/${name} \
           --suffix PATH : "${runtimePath}" \
-          --set COUNCIL_BUNDLED_SKILLS $out/share/ai-council/skills \
-          --set COUNCIL_BUNDLED_PLUGINS $out/share/ai-council/plugins \
-          --set COUNCIL_WEB_DIST $out/share/ai-council/web_dist \
+          --set COUNCIL_BUNDLED_SKILLS $out/share/pokelabs-council/skills \
+          --set COUNCIL_BUNDLED_PLUGINS $out/share/pokelabs-council/plugins \
+          --set COUNCIL_WEB_DIST $out/share/pokelabs-council/web_dist \
           --set COUNCIL_TUI_DIR $out/ui-tui \
           --set COUNCIL_PYTHON ${councilVenv}/bin/python3 \
           --set COUNCIL_NODE ${lib.getExe nodejs} \
@@ -170,7 +170,7 @@ stdenv.mkDerivation {
       '')
       [
         "council"
-        "ai-council"
+        "pokelabs-council"
         "council-acp"
       ]
     }
@@ -193,10 +193,10 @@ stdenv.mkDerivation {
       ;
 
     devShellHook = ''
-      STAMP=".nix-stamps/ai-council"
+      STAMP=".nix-stamps/pokelabs-council"
       STAMP_VALUE="${pyprojectHash}:${uvLockHash}"
       if [ ! -f "$STAMP" ] || [ "$(cat "$STAMP")" != "$STAMP_VALUE" ]; then
-        echo "ai-council: installing Python dependencies..."
+        echo "pokelabs-council: installing Python dependencies..."
         uv venv .venv --python ${python312}/bin/python3 2>/dev/null || true
         source .venv/bin/activate
         uv pip install -e ".[all]"

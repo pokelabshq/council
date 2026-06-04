@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Canonical test runner for ai-council. Run this instead of calling
+# Canonical test runner for pokelabs-council. Run this instead of calling
 # `pytest` directly to guarantee your local run matches CI behavior.
 #
 # What this script enforces:
@@ -34,7 +34,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # ── Activate venv ───────────────────────────────────────────────────────────
 VENV=""
-for candidate in "$REPO_ROOT/.venv" "$REPO_ROOT/venv" "$HOME/.council/ai-council/venv"; do
+for candidate in "$REPO_ROOT/.venv" "$REPO_ROOT/venv" "$HOME/.council/pokelabs-council/venv"; do
   if [ -f "$candidate/bin/activate" ]; then
     VENV="$candidate"
     break

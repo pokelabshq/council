@@ -2,7 +2,7 @@
 # Kill all running Modal apps (sandboxes, deployments, etc.)
 #
 # Usage:
-#   bash scripts/kill_modal.sh          # Stop ai-council sandboxes
+#   bash scripts/kill_modal.sh          # Stop pokelabs-council sandboxes
 #   bash scripts/kill_modal.sh --all    # Stop ALL Modal apps
 
 set -uo pipefail
@@ -17,10 +17,10 @@ if [[ "${1:-}" == "--all" ]]; then
         modal app stop "$app_id" 2>/dev/null || true
     done
 else
-    echo "Stopping ai-council sandboxes..."
-    APPS=$(echo "$APP_LIST" | grep 'ai-council' | grep -oE 'ap-[A-Za-z0-9]+' || true)
+    echo "Stopping pokelabs-council sandboxes..."
+    APPS=$(echo "$APP_LIST" | grep 'pokelabs-council' | grep -oE 'ap-[A-Za-z0-9]+' || true)
     if [[ -z "$APPS" ]]; then
-        echo "  No ai-council apps found."
+        echo "  No pokelabs-council apps found."
     else
         echo "$APPS" | while read app_id; do
             echo "  Stopping $app_id"
@@ -30,5 +30,5 @@ else
 fi
 
 echo ""
-echo "Current ai-council status:"
-modal app list 2>/dev/null | grep -E 'State|ai-council' || echo "  (none)"
+echo "Current pokelabs-council status:"
+modal app list 2>/dev/null | grep -E 'State|pokelabs-council' || echo "  (none)"

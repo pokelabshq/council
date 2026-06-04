@@ -61,19 +61,19 @@ If that is not solid yet, fix text mode first.
 ### CLI microphone + playback
 
 ```bash
-pip install "ai-council[voice]"
+pip install "pokelabs-council[voice]"
 ```
 
 ### Messaging platforms
 
 ```bash
-pip install "ai-council[messaging]"
+pip install "pokelabs-council[messaging]"
 ```
 
 ### Premium ElevenLabs TTS
 
 ```bash
-pip install "ai-council[tts-premium]"
+pip install "pokelabs-council[tts-premium]"
 ```
 
 ### Local NeuTTS (optional)
@@ -85,7 +85,7 @@ python -m pip install -U neutts[all]
 ### Everything
 
 ```bash
-pip install "ai-council[all]"
+pip install "pokelabs-council[all]"
 ```
 
 ## Step 3: install system dependencies
@@ -444,7 +444,7 @@ By default, the bot needs an `@mention` in Discord server text channels unless c
 If you want the shortest path to success:
 
 1. get text Council working
-2. install `ai-council[voice]`
+2. install `pokelabs-council[voice]`
 3. use CLI voice mode with local STT + Edge TTS
 4. then enable `/voice on` in Telegram or Discord
 5. only after that, try Discord VC mode

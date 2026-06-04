@@ -3392,7 +3392,7 @@ def check_for_skill_updates(
 # Council centralized index source
 # ---------------------------------------------------------------------------
 
-COUNCIL_INDEX_URL = "https://ai-council.pokelabs.com/docs/api/skills-index.json"
+COUNCIL_INDEX_URL = "https://pokelabs-council.pokelabs.com/docs/api/skills-index.json"
 COUNCIL_INDEX_CACHE_FILE = INDEX_CACHE_DIR / "council-index.json"
 COUNCIL_INDEX_TTL = 6 * 3600  # 6 hours
 

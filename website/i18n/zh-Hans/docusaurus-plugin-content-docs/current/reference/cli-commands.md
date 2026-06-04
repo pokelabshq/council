@@ -599,7 +599,7 @@ council debug share --local      # 在终端打印报告（不上传）
 council backup [options]
 ```
 
-创建 Council 配置、skill、会话和数据的 zip 归档。备份不包含 ai-council 代码库本身。
+创建 Council 配置、skill、会话和数据的 zip 归档。备份不包含 pokelabs-council 代码库本身。
 
 | 选项 | 说明 |
 |--------|-------------|
@@ -613,7 +613,7 @@ council backup [options]
 
 - `*.db-wal`、`*.db-shm`、`*.db-journal` — SQLite 的 WAL/共享内存/日志附属文件。`*.db` 文件已通过 `sqlite3.backup()` 获得一致快照；将活跃附属文件一并打包会导致恢复时看到半提交状态。
 - `checkpoints/` — 每会话轨迹缓存。以 hash 为键，每次会话重新生成；无论如何都无法干净地移植到其他安装。
-- `ai-council` 代码本身（这是用户数据备份，不是仓库快照）。
+- `pokelabs-council` 代码本身（这是用户数据备份，不是仓库快照）。
 
 ### 示例
 
@@ -1144,14 +1144,14 @@ council claw migrate --source /home/user/old-openclaw
 council dashboard [options]
 ```
 
-启动 Web 控制台——基于浏览器的界面，用于管理配置、API 密钥和监控会话。需要 `pip install ai-council[web]`（FastAPI + Uvicorn）。内嵌浏览器 Chat 标签页需要 `--tui` 加上 `pty` extra。完整文档请参阅 [Web 控制台](/user-guide/features/web-dashboard)。
+启动 Web 控制台——基于浏览器的界面，用于管理配置、API 密钥和监控会话。需要 `pip install pokelabs-council[web]`（FastAPI + Uvicorn）。内嵌浏览器 Chat 标签页需要 `--tui` 加上 `pty` extra。完整文档请参阅 [Web 控制台](/user-guide/features/web-dashboard)。
 
 | 选项 | 默认值 | 说明 |
 |--------|---------|-------------|
 | `--port` | `9119` | Web 服务器运行端口 |
 | `--host` | `127.0.0.1` | 绑定地址 |
 | `--no-open` | — | 不自动打开浏览器 |
-| `--tui` | 关闭 | 通过 PTY/WebSocket 桥接在后台运行 `council --tui`，启用浏览器内 Chat 标签页。需要 `pip install 'ai-council[web,pty]'` 以及 Linux、macOS 或 WSL2 等 POSIX PTY 环境。 |
+| `--tui` | 关闭 | 通过 PTY/WebSocket 桥接在后台运行 `council --tui`，启用浏览器内 Chat 标签页。需要 `pip install 'pokelabs-council[web,pty]'` 以及 Linux、macOS 或 WSL2 等 POSIX PTY 环境。 |
 | `--insecure` | 关闭 | 允许绑定到非 localhost 主机。会在网络上暴露控制台凭据；仅在受信任的网络控制下使用。 |
 | `--stop` | — | 停止正在运行的 `council dashboard` 进程并退出。 |
 | `--status` | — | 列出正在运行的 `council dashboard` 进程并退出。 |
@@ -1231,9 +1231,9 @@ council completion fish > ~/.config/fish/completions/council.fish
 council update [--check] [--backup] [--restart-gateway]
 ```
 
-拉取最新的 `ai-council` 代码并在 venv 中重新安装依赖，然后重新运行安装后 hook（MCP 服务器、skill 同步、补全安装）。可在运行中的安装上安全执行。
+拉取最新的 `pokelabs-council` 代码并在 venv 中重新安装依赖，然后重新运行安装后 hook（MCP 服务器、skill 同步、补全安装）。可在运行中的安装上安全执行。
 
-**pip 安装：** `council update` 自动检测基于 pip 的安装——查询 PyPI 获取最新版本并运行 `pip install --upgrade ai-council`，而非 `git pull`。PyPI 发布跟踪标记版本（主要/次要版本），而非 `main` 上的每个 commit。使用 `--check` 查看是否有更新的 PyPI 版本可用，而不安装。
+**pip 安装：** `council update` 自动检测基于 pip 的安装——查询 PyPI 获取最新版本并运行 `pip install --upgrade pokelabs-council`，而非 `git pull`。PyPI 发布跟踪标记版本（主要/次要版本），而非 `main` 上的每个 commit。使用 `--check` 查看是否有更新的 PyPI 版本可用，而不安装。
 
 | 选项 | 说明 |
 |--------|-------------|

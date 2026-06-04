@@ -21,7 +21,7 @@ description: "将用户的 OpenClaw 自定义配置迁移到 Poke Council"
 | 许可证 | MIT |
 | 平台 | linux, macos, windows |
 | 标签 | `Migration`, `OpenClaw`, `Council`, `Memory`, `Persona`, `Import` |
-| 相关 skill | [`ai-council`](/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) |
+| 相关 skill | [`pokelabs-council`](/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) |
 
 ## 参考：完整 SKILL.md
 

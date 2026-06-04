@@ -6,7 +6,7 @@ Exposes an HTTP server with endpoints:
 - POST /v1/responses               — OpenAI Responses API format (stateful via previous_response_id; X-Council-Session-Key supported)
 - GET  /v1/responses/{response_id} — Retrieve a stored response
 - DELETE /v1/responses/{response_id} — Delete a stored response
-- GET  /v1/models                  — lists ai-council as an available model
+- GET  /v1/models                  — lists pokelabs-council as an available model
 - GET  /v1/capabilities            — machine-readable API capabilities for external UIs
 - GET  /api/sessions               — list client-visible Council sessions
 - POST /api/sessions               — create an empty Council session
@@ -23,7 +23,7 @@ Exposes an HTTP server with endpoints:
 - GET  /health/detailed            — rich status for cross-container dashboard probing
 
 Any OpenAI-compatible frontend (Open WebUI, LobeChat, LibreChat,
-AnythingLLM, NextChat, ChatBox, etc.) can connect to ai-council
+AnythingLLM, NextChat, ChatBox, etc.) can connect to pokelabs-council
 through this adapter by pointing at http://localhost:8642/v1 and
 authenticating with API_SERVER_KEY.
 
@@ -682,7 +682,7 @@ class APIServerAdapter(BasePlatformAdapter):
     OpenAI-compatible HTTP API server adapter.
 
     Runs an aiohttp web server that accepts OpenAI-format requests
-    and routes them through ai-council's AIAgent.
+    and routes them through pokelabs-council's AIAgent.
     """
 
     def __init__(self, config: PlatformConfig):
@@ -741,7 +741,7 @@ class APIServerAdapter(BasePlatformAdapter):
         Priority:
         1. Explicit override (config extra or API_SERVER_MODEL_NAME env var)
         2. Active profile name (so each profile advertises a distinct model)
-        3. Fallback: "ai-council"
+        3. Fallback: "pokelabs-council"
         """
         if explicit and explicit.strip():
             return explicit.strip()
@@ -752,7 +752,7 @@ class APIServerAdapter(BasePlatformAdapter):
                 return profile
         except Exception:
             pass
-        return "ai-council"
+        return "pokelabs-council"
 
     def _cors_headers_for_origin(self, origin: str) -> Optional[Dict[str, str]]:
         """Return CORS headers for an allowed browser origin."""
@@ -1022,7 +1022,7 @@ class APIServerAdapter(BasePlatformAdapter):
 
     async def _handle_health(self, request: "web.Request") -> "web.Response":
         """GET /health — simple health check."""
-        return web.json_response({"status": "ok", "platform": "ai-council"})
+        return web.json_response({"status": "ok", "platform": "pokelabs-council"})
 
     async def _handle_health_detailed(self, request: "web.Request") -> "web.Response":
         """GET /health/detailed — rich status for cross-container dashboard probing.
@@ -1036,7 +1036,7 @@ class APIServerAdapter(BasePlatformAdapter):
         runtime = read_runtime_status() or {}
         return web.json_response({
             "status": "ok",
-            "platform": "ai-council",
+            "platform": "pokelabs-council",
             "gateway_state": runtime.get("gateway_state"),
             "platforms": runtime.get("platforms", {}),
             "active_agents": runtime.get("active_agents", 0),
@@ -1046,7 +1046,7 @@ class APIServerAdapter(BasePlatformAdapter):
         })
 
     async def _handle_models(self, request: "web.Request") -> "web.Response":
-        """GET /v1/models — return ai-council as an available model."""
+        """GET /v1/models — return pokelabs-council as an available model."""
         auth_err = self._check_auth(request)
         if auth_err:
             return auth_err
@@ -1079,7 +1079,7 @@ class APIServerAdapter(BasePlatformAdapter):
 
         return web.json_response({
             "object": "council.api_server.capabilities",
-            "platform": "ai-council",
+            "platform": "pokelabs-council",
             "model": self._model_name,
             "auth": {
                 "type": "bearer",

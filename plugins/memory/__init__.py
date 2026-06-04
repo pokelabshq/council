@@ -2,7 +2,7 @@
 
 Scans two directories for memory provider plugins:
 
-1. Bundled providers: ``plugins/memory/<name>/`` (shipped with ai-council)
+1. Bundled providers: ``plugins/memory/<name>/`` (shipped with pokelabs-council)
 2. User-installed providers: ``$COUNCIL_HOME/plugins/<name>/``
 
 Each subdirectory must contain ``__init__.py`` with a class implementing

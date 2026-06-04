@@ -1,13 +1,13 @@
 # Tool Matrix — Skills + Toolsets per Role
 
 Maps each role archetype to the Council skills it should `always_load` and the
-toolsets it needs. Only references skills that ship in the public ai-council
+toolsets it needs. Only references skills that ship in the public pokelabs-council
 repository (under `skills/` or `optional-skills/`). External APIs and CLIs are
 called from the terminal toolset; they don't appear in `always_load`.
 
 ## Council skills relevant to video production
 
-### Visual / rendering skills (`ai-council/skills/creative/`)
+### Visual / rendering skills (`pokelabs-council/skills/creative/`)
 
 | Skill | What it does | Best fit for |
 |-------|--------------|--------------|
@@ -23,7 +23,7 @@ called from the terminal toolset; they don't appear in `always_load`.
 | `baoyu-infographic` | Infographic generation | Renderer for data-driven explainer scenes |
 | `meme-generation` *(optional)* | Generate meme images by overlaying text on templates | Generator for satirical/social content; meme-style stills |
 
-### Design / pre-production skills (`ai-council/skills/creative/`)
+### Design / pre-production skills (`pokelabs-council/skills/creative/`)
 
 | Skill | What it does | Best fit for |
 |-------|--------------|--------------|
@@ -38,7 +38,7 @@ called from the terminal toolset; they don't appear in `always_load`.
 | `creative-ideation` | Constraint-driven project ideation | Director / cinematographer when the brief is wide-open and needs framing |
 | `humanizer` | Strip AI-isms from text, add real voice | Writer / copywriter post-process to avoid AI-tells in scripts and VO copy |
 
-### Audio / media skills (`ai-council/skills/creative/` + `skills/media/`)
+### Audio / media skills (`pokelabs-council/skills/creative/` + `skills/media/`)
 
 | Skill | What it does | Best fit for |
 |-------|--------------|--------------|
@@ -50,7 +50,7 @@ called from the terminal toolset; they don't appear in `always_load`.
 | `gif-search` | Find existing GIFs | Editor / concept artist sourcing references |
 | `gifs` | GIF tooling | Masterer producing GIF deliverables |
 
-### Kanban infrastructure (`ai-council/skills/devops/`)
+### Kanban infrastructure (`pokelabs-council/skills/devops/`)
 
 | Skill | What it does | When to load |
 |-------|--------------|--------------|

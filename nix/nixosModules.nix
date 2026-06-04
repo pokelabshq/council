@@ -1,4 +1,4 @@
-# nix/nixosModules.nix — NixOS module for ai-council
+# nix/nixosModules.nix — NixOS module for pokelabs-council
 #
 # Two modes:
 #   container.enable = false (default) → native systemd service
@@ -17,7 +17,7 @@
 # writable tool prefixes for npm i -g, pip install, uv tool install, etc.
 #
 # Usage:
-#   services.ai-council = {
+#   services.pokelabs-council = {
 #     enable = true;
 #     settings.model = "anthropic/claude-sonnet-4";
 #     environmentFiles = [ config.sops.secrets."council/env".path ];
@@ -27,14 +27,14 @@
   flake.nixosModules.default = { config, lib, pkgs, ... }:
 
   let
-    cfg = config.services.ai-council;
+    cfg = config.services.pokelabs-council;
     effectivePackage =
       if cfg.extraPythonPackages == [ ] && cfg.extraDependencyGroups == [ ]
       then cfg.package
       else cfg.package.override { inherit (cfg) extraPythonPackages extraDependencyGroups; };
-    ai-council = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    pokelabs-council = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-    # Deep-merge config type (from 0xrsydn/nix-ai-council)
+    # Deep-merge config type (from 0xrsydn/nix-pokelabs-council)
     deepConfigType = lib.types.mkOptionType {
       name = "council-config-attrs";
       description = "Council YAML config (attrset), merged deeply via lib.recursiveUpdate.";
@@ -66,7 +66,7 @@
       )
     );
 
-    containerName = "ai-council";
+    containerName = "pokelabs-council";
     containerDataDir = "/data";     # stateDir mount point inside container
     containerHomeDir = "/home/council";
 
@@ -202,14 +202,14 @@
       else cfg.workingDirectory;
 
   in {
-    options.services.ai-council = with lib; {
+    options.services.pokelabs-council = with lib; {
       enable = mkEnableOption "Poke Council gateway service";
 
       # ── Package ──────────────────────────────────────────────────────────
       package = mkOption {
         type = types.package;
-        default = ai-council;
-        description = "The ai-council package to use.";
+        default = pokelabs-council;
+        description = "The pokelabs-council package to use.";
       };
 
       # ── Service identity ─────────────────────────────────────────────────
@@ -499,7 +499,7 @@
         description = ''
           Python packages to add to PYTHONPATH for entry-point plugin discovery.
           These are pip-packaged plugins that register via the
-          ai_council.plugins entry-point group. Each package must be built
+          pokelabs_council.plugins entry-point group. Each package must be built
           with the same Python interpreter as council (python312).
         '';
         example = literalExpression ''
@@ -526,7 +526,7 @@
           the sealed Python venv. These are resolved by uv alongside core
           dependencies — no PYTHONPATH patching or collision risk.
 
-          Use this for optional extras already declared in ai-council's
+          Use this for optional extras already declared in pokelabs-council's
           pyproject.toml (e.g. "hindsight", "honcho", "voice").
           Use extraPythonPackages for external packages not in pyproject.toml.
         '';
@@ -600,7 +600,7 @@
 
       # ── Merge MCP servers into settings ────────────────────────────────
       (lib.mkIf (cfg.mcpServers != { }) {
-        services.ai-council.settings.mcp_servers = lib.mapAttrs (_name: srv:
+        services.pokelabs-council.settings.mcp_servers = lib.mapAttrs (_name: srv:
           # Stdio transport
           lib.optionalAttrs (srv.command != null) { inherit (srv) command args; }
           // lib.optionalAttrs (srv.env != { }) { inherit (srv) env; }
@@ -664,7 +664,7 @@
           names = map lib.getName cfg.extraPlugins;
         in [{
           assertion = (lib.length names) == (lib.length (lib.unique names));
-          message = "services.ai-council.extraPlugins: duplicate plugin names detected: ${toString names}. If using fetchFromGitHub, set name = \"plugin-name\" to disambiguate.";
+          message = "services.pokelabs-council.extraPlugins: duplicate plugin names detected: ${toString names}. If using fetchFromGitHub, set name = \"plugin-name\" to disambiguate.";
         }];
       }
 
@@ -674,7 +674,7 @@
           names = map lib.getName cfg.extraPlugins;
         in [{
           assertion = (lib.length names) == (lib.length (lib.unique names));
-          message = "services.ai-council.extraPlugins: duplicate plugin names detected: ${toString names}. If using fetchFromGitHub, set name = \"plugin-name\" to disambiguate.";
+          message = "services.pokelabs-council.extraPlugins: duplicate plugin names detected: ${toString names}. If using fetchFromGitHub, set name = \"plugin-name\" to disambiguate.";
         }];
       }
 
@@ -693,7 +693,7 @@
       (lib.mkIf (cfg.container.enable && !cfg.addToSystemPackages && cfg.container.hostUsers != []) {
         warnings = [
           ''
-            services.ai-council: container.enable is true and container.hostUsers
+            services.pokelabs-council: container.enable is true and container.hostUsers
             is set, but addToSystemPackages is false. Without a host-installed council
             binary, container routing will not work for interactive users.
             Set addToSystemPackages = true or ensure council is on PATH.
@@ -718,7 +718,7 @@
 
       # ── Activation: link config + auth + documents ────────────────────
       {
-        system.activationScripts."ai-council-setup" = lib.stringAfter ([ "users" ] ++ lib.optional (config.system.activationScripts ? setupSecrets) "setupSecrets") ''
+        system.activationScripts."pokelabs-council-setup" = lib.stringAfter ([ "users" ] ++ lib.optional (config.system.activationScripts ? setupSecrets) "setupSecrets") ''
           # Ensure directories exist (activation runs before tmpfiles)
           mkdir -p ${cfg.stateDir}/.council
           mkdir -p ${cfg.stateDir}/home
@@ -780,7 +780,7 @@
               in ''
                 if [ -L "${symlinkPath}" ] && [ "$(readlink "${symlinkPath}")" = "${cfg.stateDir}/.council" ]; then
                   rm -f "${symlinkPath}"
-                  echo "ai-council: removed symlink ${symlinkPath}"
+                  echo "pokelabs-council: removed symlink ${symlinkPath}"
                 fi
               '') cfg.container.hostUsers)}
           ''}
@@ -800,7 +800,7 @@
                   # Real directory — back it up, then create symlink.
                   # (ln -sfn cannot atomically replace a directory.)
                   _backup="${symlinkPath}.bak.$(date +%s)"
-                  echo "ai-council: backing up existing ${symlinkPath} to $_backup"
+                  echo "pokelabs-council: backing up existing ${symlinkPath} to $_backup"
                   mv "${symlinkPath}" "$_backup"
                 fi
                 # For everything else (existing symlink, doesn't exist, etc.)
@@ -864,7 +864,7 @@
       # MODE A: Native systemd service (default)
       # ══════════════════════════════════════════════════════════════════
       (lib.mkIf (!cfg.container.enable) {
-        systemd.services.ai-council = {
+        systemd.services.pokelabs-council = {
           description = "Poke Council Gateway";
           wantedBy = [ "multi-user.target" ];
           after = [ "network-online.target" ];
@@ -925,7 +925,7 @@
         # Ensure the container runtime is available
         virtualisation.docker.enable = lib.mkDefault (cfg.container.backend == "docker");
 
-        systemd.services.ai-council = {
+        systemd.services.pokelabs-council = {
           description = "Poke Council Gateway (container)";
           wantedBy = [ "multi-user.target" ];
           after = [ "network-online.target" ]

@@ -379,7 +379,7 @@ xAI Web Search **不在**自动检测链中——设置了 `XAI_API_KEY`（或�
 
 ```bash
 # 激活 venv 并直接运行网页工具模块
-source ~/.council/ai-council/.venv/bin/activate
+source ~/.council/pokelabs-council/.venv/bin/activate
 python -m tools.web_tools
 ```
 

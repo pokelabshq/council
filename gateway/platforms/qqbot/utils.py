@@ -14,10 +14,10 @@ from .constants import QQBOT_VERSION
 # ---------------------------------------------------------------------------
 
 def _get_council_version() -> str:
-    """Return the ai-council package version, or 'dev' if unavailable."""
+    """Return the pokelabs-council package version, or 'dev' if unavailable."""
     try:
         from importlib.metadata import version
-        return version("ai-council")
+        return version("pokelabs-council")
     except Exception:
         return "dev"
 

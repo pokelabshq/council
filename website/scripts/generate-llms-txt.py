@@ -9,8 +9,8 @@ Outputs:
                                     comments separating files.
 
 Both publish at:
-  https://ai-council.pokelabs.com/docs/llms.txt
-  https://ai-council.pokelabs.com/docs/llms-full.txt
+  https://pokelabs-council.pokelabs.com/docs/llms.txt
+  https://pokelabs-council.pokelabs.com/docs/llms-full.txt
 
 The `/docs/` prefix is not a mistake — Docusaurus serves `website/static/`
 at the `docs/` base path. Clients and IDE plugins that probe the classic
@@ -31,7 +31,7 @@ WEBSITE = SCRIPT_DIR.parent
 DOCS = WEBSITE / "docs"
 STATIC = WEBSITE / "static"
 
-SITE_BASE = "https://ai-council.pokelabs.com/docs"
+SITE_BASE = "https://pokelabs-council.pokelabs.com/docs"
 
 # Curated sections for llms.txt — mirrors the product story, not the filesystem.
 # Each entry: (docs-relative path without .md, display title, optional short desc).
@@ -211,7 +211,7 @@ def emit_llms_index() -> str:
     lines.append("")
     lines.append(
         "Install: `curl -fsSL https://raw.githubusercontent.com/PokeLabs/"
-        "ai-council/main/scripts/install.sh | bash`  "
+        "pokelabs-council/main/scripts/install.sh | bash`  "
         "(Linux, macOS, WSL2, Termux)"
     )
     lines.append("")
@@ -248,8 +248,8 @@ def emit_llms_full() -> str:
             "Started, Using Council, Features, Messaging, Integrations, Guides, "
             "Developer Guide, Reference, then everything else.\n"
         ),
-        "Canonical site: https://ai-council.pokelabs.com/docs\n",
-        "Short index: https://ai-council.pokelabs.com/docs/llms.txt\n",
+        "Canonical site: https://pokelabs-council.pokelabs.com/docs\n",
+        "Short index: https://pokelabs-council.pokelabs.com/docs/llms.txt\n",
         "\n---\n\n",
     ]
 

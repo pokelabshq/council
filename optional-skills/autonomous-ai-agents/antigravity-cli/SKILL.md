@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Coding-Agent, Antigravity, CLI, Auth, Plugins, Sandbox]
-    related_skills: [grok, codex, claude-code, ai-council]
+    related_skills: [grok, codex, claude-code, pokelabs-council]
 ---
 
 # Antigravity CLI (`agy`)

@@ -27,7 +27,7 @@ Council scans for video-gen backends in three places:
 
 1. **Bundled** — `<repo>/plugins/video_gen/<name>/` (auto-loaded with `kind: backend`)
 2. **User** — `~/.council/plugins/video_gen/<name>/` (opt-in via `plugins.enabled`)
-3. **Pip** — packages declaring a `ai_council.plugins` entry point
+3. **Pip** — packages declaring a `pokelabs_council.plugins` entry point
 
 Each plugin's `register(ctx)` function calls `ctx.register_video_gen_provider(...)`. The active provider is picked by `video_gen.provider` in `config.yaml`; `council tools` → Video Generation walks users through selection. Unlike `image_generate`, there is no in-tree legacy backend — every provider is a plugin.
 

@@ -482,7 +482,7 @@ council skills tap add myorg/skills-repo
 [skills.sh schema](https://skills.sh/schemas/skills.sh.schema.json). Its
 `groupings` (each with a `title` and a list of skill names) are read at index
 time and become the category labels shown in the
-[Skills Hub](https://ai-council.pokelabs.com/docs) page — instead of a
+[Skills Hub](https://pokelabs-council.pokelabs.com/docs) page — instead of a
 tag-derived guess. This is generic: any tap that ships the file gets real
 categorization, no Council-side changes required.
 
@@ -738,7 +738,7 @@ On each sync, Council recomputes the hash of your local copy and compares it to 
 - **Unchanged** → safe to pull upstream changes, copy the new bundled version in, record the new origin hash.
 - **Changed** → treated as **user-modified** and skipped forever, so your edits never get stomped.
 
-The protection is good, but it has one sharp edge. If you edit a bundled skill and then later want to abandon your changes and go back to the bundled version by just copy-pasting from `~/.council/ai-council/skills/`, the manifest still holds the *old* origin hash from whenever the last successful sync ran. Your fresh copy-paste contents (current bundled hash) won't match that stale origin hash, so sync keeps flagging it as user-modified.
+The protection is good, but it has one sharp edge. If you edit a bundled skill and then later want to abandon your changes and go back to the bundled version by just copy-pasting from `~/.council/pokelabs-council/skills/`, the manifest still holds the *old* origin hash from whenever the last successful sync ran. Your fresh copy-paste contents (current bundled hash) won't match that stale origin hash, so sync keeps flagging it as user-modified.
 
 `council skills reset` is the escape hatch:
 

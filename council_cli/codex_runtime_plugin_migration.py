@@ -48,10 +48,10 @@ logger = logging.getLogger(__name__)
 # Marker comments wrapping the managed section so re-runs can detect
 # what's ours and what's user-edited. Both must appear or strip is a no-op.
 MIGRATION_MARKER = (
-    "# managed by ai-council — `council codex-runtime migrate` regenerates this section"
+    "# managed by pokelabs-council — `council codex-runtime migrate` regenerates this section"
 )
 MIGRATION_END_MARKER = (
-    "# end ai-council managed section"
+    "# end pokelabs-council managed section"
 )
 
 

@@ -58,7 +58,7 @@ Examples:
     council config edit            Edit config in $EDITOR
     council config set model gpt-4 Set a config value
     council gateway                Run messaging gateway
-    council -s ai-council-dev,github-auth
+    council -s pokelabs-council-dev,github-auth
     council -w                     Start in isolated git worktree
     council gateway install        Install gateway background service
     council sessions list          List past sessions

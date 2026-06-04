@@ -736,8 +736,8 @@ class QQAdapter(BasePlatformAdapter):
                 "shard": [0, 1],
                 "properties": {
                     "$os": "macOS",
-                    "$browser": "ai-council",
-                    "$device": "ai-council",
+                    "$browser": "pokelabs-council",
+                    "$device": "pokelabs-council",
                 },
             },
         }

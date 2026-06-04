@@ -96,6 +96,6 @@ let
         pythonPackageOverrides
       ]);
 in
-pythonSet.mkVirtualEnv "ai-council-env" {
-  ai-council = dependency-groups;
+pythonSet.mkVirtualEnv "pokelabs-council-env" {
+  pokelabs-council = dependency-groups;
 }

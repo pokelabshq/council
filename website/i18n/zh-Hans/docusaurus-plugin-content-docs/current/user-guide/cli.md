@@ -32,7 +32,7 @@ council chat --provider openrouter  # 强制使用 OpenRouter
 council chat --toolsets "web,terminal,skills"
 
 # 启动时预加载一个或多个 skill
-council -s ai-council-dev,github-auth
+council -s pokelabs-council-dev,github-auth
 council chat -s github-pr-workflow -q "open a draft PR"
 
 # 恢复之前的会话
@@ -148,7 +148,7 @@ council -w -q "Fix issue #123"     # 在 worktree 中以单次查询模式运行
 quick_commands:
   status:
     type: exec
-    command: systemctl status ai-council
+    command: systemctl status pokelabs-council
   gpu:
     type: exec
     command: nvidia-smi --query-gpu=utilization.gpu,memory.used --format=csv,noheader
@@ -164,7 +164,7 @@ quick_commands:
 如果你已知道本次会话需要哪些 skill，可在启动时传入：
 
 ```bash
-council -s ai-council-dev,github-auth
+council -s pokelabs-council-dev,github-auth
 council chat -s github-pr-workflow -s github-auth
 ```
 

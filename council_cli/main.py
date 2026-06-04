@@ -6977,7 +6977,7 @@ def _print_curator_first_run_notice() -> None:
     print("  Preview now:  council curator run --dry-run")
     print("  Pause it:     council curator pause")
     print(
-        "  Docs:         https://ai-council.pokelabs.com/docs/user-guide/features/curator"
+        "  Docs:         https://pokelabs-council.pokelabs.com/docs/user-guide/features/curator"
     )
 
 
@@ -7207,14 +7207,14 @@ def _update_via_zip(args):
     print("→ Downloading latest version...")
     tmp_dir = tempfile.mkdtemp(prefix="council-update-")
     try:
-        zip_path = os.path.join(tmp_dir, f"ai-council-{branch}.zip")
+        zip_path = os.path.join(tmp_dir, f"pokelabs-council-{branch}.zip")
         urlretrieve(zip_url, zip_path)
 
         print("→ Extracting...")
         import stat as _stat
         with zipfile.ZipFile(zip_path, "r") as zf:
             # Validate paths to prevent zip-slip (path traversal) AND reject
-            # symlink members. A GitHub source ZIP for ai-council itself
+            # symlink members. A GitHub source ZIP for pokelabs-council itself
             # should never contain symlinks — they'd point outside the
             # extracted tree and let an attacker who can compromise the
             # update mirror plant arbitrary files via the update path.
@@ -7237,8 +7237,8 @@ def _update_via_zip(args):
                     )
             zf.extractall(tmp_dir)
 
-        # GitHub ZIPs extract to ai-council-<branch>/
-        extracted = os.path.join(tmp_dir, f"ai-council-{branch}")
+        # GitHub ZIPs extract to pokelabs-council-<branch>/
+        extracted = os.path.join(tmp_dir, f"pokelabs-council-{branch}")
         if not os.path.isdir(extracted):
             # Try to find it
             for d in os.listdir(tmp_dir):
@@ -8781,7 +8781,7 @@ def _ensure_fhs_path_guard() -> None:
     except AttributeError:
         return
     # Only act when this is actually an FHS-layout install (command link at
-    # /usr/local/bin/council, code at /usr/local/lib/ai-council).
+    # /usr/local/bin/council, code at /usr/local/lib/pokelabs-council).
     fhs_link = Path("/usr/local/bin/council")
     if not fhs_link.is_symlink() and not fhs_link.exists():
         return
@@ -9017,13 +9017,13 @@ def _cmd_update_pip(args):
         if not uv:
             print("✗ Detected a uv-tool install but `uv` is not on PATH; install uv and retry.")
             sys.exit(1)
-        cmd = [uv, "tool", "upgrade", "ai-council"]
+        cmd = [uv, "tool", "upgrade", "pokelabs-council"]
     elif pipx_managed and pipx:
         # pipx owns its own venv; ``pipx upgrade`` is the only correct path.
         # Matches scripts/auto-update.sh, which already uses pipx upgrade.
-        cmd = [pipx, "upgrade", "ai-council"]
+        cmd = [pipx, "upgrade", "pokelabs-council"]
     elif uv:
-        cmd = [uv, "pip", "install", "--upgrade", "ai-council"]
+        cmd = [uv, "pip", "install", "--upgrade", "pokelabs-council"]
         if in_venv:
             # Launcher shim runs the venv interpreter but doesn't export
             # VIRTUAL_ENV; without it uv errors "No virtual environment found".
@@ -9033,7 +9033,7 @@ def _cmd_update_pip(args):
             # interpreter, matching pip's default behaviour.
             cmd.insert(3, "--system")
     else:
-        cmd = [sys.executable, "-m", "pip", "install", "--upgrade", "ai-council"]
+        cmd = [sys.executable, "-m", "pip", "install", "--upgrade", "pokelabs-council"]
 
     print(f"→ Running: {' '.join(cmd)}")
     run_kwargs = {}
@@ -11578,7 +11578,7 @@ def main():
             "Manage the fallback provider chain.  Fallback providers are tried "
             "in order when the primary model fails with rate-limit, overload, or "
             "connection errors.  See: "
-            "https://ai-council.pokelabs.com/docs/user-guide/features/fallback-providers"
+            "https://pokelabs-council.pokelabs.com/docs/user-guide/features/fallback-providers"
         ),
     )
     fallback_subparsers = fallback_parser.add_subparsers(dest="fallback_command")
@@ -11612,7 +11612,7 @@ def main():
             "Pull API keys from an external secret manager at process startup "
             "instead of storing them in ~/.council/.env.  Currently supports "
             "Bitwarden Secrets Manager.  See: "
-            "https://ai-council.pokelabs.com/docs/user-guide/secrets/bitwarden"
+            "https://pokelabs-council.pokelabs.com/docs/user-guide/secrets/bitwarden"
         ),
     )
     secrets_subparsers = secrets_parser.add_subparsers(dest="secrets_command")
@@ -12688,7 +12688,7 @@ Examples:
         "backup",
         help="Back up Council home directory to a zip file",
         description="Create a zip archive of your entire Council configuration, "
-        "skills, sessions, and data (excludes the ai-council codebase). "
+        "skills, sessions, and data (excludes the pokelabs-council codebase). "
         "Use --quick for a fast snapshot of just critical state files.",
     )
     backup_parser.add_argument(

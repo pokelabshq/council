@@ -21,7 +21,7 @@ description: "配置并使用 Honcho 记忆功能与 Council -- 跨会话用户�
 | 许可证 | MIT |
 | 平台 | linux, macos, windows |
 | 标签 | `Honcho`, `Memory`, `Profiles`, `Observation`, `Dialectic`, `User-Modeling`, `Session-Summary` |
-| 相关 skills | [`ai-council`](/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) |
+| 相关 skills | [`pokelabs-council`](/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) |
 
 ## 参考：完整 SKILL.md
 

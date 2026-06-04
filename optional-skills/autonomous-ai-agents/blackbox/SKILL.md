@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Coding-Agent, Blackbox, Multi-Agent, Judge, Multi-Model]
-    related_skills: [claude-code, codex, ai-council]
+    related_skills: [claude-code, codex, pokelabs-council]
 ---
 
 # Blackbox CLI

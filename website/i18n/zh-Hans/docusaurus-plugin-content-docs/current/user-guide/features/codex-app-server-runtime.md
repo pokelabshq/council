@@ -238,7 +238,7 @@ Codex 有三个内置权限配置文件：
 default_permissions = ":read-only"
 ```
 
-（只要你的覆盖配置位于 `# managed by ai-council` 标记之外，Council 在重新迁移时会保留它。）
+（只要你的覆盖配置位于 `# managed by pokelabs-council` 标记之外，Council 在重新迁移时会保留它。）
 
 ## 辅助任务与 ChatGPT 订阅 token 消耗
 
@@ -271,13 +271,13 @@ auxiliary:
 Council 将其管理的所有内容包裹在两个标记注释之间：
 
 ```toml
-# managed by ai-council — `council codex-runtime migrate` regenerates this section
+# managed by pokelabs-council — `council codex-runtime migrate` regenerates this section
 default_permissions = ":workspace"
 [mcp_servers.filesystem]
 ...
 [plugins."github@openai-curated"]
 ...
-# end ai-council managed section
+# end pokelabs-council managed section
 ```
 
 该块**之外**的内容归你所有。重新运行迁移（通过 `/codex-runtime codex_app_server` 或每次切换运行时时）会原地替换管理块，但完整保留其上下方的用户内容。这意味着你可以：

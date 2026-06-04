@@ -127,7 +127,7 @@ Container-relevant callers outside `gateway.py`:
 `council gateway start`, `coder gateway start` (profile alias), and
 `council -p <profile> gateway start` all spawn a gateway process scoped to a
 given profile. See
-[Profiles: Running Gateways](https://ai-council.pokelabs.com/docs/user-guide/profiles#running-gateways).
+[Profiles: Running Gateways](https://pokelabs-council.pokelabs.com/docs/user-guide/profiles#running-gateways).
 On host, lifecycle is managed via per-profile systemd units
 (`council-gateway-<profile>.service`); inside the container, an s6 service at
 `/run/service/gateway-<name>/` is registered when the profile is created and
@@ -408,7 +408,7 @@ and `COLUMNS=123` as the probe.
 
 - [x] Test harness (`tests/docker/`) passes against the s6 image
 - [x] hadolint + shellcheck run green in CI
-- [x] `docker run -it --rm ai-council --tui` starts the Ink TUI with
+- [x] `docker run -it --rm pokelabs-council --tui` starts the Ink TUI with
       working keyboard input, cursor control, and resize (SIGWINCH)
 - [x] Dashboard crashes are recovered by s6 within ~2s
 - [x] `council profile create test` inside a container creates

@@ -437,7 +437,7 @@ Configure in `~/.council/config.yaml` under your gateway's settings. See the [Me
 **Solution:**
 ```bash
 # Install core messaging gateway dependencies
-pip install "ai-council[messaging]"  # Telegram, Discord, Slack, and shared gateway deps
+pip install "pokelabs-council[messaging]"  # Telegram, Discord, Slack, and shared gateway deps
 
 # Check for port conflicts
 lsof -i :8080
@@ -557,7 +557,7 @@ council chat --continue
 **Solution:**
 ```bash
 # Ensure MCP dependencies are installed (already included in standard install)
-cd ~/.council/ai-council && uv pip install -e ".[mcp]"
+cd ~/.council/pokelabs-council && uv pip install -e ".[mcp]"
 
 # For npm-based servers, ensure Node.js is available
 node --version
@@ -797,7 +797,7 @@ The imported profile will have all config, memories, sessions, and skills from t
 
 **Manual fallback (rsync):** If you prefer to copy files directly, exclude the code repo:
 ```bash
-rsync -av --exclude='ai-council' ~/.council/ newmachine:~/.council/
+rsync -av --exclude='pokelabs-council' ~/.council/ newmachine:~/.council/
 ```
 
 :::tip

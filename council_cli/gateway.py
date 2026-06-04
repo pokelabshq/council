@@ -2081,7 +2081,7 @@ def _remap_path_for_user(path: str, target_home_dir: str) -> str:
     If *path* lives under ``Path.home()`` the corresponding prefix is swapped
     to *target_home_dir*; otherwise the path is returned unchanged.
 
-      /root/.council/ai-council  -> /home/alice/.council/ai-council
+      /root/.council/pokelabs-council  -> /home/alice/.council/pokelabs-council
       /opt/council                 -> /opt/council  (kept as-is)
 
     Note: this function intentionally does NOT resolve symlinks. A venv's

@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Coding-Agent, Claude, Anthropic, Code-Review, Refactoring, PTY, Automation]
-    related_skills: [codex, ai-council, opencode]
+    related_skills: [codex, pokelabs-council, opencode]
 ---
 
 # Claude Code — Council Orchestration Guide

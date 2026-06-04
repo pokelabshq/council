@@ -42,7 +42,7 @@ description: "如何为 Poke Council 做贡献 — 开发环境配置、代码�
 
 ```bash
 git clone --recurse-submodules https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 
 # 使用 Python 3.11 创建虚拟环境
 uv venv venv --python 3.11

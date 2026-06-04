@@ -399,7 +399,7 @@
 - Docs: explain restoring bundled skills (salvage #19254) ([#20404](https://github.com/pokelabshq/council/pull/20404))
 - Docs: document `council skills reset` subcommand (salvage #11544) ([#20395](https://github.com/pokelabshq/council/pull/20395))
 - Docs: himalaya v1.2.0 `folder.aliases` syntax ([#19882](https://github.com/pokelabshq/council/pull/19882))
-- Point agent at `ai-council` skill + docs site sync ([#20390](https://github.com/pokelabshq/council/pull/20390))
+- Point agent at `pokelabs-council` skill + docs site sync ([#20390](https://github.com/pokelabshq/council/pull/20390))
 
 ---
 

@@ -48,7 +48,7 @@ This installs the `agent-client-protocol` dependency and enables:
 For Zed registry installs, Zed launches Council through the official ACP Registry entry. That entry uses a `uvx` distribution that runs:
 
 ```bash
-uvx --from 'ai-council[acp]==<version>' council-acp
+uvx --from 'pokelabs-council[acp]==<version>' council-acp
 ```
 
 Make sure `uv` is available on `PATH` before using the registry install path.
@@ -136,14 +136,14 @@ Zed v0.221.x and newer installs external agents through the official ACP Registr
 Prerequisites:
 
 - Configure Council provider credentials first with `council model`, or set them in `~/.council/.env` / `~/.council/config.yaml`.
-- Install `uv` so the registry launcher can run `uvx --from 'ai-council[acp]==<version>' council-acp`.
+- Install `uv` so the registry launcher can run `uvx --from 'pokelabs-council[acp]==<version>' council-acp`.
 
 For local development before the registry entry is available, use a custom agent server in Zed settings:
 
 ```json
 {
   "agent_servers": {
-    "ai-council": {
+    "pokelabs-council": {
       "type": "custom",
       "command": "council",
       "args": ["acp"]
@@ -157,7 +157,7 @@ For local development before the registry entry is available, use a custom agent
 Use an ACP-compatible plugin and point it at:
 
 ```text
-/path/to/ai-council/acp_registry
+/path/to/pokelabs-council/acp_registry
 ```
 
 ## Registry manifest
@@ -169,12 +169,12 @@ acp_registry/agent.json
 acp_registry/icon.svg
 ```
 
-The upstream registry PR copies those files into the top-level `ai-council/` directory in `agentclientprotocol/registry`.
+The upstream registry PR copies those files into the top-level `pokelabs-council/` directory in `agentclientprotocol/registry`.
 
-The registry entry uses a `uvx` distribution that points directly at the `ai-council` PyPI release:
+The registry entry uses a `uvx` distribution that points directly at the `pokelabs-council` PyPI release:
 
 ```text
-uvx --from 'ai-council[acp]==<version>' council-acp
+uvx --from 'pokelabs-council[acp]==<version>' council-acp
 ```
 
 The registry CI verifies that the pinned version exists on PyPI, so the manifest's `version` and uvx `package` pin must always match `pyproject.toml`. `scripts/release.py` keeps them in lockstep automatically.

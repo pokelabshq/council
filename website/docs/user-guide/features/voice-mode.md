@@ -14,7 +14,7 @@ If you want a practical setup walkthrough with recommended configurations and re
 
 Before using voice features, make sure you have:
 
-1. **Poke Council installed** — `pip install ai-council` (see [Installation](/getting-started/installation))
+1. **Poke Council installed** — `pip install pokelabs-council` (see [Installation](/getting-started/installation))
 2. **An LLM provider configured** — run `council model` or set your preferred provider credentials in `~/.council/.env`
 3. **A working base setup** — run `council` to verify the agent responds to text before enabling voice
 
@@ -40,19 +40,19 @@ A paid [Poke Portal](/user-guide/features/tool-gateway) subscription supplies th
 
 ```bash
 # CLI voice mode (microphone + audio playback)
-pip install "ai-council[voice]"
+pip install "pokelabs-council[voice]"
 
 # Discord + Telegram messaging (includes discord.py[voice] for VC support)
-pip install "ai-council[messaging]"
+pip install "pokelabs-council[messaging]"
 
 # Premium TTS (ElevenLabs)
-pip install "ai-council[tts-premium]"
+pip install "pokelabs-council[tts-premium]"
 
 # Local TTS (NeuTTS, optional)
 python -m pip install -U neutts[all]
 
 # Everything at once
-pip install "ai-council[all]"
+pip install "pokelabs-council[all]"
 ```
 
 | Extra | Packages | Required For |

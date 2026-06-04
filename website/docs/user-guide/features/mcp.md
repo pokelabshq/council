@@ -23,7 +23,7 @@ If you have ever wanted Council to use a tool that already exists somewhere else
 1. Install MCP support (already included if you used the standard install script):
 
 ```bash
-cd ~/.council/ai-council
+cd ~/.council/pokelabs-council
 uv pip install -e ".[mcp]"
 ```
 
@@ -74,7 +74,7 @@ github       installed (disabled)   GitHub repo + PR tools
 
 Hit `Enter` on a row to install (and walk through any required credentials),
 enable, disable, or uninstall. Catalog entries are stored under
-`optional-mcps/` in the ai-council repo — presence in that directory means
+`optional-mcps/` in the pokelabs-council repo — presence in that directory means
 Poke approval. There is no community submission tier; entries are added by
 merging a PR.
 
@@ -124,7 +124,7 @@ reachable to refine.
 Installing a catalog entry runs whatever the manifest specifies — `git clone`,
 the entry's `bootstrap` commands (`pip install`, `npm install`, etc.), and
 ultimately the MCP server's own code. Manifests are gated by PR review into
-the ai-council repo, so Poke has reviewed each entry before it shipped —
+the pokelabs-council repo, so Poke has reviewed each entry before it shipped —
 **but you should still read the manifest before installing**, especially the
 `source:` field's repository, the `install.bootstrap:` commands, and any
 `transport.command:` invocation.
@@ -563,7 +563,7 @@ Check:
 
 ```bash
 # Verify MCP deps are installed (already included in standard install)
-cd ~/.council/ai-council && uv pip install -e ".[mcp]"
+cd ~/.council/pokelabs-council && uv pip install -e ".[mcp]"
 
 node --version
 npx --version
@@ -679,7 +679,7 @@ Or if you installed Council in a specific location:
 {
   "mcpServers": {
     "council": {
-      "command": "/home/user/.council/ai-council/venv/bin/council",
+      "command": "/home/user/.council/pokelabs-council/venv/bin/council",
       "args": ["mcp", "serve"]
     }
   }

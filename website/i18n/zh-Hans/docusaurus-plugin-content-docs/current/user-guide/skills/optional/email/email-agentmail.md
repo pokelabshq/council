@@ -8,7 +8,7 @@ description: "通过 AgentMail 为 Agent 提供专属电子邮件收件箱"
 
 # Agentmail
 
-通过 AgentMail 为 Agent 提供专属电子邮件收件箱。使用 Agent 专属电子邮件地址（例如 ai-council@agentmail.to）自主发送、接收和管理电子邮件。
+通过 AgentMail 为 Agent 提供专属电子邮件收件箱。使用 Agent 专属电子邮件地址（例如 pokelabs-council@agentmail.to）自主发送、接收和管理电子邮件。
 
 ## Skill 元数据
 
@@ -88,8 +88,8 @@ council
 
 ### 创建收件箱并发送邮件
 1. 创建专属收件箱：
-   - 使用 `create_inbox` 并指定用户名（例如 `ai-council`）
-   - Agent 获得地址：`ai-council@agentmail.to`
+   - 使用 `create_inbox` 并指定用户名（例如 `pokelabs-council`）
+   - Agent 获得地址：`pokelabs-council@agentmail.to`
 2. 发送邮件：
    - 使用 `send_message`，传入 `inbox_id`、`to`、`subject`、`text`
 3. 检查回复：

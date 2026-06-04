@@ -1,15 +1,15 @@
 {
-  "id": "ai-council",
+  "id": "pokelabs-council",
   "name": "Poke Council",
   "version": "0.15.1",
   "description": "Self-improving open-source AI agent by Poke Labs with ACP editor integration, persistent memory, skills, and rich tool support.",
   "repository": "https://github.com/pokelabshq/council",
-  "website": "https://ai-council.pokelabs.com/docs/user-guide/features/acp",
+  "website": "https://pokelabs-council.pokelabs.com/docs/user-guide/features/acp",
   "authors": ["Poke Labs"],
   "license": "MIT",
   "distribution": {
     "uvx": {
-      "package": "ai-council[acp]==0.15.1",
+      "package": "pokelabs-council[acp]==0.15.1",
       "args": ["council-acp"]
     }
   }

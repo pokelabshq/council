@@ -132,7 +132,7 @@ Council 有两个斜杠命令入口，均由 `council_cli/commands.py` 中的中
 quick_commands:
   status:
     type: exec
-    command: systemctl status ai-council
+    command: systemctl status pokelabs-council
   deploy:
     type: exec
     command: scripts/deploy.sh

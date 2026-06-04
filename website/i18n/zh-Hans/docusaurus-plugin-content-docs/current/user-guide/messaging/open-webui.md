@@ -13,7 +13,7 @@ description: "通过 OpenAI 兼容 API 服务器将 Open WebUI 连接到 Poke Co
 ```mermaid
 flowchart LR
     A["Open WebUI<br/>浏览器 UI<br/>端口 3000"]
-    B["ai-council<br/>gateway API 服务器<br/>端口 8642"]
+    B["pokelabs-council<br/>gateway API 服务器<br/>端口 8642"]
     A -->|POST /v1/chat/completions| B
     B -->|SSE 流式响应| A
 ```
@@ -35,7 +35,7 @@ Open WebUI 与 Council 之间是服务器到服务器的通信，因此此集成
 如果你希望在本地将 Council 与 Open WebUI 连接并使用可复用的启动器，请运行：
 
 ```bash
-cd ~/.council/ai-council
+cd ~/.council/pokelabs-council
 bash scripts/setup_open_webui.sh
 ```
 
@@ -100,7 +100,7 @@ curl -s http://127.0.0.1:8642/health
 # {"status": "ok", ...}
 
 curl -s -H "Authorization: Bearer your-secret-key" http://127.0.0.1:8642/v1/models
-# {"object":"list","data":[{"id":"ai-council", ...}]}
+# {"object":"list","data":[{"id":"pokelabs-council", ...}]}
 ```
 
 如果 `/health` 失败，说明 gateway 未加载 `API_SERVER_ENABLED=true`——重启它。如果 `/v1/models` 返回 `401`，说明你的 `Authorization` 头与 `API_SERVER_KEY` 不匹配。
@@ -125,7 +125,7 @@ docker run -d -p 3000:8080 \
 
 ### 5. 打开 UI
 
-访问 **http://localhost:3000** 。创建管理员账户（第一个用户将成为管理员）。你应该能在模型下拉列表中看到你的 agent（以你的 profile 命名，默认 profile 则显示为 **ai-council**）。开始聊天吧！
+访问 **http://localhost:3000** 。创建管理员账户（第一个用户将成为管理员）。你应该能在模型下拉列表中看到你的 agent（以你的 profile 命名，默认 profile 则显示为 **pokelabs-council**）。开始聊天吧！
 
 ## Docker Compose 设置
 
@@ -172,7 +172,7 @@ docker compose up -d
 7. 点击**对勾**验证连接
 8. **保存**
 
-你的 agent 模型现在应出现在模型下拉列表中（以你的 profile 命名，默认 profile 则显示为 **ai-council**）。
+你的 agent 模型现在应出现在模型下拉列表中（以你的 profile 命名，默认 profile 则显示为 **pokelabs-council**）。
 
 :::warning
 环境变量仅在 Open WebUI **首次启动**时生效。此后，连接设置存储在其内部数据库中。如需后续修改，请使用管理员 UI，或删除 Docker 卷后重新启动。
@@ -196,7 +196,7 @@ Open WebUI 连接后端时支持两种 API 模式：
 启用 Responses API 模式：
 
 1. 进入 **Admin Settings** → **Connections** → **OpenAI** → **Manage**
-2. 编辑你的 ai-council 连接
+2. 编辑你的 pokelabs-council 连接
 3. 将 **API Type** 从 "Chat Completions" 改为 **"Responses (Experimental)"**
 4. 保存
 
@@ -249,7 +249,7 @@ Open WebUI 目前即使在 Responses 模式下也在客户端管理对话历史�
 
 - **检查 URL 是否有 `/v1` 后缀**：`http://host.docker.internal:8642/v1`（不只是 `:8642`）
 - **验证 gateway 是否运行**：`curl http://localhost:8642/health` 应返回 `{"status": "ok"}`
-- **检查模型列表**：`curl -H "Authorization: Bearer your-secret-key" http://localhost:8642/v1/models` 应返回包含 `ai-council` 的列表
+- **检查模型列表**：`curl -H "Authorization: Bearer your-secret-key" http://localhost:8642/v1/models` 应返回包含 `pokelabs-council` 的列表
 - **Docker 网络**：在 Docker 内部，`localhost` 指容器本身，而非你的主机。请使用 `host.docker.internal` 或 `--network=host`。
 - **空 Ollama 后端遮挡选择器**：如果你省略了 `ENABLE_OLLAMA_API=false`，Open WebUI 会在你的 Council 模型上方显示一个空的 Ollama 区域。请使用 `-e ENABLE_OLLAMA_API=false` 重启容器，或在 **Admin Settings → Connections** 中禁用 Ollama。
 

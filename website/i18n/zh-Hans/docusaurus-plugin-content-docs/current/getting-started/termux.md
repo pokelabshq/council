@@ -81,7 +81,7 @@ pkg install -y git python clang rust make pkg-config libffi openssl nodejs ripgr
 
 ```bash
 git clone --recurse-submodules https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 ```
 
 如果你已经克隆但未包含子模块：

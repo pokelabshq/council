@@ -21,7 +21,7 @@ Delegate coding tasks to Blackbox AI CLI agent. Multi-model agent with built-in 
 | License | MIT |
 | Platforms | linux, macos, windows |
 | Tags | `Coding-Agent`, `Blackbox`, `Multi-Agent`, `Judge`, `Multi-Model` |
-| Related skills | [`claude-code`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-claude-code), [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex), [`ai-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) |
+| Related skills | [`claude-code`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-claude-code), [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex), [`pokelabs-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) |
 
 ## Reference: full SKILL.md
 

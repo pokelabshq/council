@@ -76,7 +76,7 @@ if __name__ == "__main__":
 运行：
 
 ```bash
-cd ~/.council/ai-council
+cd ~/.council/pokelabs-council
 source .venv/bin/activate
 python my_cli.py
 ```

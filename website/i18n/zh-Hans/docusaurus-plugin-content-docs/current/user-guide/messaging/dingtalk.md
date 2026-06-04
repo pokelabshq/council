@@ -44,7 +44,7 @@ group_sessions_per_user: false
 安装所需的 Python 包：
 
 ```bash
-pip install "ai-council[dingtalk]"
+pip install "pokelabs-council[dingtalk]"
 ```
 
 或单独安装：

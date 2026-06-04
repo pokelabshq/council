@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def _print_aiohttp_missing() -> None:
     print(
         "council proxy requires aiohttp. Install one of:\n"
-        "  pip install 'ai-council[messaging]'\n"
+        "  pip install 'pokelabs-council[messaging]'\n"
         "  pip install aiohttp",
         file=sys.stderr,
     )

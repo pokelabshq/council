@@ -2,8 +2,8 @@
   "version": 1,
   "updated_at": "2026-05-29T11:20:16Z",
   "metadata": {
-    "source": "ai-council repo",
-    "docs": "https://ai-council.pokelabs.com/docs/reference/model-catalog"
+    "source": "pokelabs-council repo",
+    "docs": "https://pokelabs-council.pokelabs.com/docs/reference/model-catalog"
   },
   "providers": {
     "openrouter": {

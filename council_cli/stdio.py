@@ -232,7 +232,7 @@ def _augment_path_with_known_tools() -> None:
         # Council venv Scripts directory — host of the council.exe shim itself,
         # also where any pip-installed console scripts land.  Usually already
         # on PATH when the user invokes council, but harmless to include.
-        os.path.join(local_appdata, "council", "ai-council", "venv", "Scripts"),
+        os.path.join(local_appdata, "council", "pokelabs-council", "venv", "Scripts"),
         # WinGet packages directory — where ``winget install`` drops CLI
         # shims by default (ripgrep lands here as rg.exe).  Covers the case
         # of a system-Git install + ripgrep-via-winget that isn't yet on

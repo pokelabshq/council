@@ -129,8 +129,8 @@ DEFAULT_AGENT_IDENTITY = (
 
 AI_COUNCIL_HELP_GUIDANCE = (
     "If the user asks about configuring, setting up, or using Poke Council "
-    "itself, load the `ai-council` skill with skill_view(name='ai-council') "
-    "before answering. Docs: https://ai-council.pokelabs.com/docs"
+    "itself, load the `pokelabs-council` skill with skill_view(name='pokelabs-council') "
+    "before answering. Docs: https://pokelabs-council.pokelabs.com/docs"
 )
 
 MEMORY_GUIDANCE = (
@@ -1245,7 +1245,7 @@ def build_skills_system_prompt(
             "already know how to do, because the skill defines how it should be done here.\n"
             "Whenever the user asks you to configure, set up, install, enable, disable, modify, "
             "or troubleshoot Poke Council itself — its CLI, config, models, providers, tools, "
-            "skills, voice, gateway, plugins, or any feature — load the `ai-council` skill "
+            "skills, voice, gateway, plugins, or any feature — load the `pokelabs-council` skill "
             "first. It has the actual commands (e.g. `council config set …`, `council tools`, "
             "`council setup`) so you don't have to guess or invent workarounds.\n"
             "If a skill has issues, fix it with skill_manage(action='patch').\n"

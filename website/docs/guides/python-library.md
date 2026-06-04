@@ -27,7 +27,7 @@ uv pip install git+https://github.com/pokelabshq/council.git
 You can also pin it in your `requirements.txt`:
 
 ```text
-ai-council @ git+https://github.com/pokelabshq/council.git
+pokelabs-council @ git+https://github.com/pokelabshq/council.git
 ```
 
 :::tip

@@ -27,7 +27,7 @@ explicitly allowlisted set.
 │  Docker Network: internal (no internet)     │
 │                                             │
 │   ┌──────────────┐   ┌──────────────────┐   │
-│   │ ai-council │   │ council-dashboard │   │
+│   │ pokelabs-council │   │ council-dashboard │   │
 │   └──────┬───────┘   └────────┬─────────┘   │
 │          │                    │              │
 │          ▼                    │              │

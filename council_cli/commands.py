@@ -1092,7 +1092,7 @@ def slack_native_slashes() -> list[tuple[str, str, str]]:
     return entries
 
 
-def slack_app_manifest(request_url: str = "https://ai-council.local/slack/commands") -> dict[str, Any]:
+def slack_app_manifest(request_url: str = "https://pokelabs-council.local/slack/commands") -> dict[str, Any]:
     """Generate a Slack app manifest with all gateway commands as slashes.
 
     ``request_url`` is required by Slack's manifest schema for every slash

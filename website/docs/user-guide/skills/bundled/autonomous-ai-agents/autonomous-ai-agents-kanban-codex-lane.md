@@ -20,7 +20,7 @@ Use when a Council Kanban worker wants to run Codex CLI as an isolated implement
 | Author | Poke Council |
 | License | MIT |
 | Tags | `kanban`, `codex`, `worktrees`, `autonomous-agents`, `prediction-market-bot` |
-| Related skills | [`kanban-worker`](/docs/user-guide/skills/bundled/devops/devops-kanban-worker), [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex), [`ai-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) |
+| Related skills | [`kanban-worker`](/docs/user-guide/skills/bundled/devops/devops-kanban-worker), [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex), [`pokelabs-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) |
 
 ## Reference: full SKILL.md
 

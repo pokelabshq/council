@@ -8,7 +8,7 @@ platforms: [linux, macos]
 metadata:
   council:
     tags: [Coding-Agent, OpenHands, Model-Agnostic, LiteLLM]
-    related_skills: [claude-code, codex, opencode, ai-council]
+    related_skills: [claude-code, codex, opencode, pokelabs-council]
 ---
 
 # OpenHands CLI
@@ -146,4 +146,4 @@ If the JSONL stream ends with a `FinishAction` whose `action.message` mentions `
 
 - [OpenHands GitHub](https://github.com/All-Hands-AI/OpenHands)
 - [OpenHands CLI command reference](https://docs.openhands.dev/openhands/usage/cli/command-reference)
-- Sibling skills: `claude-code` (Anthropic-only), `codex` (OpenAI-only), `opencode` (multi-provider via OpenCode), `ai-council` (Council subagents via `delegate_task`).
+- Sibling skills: `claude-code` (Anthropic-only), `codex` (OpenAI-only), `opencode` (multi-provider via OpenCode), `pokelabs-council` (Council subagents via `delegate_task`).

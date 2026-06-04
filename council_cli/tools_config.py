@@ -785,11 +785,11 @@ def _run_post_setup(post_setup_key: str):
                 _print_success("    Node.js dependencies installed")
             else:
                 from council_constants import display_council_home
-                _print_warning(f"    npm install failed - run manually: cd {display_council_home()}/ai-council && npm install")
+                _print_warning(f"    npm install failed - run manually: cd {display_council_home()}/pokelabs-council && npm install")
                 if result.stderr:
                     _print_info(f"      {result.stderr.strip()[:200]}")
         elif not node_modules.exists():
-            _print_warning("    Node.js not found - browser tools require: npm install (in ai-council directory)")
+            _print_warning("    Node.js not found - browser tools require: npm install (in pokelabs-council directory)")
             return
 
         # Step 2: only the local browser provider actually needs Chromium on
@@ -3106,7 +3106,7 @@ def tools_command(args=None, first_install: bool = False, config: dict = None):
     print(color("⚕ Council Tool Configuration", Colors.CYAN, Colors.BOLD))
     print(color("  Enable or disable tools per platform.", Colors.DIM))
     print(color("  Tools that need API keys will be configured when enabled.", Colors.DIM))
-    print(color("  Guide: https://ai-council.pokelabs.com/docs/user-guide/features/tools", Colors.DIM))
+    print(color("  Guide: https://pokelabs-council.pokelabs.com/docs/user-guide/features/tools", Colors.DIM))
     print()
 
     # ── First-time install: linear flow, no platform menu ──

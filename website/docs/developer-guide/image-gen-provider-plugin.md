@@ -18,7 +18,7 @@ Council scans for image-gen backends in three places:
 
 1. **Bundled** — `<repo>/plugins/image_gen/<name>/` (auto-loaded with `kind: backend`, always available)
 2. **User** — `~/.council/plugins/image_gen/<name>/` (opt-in via `plugins.enabled`)
-3. **Pip** — packages declaring a `ai_council.plugins` entry point
+3. **Pip** — packages declaring a `pokelabs_council.plugins` entry point
 
 Each plugin's `register(ctx)` function calls `ctx.register_image_gen_provider(...)` — that puts it into the registry in `agent/image_gen_registry.py`. The active provider is picked by `image_gen.provider` in `config.yaml`; `council tools` walks users through selection.
 
@@ -275,7 +275,7 @@ Or interactively: `council tools` → "Image Generation" → select `my-backend`
 
 ```toml
 # pyproject.toml
-[project.entry-points."ai_council.plugins"]
+[project.entry-points."pokelabs_council.plugins"]
 my-backend-imggen = "my_backend_imggen_package"
 ```
 

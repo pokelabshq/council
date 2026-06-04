@@ -46,13 +46,13 @@ council dashboard --tui
 
 ## Prerequisites
 
-The default `ai-council` install does not ship the HTTP stack or PTY helper — those are optional extras. The **web dashboard** needs FastAPI and Uvicorn (`web` extra). The **Chat** tab also needs `ptyprocess` to spawn the embedded TUI behind a pseudo-terminal (`pty` extra on POSIX). Install both with:
+The default `pokelabs-council` install does not ship the HTTP stack or PTY helper — those are optional extras. The **web dashboard** needs FastAPI and Uvicorn (`web` extra). The **Chat** tab also needs `ptyprocess` to spawn the embedded TUI behind a pseudo-terminal (`pty` extra on POSIX). Install both with:
 
 ```bash
-pip install 'ai-council[web,pty]'
+pip install 'pokelabs-council[web,pty]'
 ```
 
-The `web` extra pulls in FastAPI/Uvicorn; `pty` pulls in `ptyprocess` (POSIX) or `pywinpty` (native Windows — note that the embedded TUI itself still requires WSL). `pip install ai-council[all]` includes both extras and is the easiest path if you also want messaging/voice/etc.
+The `web` extra pulls in FastAPI/Uvicorn; `pty` pulls in `ptyprocess` (POSIX) or `pywinpty` (native Windows — note that the embedded TUI itself still requires WSL). `pip install pokelabs-council[all]` includes both extras and is the easiest path if you also want messaging/voice/etc.
 
 When you run `council dashboard` without the dependencies, it will tell you what to install. If the frontend hasn't been built yet and `npm` is available, it builds automatically on first launch.
 
@@ -88,7 +88,7 @@ The **Chat** tab embeds the full Council TUI (the same interface you get from `c
 **Prerequisites:**
 
 - Node.js (same requirement as `council --tui`; the TUI bundle is built on first launch)
-- `ptyprocess` — installed by the `pty` extra (`pip install 'ai-council[web,pty]'`, or `[all]` covers both)
+- `ptyprocess` — installed by the `pty` extra (`pip install 'pokelabs-council[web,pty]'`, or `[all]` covers both)
 - POSIX kernel (Linux, macOS, or WSL2).  The `/chat` terminal pane specifically needs a POSIX PTY — native Windows Python has no equivalent, so on a native Windows install the rest of the dashboard (sessions, jobs, metrics, config editor) works but the `/chat` tab will show a banner telling you to use WSL2 for that feature.
 
 Close the browser tab and the PTY is reaped cleanly on the server. Re-opening spawns a fresh session.

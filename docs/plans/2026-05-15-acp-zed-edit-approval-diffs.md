@@ -15,7 +15,7 @@
 Run:
 
 ```bash
-/home/nour/.council/ai-council/venv/bin/python - <<'PY'
+/home/nour/.council/pokelabs-council/venv/bin/python - <<'PY'
 from acp.schema import RequestPermissionRequest, ToolCallUpdate
 import acp, inspect
 print(RequestPermissionRequest.model_fields)

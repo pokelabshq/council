@@ -138,9 +138,9 @@ Report any gaps where code changed but docs didn't. If everything is in sync, re
 
 ```bash
 council cron create "0 6 * * *" \
-  "Run a dependency security audit on the ai-council project.
+  "Run a dependency security audit on the pokelabs-council project.
 
-1. cd ~/.council/ai-council && source .venv/bin/activate
+1. cd ~/.council/pokelabs-council && source .venv/bin/activate
 2. Run: pip audit --format json 2>/dev/null || pip audit 2>&1
 3. Run: npm audit --json 2>/dev/null (in website/ directory if it exists)
 4. Check for any CVEs with CVSS score >= 7.0
@@ -501,7 +501,7 @@ Deliver as a clean, scannable message." \
 
 ```bash
 council cron create "0 3 * * 0" \
-  "Run a comprehensive security audit of the ai-council codebase.
+  "Run a comprehensive security audit of the pokelabs-council codebase.
 
 1. Check for dependency vulnerabilities (pip audit, npm audit)
 2. Search the codebase for common security anti-patterns:

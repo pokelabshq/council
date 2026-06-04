@@ -28,7 +28,7 @@ If a skill is missing from this list but present in the repo, the catalog is reg
 |-------|-------------|------|
 | [`claude-code`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-claude-code) | Delegate coding to Claude Code CLI (features, PRs). | `autonomous-ai-agents/claude-code` |
 | [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex) | Delegate coding to OpenAI Codex CLI (features, PRs). | `autonomous-ai-agents/codex` |
-| [`ai-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) | Configure, extend, or contribute to Poke Council. | `autonomous-ai-agents/ai-council` |
+| [`pokelabs-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) | Configure, extend, or contribute to Poke Council. | `autonomous-ai-agents/pokelabs-council` |
 | [`kanban-codex-lane`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-kanban-codex-lane) | Use when a Council Kanban worker wants to run Codex CLI as an isolated implementation lane while Council keeps ownership of task lifecycle, reconciliation, testing, and handoff. | `autonomous-ai-agents/kanban-codex-lane` |
 | [`opencode`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-opencode) | Delegate coding to OpenCode CLI (features, PR review). | `autonomous-ai-agents/opencode` |
 
@@ -184,7 +184,7 @@ If a skill is missing from this list but present in the repo, the catalog is reg
 | Skill | Description | Path |
 |-------|-------------|------|
 | [`debugging-council-tui-commands`](/docs/user-guide/skills/bundled/software-development/software-development-debugging-council-tui-commands) | Debug Council TUI slash commands: Python, gateway, Ink UI. | `software-development/debugging-council-tui-commands` |
-| [`ai-council-skill-authoring`](/docs/user-guide/skills/bundled/software-development/software-development-ai-council-skill-authoring) | Author in-repo SKILL.md: frontmatter, validator, structure. | `software-development/ai-council-skill-authoring` |
+| [`pokelabs-council-skill-authoring`](/docs/user-guide/skills/bundled/software-development/software-development-pokelabs-council-skill-authoring) | Author in-repo SKILL.md: frontmatter, validator, structure. | `software-development/pokelabs-council-skill-authoring` |
 | [`council-s6-container-supervision`](/docs/user-guide/skills/bundled/software-development/software-development-council-s6-container-supervision) | Modify, debug, or extend the s6-overlay supervision tree inside the Poke Council Docker image — adding new services, debugging profile gateways, understanding the Architecture B main-program pattern. | `software-development/council-s6-container-supervision` |
 | [`node-inspect-debugger`](/docs/user-guide/skills/bundled/software-development/software-development-node-inspect-debugger) | Debug Node.js via --inspect + Chrome DevTools Protocol CLI. | `software-development/node-inspect-debugger` |
 | [`plan`](/docs/user-guide/skills/bundled/software-development/software-development-plan) | Plan mode: write markdown plan to .council/plans/, no exec. | `software-development/plan` |

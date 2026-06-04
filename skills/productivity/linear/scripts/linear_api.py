@@ -81,7 +81,7 @@ def gql(query: str, variables: dict[str, Any] | None = None) -> dict[str, Any]:
         headers={
             "Content-Type": "application/json",
             "Authorization": key,  # Personal API key — NO `Bearer` prefix
-            "User-Agent": "ai-council-linear-skill/1.0",
+            "User-Agent": "pokelabs-council-linear-skill/1.0",
         },
         method="POST",
     )

@@ -248,7 +248,7 @@ terminal:
 
 **镜像处理：** Docker URL（`docker://...`）自动转换为 SIF 文件并缓存。现有 `.sif` 文件直接使用。
 
-**临时目录：** 按顺序解析：`TERMINAL_SCRATCH_DIR` → `TERMINAL_SANDBOX_DIR/singularity` → `/scratch/$USER/ai-council`（HPC 惯例）→ `~/.council/sandboxes/singularity`。
+**临时目录：** 按顺序解析：`TERMINAL_SCRATCH_DIR` → `TERMINAL_SANDBOX_DIR/singularity` → `/scratch/$USER/pokelabs-council`（HPC 惯例）→ `~/.council/sandboxes/singularity`。
 
 **隔离：** 使用 `--containall --no-home` 实现完全命名空间隔离，不挂载宿主 home 目录。
 
@@ -1355,13 +1355,13 @@ whatsapp:
 quick_commands:
   status:
     type: exec
-    command: systemctl status ai-council
+    command: systemctl status pokelabs-council
   disk:
     type: exec
     command: df -h /
   update:
     type: exec
-    command: cd ~/.council/ai-council && git pull && pip install -e .
+    command: cd ~/.council/pokelabs-council && git pull && pip install -e .
   gpu:
     type: exec
     command: nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total --format=csv,noheader

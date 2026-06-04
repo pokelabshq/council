@@ -42,7 +42,7 @@ We value contributions in this order:
 
 ```bash
 git clone --recurse-submodules https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 
 # Create venv with Python 3.11
 uv venv venv --python 3.11

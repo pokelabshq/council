@@ -106,7 +106,7 @@ Every `ctx.*` API below is available inside a plugin's `register(ctx)` function.
 | Ship data files | `Path(__file__).parent / "data" / "file.yaml"` |
 | Bundle skills | `ctx.register_skill(name, path)` — namespaced as `plugin:skill`, loaded via `skill_view("plugin:skill")` |
 | Gate on env vars | `requires_env: [API_KEY]` in plugin.yaml — prompted during `council plugins install` |
-| Distribute via pip | `[project.entry-points."ai_council.plugins"]` |
+| Distribute via pip | `[project.entry-points."pokelabs_council.plugins"]` |
 | Register a gateway platform (Discord, Telegram, IRC, …) | `ctx.register_platform(name, label, adapter_factory, check_fn, ...)` — see [Adding Platform Adapters](/developer-guide/adding-platform-adapters) |
 | Register an image-generation backend | `ctx.register_image_gen_provider(provider)` — see [Image Generation Provider Plugins](/developer-guide/image-gen-provider-plugin) |
 | Register a video-generation backend | `ctx.register_video_gen_provider(provider)` — see [Video Generation Provider Plugins](/developer-guide/video-gen-provider-plugin) |
@@ -122,8 +122,8 @@ Every `ctx.*` API below is available inside a plugin's `register(ctx)` function.
 | Bundled | `<repo>/plugins/` | Ships with Council — see [Built-in Plugins](/user-guide/features/built-in-plugins) |
 | User | `~/.council/plugins/` | Personal plugins |
 | Project | `.council/plugins/` | Project-specific plugins (requires `COUNCIL_ENABLE_PROJECT_PLUGINS=true`) |
-| pip | `ai_council.plugins` entry_points | Distributed packages |
-| Nix | `services.ai-council.extraPlugins` / `extraPythonPackages` | NixOS declarative installs — see [Nix Setup](/getting-started/nix-setup#plugins) |
+| pip | `pokelabs_council.plugins` entry_points | Distributed packages |
+| Nix | `services.pokelabs-council.extraPlugins` / `extraPythonPackages` | NixOS declarative installs — see [Nix Setup](/getting-started/nix-setup#plugins) |
 
 Later sources override earlier ones on name collision, so a user plugin with the same name as a bundled plugin replaces it.
 
@@ -250,7 +250,7 @@ Not everything is a Python plugin. Some extension surfaces intentionally use **c
 On NixOS, plugins can be installed declaratively via the module options — no `council plugins install` needed. See the **[Nix Setup guide](/getting-started/nix-setup#plugins)** for full details.
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   # Directory plugin (source tree with plugin.yaml)
   extraPlugins = [ (pkgs.fetchFromGitHub { ... }) ];
   # Entry-point plugin (pip package)

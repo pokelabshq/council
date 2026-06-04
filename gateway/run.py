@@ -1996,10 +1996,10 @@ class GatewayRunner:
     # -- Setup skill availability ----------------------------------------
 
     def _has_setup_skill(self) -> bool:
-        """Check if the ai-council-setup skill is installed."""
+        """Check if the pokelabs-council-setup skill is installed."""
         try:
             from tools.skill_manager_tool import _find_skill
-            return _find_skill("ai-council-setup") is not None
+            return _find_skill("pokelabs-council-setup") is not None
         except Exception:
             return False
 
@@ -3980,7 +3980,7 @@ class GatewayRunner:
         logger.info("Session storage: %s", self.config.sessions_dir)
 
         # Sanity-check that systemd's TimeoutStopSec covers our drain
-        # window.  When the user upgraded ai-council without re-running
+        # window.  When the user upgraded pokelabs-council without re-running
         # ``council setup``, their unit file may still encode the old
         # default — in which case SIGKILL hits mid-drain and looks like
         # a phantom kill in the journal.  Best-effort, never raises.
@@ -6456,7 +6456,7 @@ class GatewayRunner:
         elif platform == Platform.SLACK:
             from gateway.platforms.slack import SlackAdapter, check_slack_requirements
             if not check_slack_requirements():
-                logger.warning("Slack: slack-bolt not installed. Run: pip install 'ai-council[slack]'")
+                logger.warning("Slack: slack-bolt not installed. Run: pip install 'pokelabs-council[slack]'")
                 return None
             return SlackAdapter(config)
 
@@ -8217,7 +8217,7 @@ class GatewayRunner:
                                 "then /restart the gateway."
                             )
                             if self._has_setup_skill():
-                                _stt_msg += "\n\nFor full setup instructions, type: `/skill ai-council-setup`"
+                                _stt_msg += "\n\nFor full setup instructions, type: `/skill pokelabs-council-setup`"
                             await _stt_adapter.send(
                                 source.chat_id,
                                 _stt_msg,
@@ -15075,7 +15075,7 @@ class GatewayRunner:
                         )
                         if self._has_setup_skill():
                             _no_stt_note += (
-                                " You have a skill called ai-council-setup "
+                                " You have a skill called pokelabs-council-setup "
                                 "that can help users configure Council features "
                                 "including voice, tools, and more."
                             )
@@ -16018,7 +16018,7 @@ class GatewayRunner:
             headers["X-Council-Session-Id"] = session_id
 
         body = {
-            "model": "ai-council",
+            "model": "pokelabs-council",
             "messages": api_messages,
             "stream": True,
         }

@@ -21,7 +21,7 @@ Migrate a user's OpenClaw customization footprint into Poke Council. Imports Cou
 | License | MIT |
 | Platforms | linux, macos, windows |
 | Tags | `Migration`, `OpenClaw`, `Council`, `Memory`, `Persona`, `Import` |
-| Related skills | [`ai-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) |
+| Related skills | [`pokelabs-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) |
 
 ## Reference: full SKILL.md
 

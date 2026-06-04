@@ -1,12 +1,12 @@
 ---
 sidebar_position: 9
 title: "Optional Skills Catalog"
-description: "Official optional skills shipped with ai-council — install via council skills install official/<category>/<skill>"
+description: "Official optional skills shipped with pokelabs-council — install via council skills install official/<category>/<skill>"
 ---
 
 # Optional Skills Catalog
 
-Optional skills ship with ai-council under `optional-skills/` but are **not active by default**. Install them explicitly:
+Optional skills ship with pokelabs-council under `optional-skills/` but are **not active by default**. Install them explicitly:
 
 ```bash
 council skills install official/<category>/<skill>
@@ -80,7 +80,7 @@ council skills uninstall <skill-name>
 
 | Skill | Description |
 |-------|-------------|
-| [**agentmail**](/docs/user-guide/skills/optional/email/email-agentmail) | Give the agent its own dedicated email inbox via AgentMail. Send, receive, and manage email autonomously using agent-owned email addresses (e.g. ai-council@agentmail.to). |
+| [**agentmail**](/docs/user-guide/skills/optional/email/email-agentmail) | Give the agent its own dedicated email inbox via AgentMail. Send, receive, and manage email autonomously using agent-owned email addresses (e.g. pokelabs-council@agentmail.to). |
 
 ## finance
 

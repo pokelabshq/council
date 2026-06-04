@@ -44,14 +44,14 @@ council setup
 council chat
 ```
 
-执行 `nix profile install` 后，`council`、`ai-council` 和 `council-acp` 将出现在你的 PATH 中。之后的工作流与[标准安装](./installation.md)完全相同——`council setup` 引导你完成提供商选择，`council gateway install` 设置 launchd（macOS）或 systemd 用户服务，配置存放在 `~/.council/`。
+执行 `nix profile install` 后，`council`、`pokelabs-council` 和 `council-acp` 将出现在你的 PATH 中。之后的工作流与[标准安装](./installation.md)完全相同——`council setup` 引导你完成提供商选择，`council gateway install` 设置 launchd（macOS）或 systemd 用户服务，配置存放在 `~/.council/`。
 
 <details>
 <summary><strong>从本地克隆构建</strong></summary>
 
 ```bash
 git clone https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 nix build
 ./result/bin/council setup
 ```
@@ -75,14 +75,14 @@ nix build
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    ai-council.url = "github:pokelabshq/council";
+    pokelabs-council.url = "github:pokelabshq/council";
   };
 
-  outputs = { nixpkgs, ai-council, ... }: {
+  outputs = { nixpkgs, pokelabs-council, ... }: {
     nixosConfigurations.your-host = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ai-council.nixosModules.default
+        pokelabs-council.nixosModules.default
         ./configuration.nix
       ];
     };
@@ -95,7 +95,7 @@ nix build
 ```nix
 # configuration.nix
 { config, ... }: {
-  services.ai-council = {
+  services.pokelabs-council = {
     enable = true;
     settings.model.default = "anthropic/claude-sonnet-4";
     environmentFiles = [ config.sops.secrets."council-env".path ];
@@ -114,7 +114,7 @@ echo "OPENROUTER_API_KEY=sk-or-your-key" | sudo install -m 0600 -o council /dev/
 ```
 
 ```nix
-services.ai-council.environmentFiles = [ "/var/lib/council/env" ];
+services.pokelabs-council.environmentFiles = [ "/var/lib/council/env" ];
 ```
 :::
 
@@ -135,7 +135,7 @@ services.ai-council.environmentFiles = [ "/var/lib/council/env" ];
 设置 `container.hostUsers` 可创建 `~/.council` 到服务状态目录的符号链接，使主机 CLI 和容器共享会话、配置和记忆：
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   container.enable = true;
   container.hostUsers = [ "your-username" ];
   addToSystemPackages = true;
@@ -165,10 +165,10 @@ CLI 会自动检测何时需要 sudo 并透明地使用它。没有此配置，�
 
 ```bash
 # 检查服务状态
-systemctl status ai-council
+systemctl status pokelabs-council
 
 # 查看日志（Ctrl+C 停止）
-journalctl -u ai-council -f
+journalctl -u pokelabs-council -f
 
 # 如果 addToSystemPackages 为 true，测试 CLI
 council version
@@ -191,7 +191,7 @@ council config       # 显示生成的配置
 
 ```nix
 {
-  services.ai-council = {
+  services.pokelabs-council = {
     enable = true;
     container.enable = true;
     # ... 其余配置相同
@@ -213,14 +213,14 @@ council config       # 显示生成的配置
 
 ```nix
 # base.nix
-services.ai-council.settings = {
+services.pokelabs-council.settings = {
   model.default = "anthropic/claude-sonnet-4";
   toolsets = [ "all" ];
   terminal = { backend = "local"; timeout = 180; };
 };
 
 # personality.nix
-services.ai-council.settings = {
+services.pokelabs-council.settings = {
   display = { compact = false; personality = "kawaii"; };
   memory = { memory_enabled = true; user_profile_enabled = true; };
 };
@@ -241,7 +241,7 @@ services.ai-council.settings = {
 
 ```nix
 { config, ... }: {
-  services.ai-council = {
+  services.pokelabs-council = {
     enable = true;
     container.enable = true;
 
@@ -303,7 +303,7 @@ services.ai-council.settings = {
 如果你希望完全在 Nix 之外管理 `config.yaml`，请使用 `configFile`：
 
 ```nix
-services.ai-council.configFile = /etc/council/config.yaml;
+services.pokelabs-council.configFile = /etc/council/config.yaml;
 ```
 
 这会完全绕过 `settings`——不合并，不生成。每次激活时，该文件会原样复制到 `$COUNCIL_HOME/config.yaml`。
@@ -317,7 +317,7 @@ Nix 用户最常见自定义需求的快速参考：
 | 更改 LLM 模型 | `settings.model.default` | `"anthropic/claude-sonnet-4"` |
 | 使用不同的提供商端点 | `settings.model.base_url` | `"https://openrouter.ai/api/v1"` |
 | 添加 API 密钥 | `environmentFiles` | `[ config.sops.secrets."council-env".path ]` |
-| 给 Agent 设置个性 | `${services.ai-council.stateDir}/.council/SOUL.md` | 直接管理该文件 |
+| 给 Agent 设置个性 | `${services.pokelabs-council.stateDir}/.council/SOUL.md` | 直接管理该文件 |
 | 添加 MCP 工具服务器 | `mcpServers.<name>` | 参见 [MCP 服务器](#mcp-servers) |
 | 将主机目录挂载到容器 | `container.extraVolumes` | `[ "/data:/data:rw" ]` |
 | 为容器传入 GPU 访问 | `container.extraOptions` | `[ "--gpus" "all" ]` |
@@ -325,7 +325,7 @@ Nix 用户最常见自定义需求的快速参考：
 | 在主机 CLI 和容器间共享状态 | `container.hostUsers` | `[ "sidbin" ]` |
 | 为 Agent 提供额外工具 | `extraPackages` | `[ pkgs.pandoc pkgs.imagemagick ]` |
 | 使用自定义基础镜像 | `container.image` | `"ubuntu:24.04"` |
-| 覆盖 council 包 | `package` | `inputs.ai-council.packages.${system}.default.override { ... }` |
+| 覆盖 council 包 | `package` | `inputs.pokelabs-council.packages.${system}.default.override { ... }` |
 | 更改状态目录 | `stateDir` | `"/opt/council"` |
 | 设置 Agent 的工作目录 | `workingDirectory` | `"/home/user/projects"` |
 
@@ -337,7 +337,7 @@ Nix 用户最常见自定义需求的快速参考：
 Nix 表达式中的值会进入 `/nix/store`，该目录是全局可读的。请始终使用带有密钥管理器的 `environmentFiles`。
 :::
 
-`environment`（非密钥变量）和 `environmentFiles`（密钥文件）在激活时（`nixos-rebuild switch`）都会合并到 `$COUNCIL_HOME/.env` 中。Council 在每次启动时读取此文件，因此更改在 `systemctl restart ai-council` 后生效——无需重建容器。
+`environment`（非密钥变量）和 `environmentFiles`（密钥文件）在激活时（`nixos-rebuild switch`）都会合并到 `$COUNCIL_HOME/.env` 中。Council 在每次启动时读取此文件，因此更改在 `systemctl restart pokelabs-council` 后生效——无需重建容器。
 
 ### sops-nix
 
@@ -349,7 +349,7 @@ Nix 表达式中的值会进入 `/nix/store`，该目录是全局可读的。请
     secrets."council-env" = { format = "yaml"; };
   };
 
-  services.ai-council.environmentFiles = [
+  services.pokelabs-council.environmentFiles = [
     config.sops.secrets."council-env".path
   ];
 }
@@ -371,7 +371,7 @@ council-env: |
 {
   age.secrets.council-env.file = ./secrets/council-env.age;
 
-  services.ai-council.environmentFiles = [
+  services.pokelabs-council.environmentFiles = [
     config.age.secrets.council-env.path
   ];
 }
@@ -383,7 +383,7 @@ council-env: |
 
 ```nix
 {
-  services.ai-council = {
+  services.pokelabs-council = {
     authFile = config.sops.secrets."council/auth.json".path;
     # authFileForceOverwrite = true;  # 每次激活时强制覆盖
   };
@@ -401,11 +401,11 @@ council-env: |
 - **`USER.md`** — 关于 Agent 正在交互的用户的上下文信息。
 - 你放置在此处的任何其他文件对 Agent 都可见，作为工作区文件。
 
-Agent 身份文件是独立的：Council 从 `$COUNCIL_HOME/SOUL.md` 加载其主要 `SOUL.md`，在 NixOS 模块中对应 `${services.ai-council.stateDir}/.council/SOUL.md`。将 `SOUL.md` 放入 `documents` 只会创建一个工作区文件，不会替换主角色文件。
+Agent 身份文件是独立的：Council 从 `$COUNCIL_HOME/SOUL.md` 加载其主要 `SOUL.md`，在 NixOS 模块中对应 `${services.pokelabs-council.stateDir}/.council/SOUL.md`。将 `SOUL.md` 放入 `documents` 只会创建一个工作区文件，不会替换主角色文件。
 
 ```nix
 {
-  services.ai-council.documents = {
+  services.pokelabs-council.documents = {
     "USER.md" = ./documents/USER.md;  # 路径引用，从 Nix store 复制
   };
 }
@@ -423,7 +423,7 @@ Agent 身份文件是独立的：Council 从 `$COUNCIL_HOME/SOUL.md` 加载其�
 
 ```nix
 {
-  services.ai-council.mcpServers = {
+  services.pokelabs-council.mcpServers = {
     filesystem = {
       command = "npx";
       args = [ "-y" "@modelcontextprotocol/server-filesystem" "/data/workspace" ];
@@ -445,7 +445,7 @@ Agent 身份文件是独立的：Council 从 `$COUNCIL_HOME/SOUL.md` 加载其�
 
 ```nix
 {
-  services.ai-council.mcpServers.remote-api = {
+  services.pokelabs-council.mcpServers.remote-api = {
     url = "https://mcp.example.com/v1/mcp";
     headers.Authorization = "Bearer \${MCP_REMOTE_API_KEY}";
     timeout = 180;
@@ -459,7 +459,7 @@ Agent 身份文件是独立的：Council 从 `$COUNCIL_HOME/SOUL.md` 加载其�
 
 ```nix
 {
-  services.ai-council.mcpServers.my-oauth-server = {
+  services.pokelabs-council.mcpServers.my-oauth-server = {
     url = "https://mcp.example.com/mcp";
     auth = "oauth";
   };
@@ -477,7 +477,7 @@ Token 存储在 `$COUNCIL_HOME/mcp-tokens/<server-name>.json` 中，在重启和
 
 ```bash
 # 容器模式
-docker exec -it ai-council \
+docker exec -it pokelabs-council \
   council mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
 
 # 原生模式
@@ -504,7 +504,7 @@ scp ~/.council/mcp-tokens/my-oauth-server{,.client}.json \
 
 ```nix
 {
-  services.ai-council.mcpServers.analysis = {
+  services.pokelabs-council.mcpServers.analysis = {
     command = "npx";
     args = [ "-y" "analysis-server" ];
     sampling = {
@@ -535,7 +535,7 @@ scp ~/.council/mcp-tokens/my-oauth-server{,.client}.json \
 这可以防止 Nix 声明的内容与磁盘上实际内容之间产生漂移。检测使用两个信号：
 
 1. **`COUNCIL_MANAGED=true`** 环境变量——由 systemd 服务设置，对 gateway 进程可见
-2. **`.managed` 标记文件**，位于 `COUNCIL_HOME` 中——由激活脚本设置，对交互式 shell 可见（例如 `docker exec -it ai-council council config set ...` 也会被屏蔽）
+2. **`.managed` 标记文件**，位于 `COUNCIL_HOME` 中——由激活脚本设置，对交互式 shell 可见（例如 `docker exec -it pokelabs-council council config set ...` 也会被屏蔽）
 
 要更改配置，请编辑你的 Nix 配置并运行 `sudo nixos-rebuild switch`。
 
@@ -552,7 +552,7 @@ scp ~/.council/mcp-tokens/my-oauth-server{,.client}.json \
 ```
 主机                                    容器
 ────                                    ─────────
-/nix/store/...-ai-council-0.1.0  ──►  /nix/store/... (ro)
+/nix/store/...-pokelabs-council-0.1.0  ──►  /nix/store/... (ro)
 ~/.council -> /var/lib/council/.council       （符号链接桥接，按 hostUsers）
 /var/lib/council/                    ──►  /data/          (rw)
   ├── current-package -> /nix/store/...    （符号链接，每次重建更新）
@@ -579,7 +579,7 @@ Nix 构建的二进制文件能在 Ubuntu 容器内运行，是因为 `/nix/stor
 
 | 事件 | 容器重建？ | `/data`（状态） | `/home/council` | 可写层（`apt`/`pip`/`npm`） |
 |---|---|---|---|---|
-| `systemctl restart ai-council` | 否 | 保留 | 保留 | 保留 |
+| `systemctl restart pokelabs-council` | 否 | 保留 | 保留 | 保留 |
 | `nixos-rebuild switch`（代码变更） | 否（更新符号链接） | 保留 | 保留 | 保留 |
 | 主机重启 | 否 | 保留 | 保留 | 保留 |
 | `nix-collect-garbage` | 否（GC root） | 保留 | 保留 | 保留 |
@@ -610,7 +610,7 @@ NixOS 模块支持声明式插件安装——无需命令式的 `council plugins
 对于只包含 `plugin.yaml` + `__init__.py` 的源码树插件（例如 [council-lcm](https://github.com/stephenschoettler/council-lcm)）：
 
 ```nix
-services.ai-council.extraPlugins = [
+services.pokelabs-council.extraPlugins = [
   (pkgs.fetchFromGitHub {
     owner = "stephenschoettler";
     repo = "council-lcm";
@@ -624,10 +624,10 @@ services.ai-council.extraPlugins = [
 
 ### 入口点插件（`extraPythonPackages`）
 
-对于通过 `[project.entry-points."ai_council.plugins"]` 注册的 pip 打包插件（例如 [rtk-council](https://github.com/ogallotti/rtk-council)）：
+对于通过 `[project.entry-points."pokelabs_council.plugins"]` 注册的 pip 打包插件（例如 [rtk-council](https://github.com/ogallotti/rtk-council)）：
 
 ```nix
-services.ai-council.extraPythonPackages = [
+services.pokelabs-council.extraPythonPackages = [
   (pkgs.python312Packages.buildPythonPackage {
     pname = "rtk-council";
     version = "1.0.0";
@@ -647,10 +647,10 @@ services.ai-council.extraPythonPackages = [
 
 ### 可选依赖组（`extraDependencyGroups`）
 
-对于已在 ai-council 的 `pyproject.toml` 中声明的可选 extras（例如 `hindsight` 或 `honcho` 等记忆提供商），使用 `extraDependencyGroups` 在构建时将其包含到封闭的 venv 中：
+对于已在 pokelabs-council 的 `pyproject.toml` 中声明的可选 extras（例如 `hindsight` 或 `honcho` 等记忆提供商），使用 `extraDependencyGroups` 在构建时将其包含到封闭的 venv 中：
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   extraDependencyGroups = [ "hindsight" ];
   settings.memory.provider = "hindsight";
 };
@@ -672,7 +672,7 @@ services.ai-council = {
 带有第三方 Python 依赖的目录插件需要同时使用两个选项：
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   extraPlugins = [ my-plugin-src ];          # 插件源码
   extraPythonPackages = [ pkgs.python312Packages.redis ];  # 其 Python 依赖
   extraPackages = [ pkgs.redis ];            # 其需要的系统二进制文件
@@ -685,12 +685,12 @@ services.ai-council = {
 
 ```nix
 {
-  inputs.ai-council.url = "github:pokelabshq/council";
-  outputs = { ai-council, nixpkgs, ... }: {
-    nixpkgs.overlays = [ ai-council.overlays.default ];
+  inputs.pokelabs-council.url = "github:pokelabshq/council";
+  outputs = { pokelabs-council, nixpkgs, ... }: {
+    nixpkgs.overlays = [ pokelabs-council.overlays.default ];
     # 然后：
-    #   pkgs.ai-council.override { extraPythonPackages = [...]; }
-    #   pkgs.ai-council.override { extraDependencyGroups = [ "hindsight" ]; }
+    #   pkgs.pokelabs-council.override { extraPythonPackages = [...]; }
+    #   pkgs.pokelabs-council.override { extraDependencyGroups = [ "hindsight" ]; }
   };
 }
 ```
@@ -700,7 +700,7 @@ services.ai-council = {
 插件仍需在 `config.yaml` 中启用。通过声明式 settings 添加：
 
 ```nix
-services.ai-council.settings.plugins.enabled = [
+services.pokelabs-council.settings.plugins.enabled = [
   "council-lcm"
   "rtk-rewrite"
 ];
@@ -719,7 +719,7 @@ services.ai-council.settings.plugins.enabled = [
 该 flake 提供了一个包含 Python 3.12、uv、Node.js 和所有运行时工具的开发 shell：
 
 ```bash
-cd ai-council
+cd pokelabs-council
 nix develop
 
 # Shell 提供：
@@ -736,7 +736,7 @@ council chat
 包含的 `.envrc` 会自动激活开发 shell：
 
 ```bash
-cd ai-council
+cd pokelabs-council
 direnv allow    # 仅需一次
 # 后续进入几乎即时（戳记文件跳过依赖安装）
 ```
@@ -763,7 +763,7 @@ nix build .#checks.x86_64-linux.config-roundtrip    # 合并脚本保留用户�
 
 | 检查 | 测试内容 |
 |---|---|
-| `package-contents` | `council` 和 `ai-council` 二进制文件存在且 `council version` 可运行 |
+| `package-contents` | `council` 和 `pokelabs-council` 二进制文件存在且 `council version` 可运行 |
 | `entry-points-sync` | `pyproject.toml` 中 `[project.scripts]` 的每个条目在 Nix 包中都有对应的封装二进制文件 |
 | `cli-commands` | `council --help` 暴露 `gateway` 和 `config` 子命令 |
 | `managed-guard` | `COUNCIL_MANAGED=true council config set ...` 打印 NixOS 错误 |
@@ -780,8 +780,8 @@ nix build .#checks.x86_64-linux.config-roundtrip    # 合并脚本保留用户�
 
 | 选项 | 类型 | 默认值 | 描述 |
 |---|---|---|---|
-| `enable` | `bool` | `false` | 启用 ai-council 服务 |
-| `package` | `package` | `ai-council` | 使用的 ai-council 包 |
+| `enable` | `bool` | `false` | 启用 pokelabs-council 服务 |
+| `package` | `package` | `pokelabs-council` | 使用的 pokelabs-council 包 |
 | `user` | `str` | `"council"` | 系统用户 |
 | `group` | `str` | `"council"` | 系统组 |
 | `createUser` | `bool` | `true` | 自动创建用户/组 |
@@ -895,7 +895,7 @@ nix build .#checks.x86_64-linux.config-roundtrip    # 合并脚本保留用户�
 
 ```bash
 # 更新 flake 输入（在包含 flake.nix 的目录中运行）
-cd /etc/nixos && nix flake update ai-council
+cd /etc/nixos && nix flake update pokelabs-council
 
 # 重建
 sudo nixos-rebuild switch
@@ -915,21 +915,21 @@ sudo nixos-rebuild switch
 
 ```bash
 # 两种模式使用相同的 systemd 单元
-journalctl -u ai-council -f
+journalctl -u pokelabs-council -f
 
 # 容器模式：也可直接查看
-docker logs -f ai-council
+docker logs -f pokelabs-council
 ```
 
 ### 容器检查
 
 ```bash
-systemctl status ai-council
-docker ps -a --filter name=ai-council
-docker inspect ai-council --format='{{.State.Status}}'
-docker exec -it ai-council bash
-docker exec ai-council readlink /data/current-package
-docker exec ai-council cat /data/.container-identity
+systemctl status pokelabs-council
+docker ps -a --filter name=pokelabs-council
+docker inspect pokelabs-council --format='{{.State.Status}}'
+docker exec -it pokelabs-council bash
+docker exec pokelabs-council readlink /data/current-package
+docker exec pokelabs-council cat /data/.container-identity
 ```
 
 ### 强制重建容器
@@ -937,10 +937,10 @@ docker exec ai-council cat /data/.container-identity
 如果需要重置可写层（全新 Ubuntu）：
 
 ```bash
-sudo systemctl stop ai-council
-docker rm -f ai-council
+sudo systemctl stop pokelabs-council
+docker rm -f pokelabs-council
 sudo rm /var/lib/council/.container-identity
-sudo systemctl start ai-council
+sudo systemctl start pokelabs-council
 ```
 
 ### 验证密钥已加载
@@ -952,13 +952,13 @@ sudo systemctl start ai-council
 sudo -u council cat /var/lib/council/.council/.env
 
 # 容器模式
-docker exec ai-council cat /data/.council/.env
+docker exec pokelabs-council cat /data/.council/.env
 ```
 
 ### GC Root 验证
 
 ```bash
-nix-store --query --roots $(docker exec ai-council readlink /data/current-package)
+nix-store --query --roots $(docker exec pokelabs-council readlink /data/current-package)
 ```
 
 ### 常见问题
@@ -967,9 +967,9 @@ nix-store --query --roots $(docker exec ai-council readlink /data/current-packag
 |---|---|---|
 | `Cannot save configuration: managed by NixOS` | CLI 守卫已激活 | 编辑 `configuration.nix` 并执行 `nixos-rebuild switch` |
 | 容器意外重建 | `extraVolumes`、`extraOptions` 或 `image` 发生变更 | 预期行为——可写层重置。重新安装包或使用自定义镜像 |
-| `council version` 显示旧版本 | 容器未重启 | `systemctl restart ai-council` |
+| `council version` 显示旧版本 | 容器未重启 | `systemctl restart pokelabs-council` |
 | `/var/lib/council` 权限拒绝 | 状态目录为 `0750 council:council` | 使用 `docker exec` 或 `sudo -u council` |
 | `nix-collect-garbage` 删除了 council | GC root 缺失 | 重启服务（preStart 会重新创建 GC root） |
-| `no container with name or ID "ai-council"`（Podman） | Podman rootful 容器对普通用户不可见 | 为 podman 添加免密 sudo（参见[容器模式](#container-mode)章节） |
+| `no container with name or ID "pokelabs-council"`（Podman） | Podman rootful 容器对普通用户不可见 | 为 podman 添加免密 sudo（参见[容器模式](#container-mode)章节） |
 | `unable to find user council` | 容器仍在启动中（入口点尚未创建用户） | 等待几秒后重试——CLI 会自动重试 |
-| 通过 `extraPackages` 添加的工具在终端中找不到 | 需要 `nixos-rebuild switch` 更新每用户 profile | 重建并重启：`nixos-rebuild switch && systemctl restart ai-council` |
+| 通过 `extraPackages` 添加的工具在终端中找不到 | 需要 `nixos-rebuild switch` 更新每用户 profile | 重建并重启：`nixos-rebuild switch && systemctl restart pokelabs-council` |

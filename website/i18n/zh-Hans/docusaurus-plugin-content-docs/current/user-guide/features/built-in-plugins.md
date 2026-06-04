@@ -18,7 +18,7 @@ Council 随仓库附带了一小组插件。它们位于 `<repo>/plugins/<name>/
 1. **内置（Bundled）** — `<repo>/plugins/<name>/`（本页所记录的内容）
 2. **用户（User）** — `~/.council/plugins/<name>/`
 3. **项目（Project）** — `./.council/plugins/<name>/`（需要 `COUNCIL_ENABLE_PROJECT_PLUGINS=1`）
-4. **Pip 入口点（Entry points）** — `ai_council.plugins`
+4. **Pip 入口点（Entry points）** — `pokelabs_council.plugins`
 
 名称冲突时，后面的来源优先——名为 `disk-cleanup` 的用户插件会替换内置版本。
 

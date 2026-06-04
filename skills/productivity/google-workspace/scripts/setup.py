@@ -115,7 +115,7 @@ def install_deps():
         print(
             "On environments without pip (e.g. Nix), install the optional extra instead:"
         )
-        print("  pip install 'ai-council[google]'")
+        print("  pip install 'pokelabs-council[google]'")
         print(f"Or manually: {sys.executable} -m pip install {' '.join(REQUIRED_PACKAGES)}")
         return False
 

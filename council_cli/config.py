@@ -273,7 +273,7 @@ def get_managed_update_command() -> Optional[str]:
     """Return the preferred upgrade command for a managed install."""
     managed_system = get_managed_system()
     if managed_system == "Homebrew":
-        return "brew upgrade ai-council"
+        return "brew upgrade pokelabs-council"
     if managed_system == "NixOS":
         return _NIX_UPDATE_MSG
     return None
@@ -332,8 +332,8 @@ def stamp_install_method(method: str) -> None:
 def is_uv_tool_install() -> bool:
     """Return True when the *running* Council lives in a ``uv tool`` layout.
 
-    ``uv tool install ai-council`` places the install at
-    ``.../uv/tools/ai-council/...`` (default ``~/.local/share/uv/tools``,
+    ``uv tool install pokelabs-council`` places the install at
+    ``.../uv/tools/pokelabs-council/...`` (default ``~/.local/share/uv/tools``,
     or ``$UV_TOOL_DIR/...``). Such installs live outside any virtualenv, so
     ``uv pip install`` fails with ``No virtual environment found`` and the
     update path must use ``uv tool upgrade`` instead.
@@ -341,14 +341,14 @@ def is_uv_tool_install() -> bool:
     Detection is intentionally restricted to properties of the running
     interpreter (``sys.prefix`` / ``sys.executable``). We deliberately do
     NOT consult ``uv tool list``: it would also return True when
-    ``ai-council`` happens to be uv-tool-installed on the machine while
+    ``pokelabs-council`` happens to be uv-tool-installed on the machine while
     the *active* Council is a regular pip/venv install, causing
     ``council update`` to upgrade the wrong copy. It would also block on a
     subprocess call (~seconds) just to compute a recommendation string.
     """
     def _has_uv_tool_marker(path: str) -> bool:
         norm = os.path.normpath(path).replace(os.sep, "/").lower()
-        return "/uv/tools/ai-council/" in norm + "/"
+        return "/uv/tools/pokelabs-council/" in norm + "/"
 
     if _has_uv_tool_marker(sys.prefix):
         return True
@@ -362,16 +362,16 @@ def recommended_update_command_for_method(method: str) -> str:
     if method == "nixos":
         return _NIX_UPDATE_MSG
     if method == "homebrew":
-        return "brew upgrade ai-council"
+        return "brew upgrade pokelabs-council"
     if method == "docker":
         return "docker pull pokelabshq/council:latest"
     if method == "pip":
         if is_uv_tool_install():
-            return "uv tool upgrade ai-council"
+            return "uv tool upgrade pokelabs-council"
         import shutil
         if shutil.which("uv"):
-            return "uv pip install --upgrade ai-council"
-        return "pip install --upgrade ai-council"
+            return "uv pip install --upgrade pokelabs-council"
+        return "pip install --upgrade pokelabs-council"
     return "council update"
 
 
@@ -408,7 +408,7 @@ pulling a fresh image and restarting your container instead:
 
   docker pull pokelabshq/council:latest
   # then restart whatever started the container, e.g.:
-  docker compose up -d --force-recreate ai-council
+  docker compose up -d --force-recreate pokelabs-council
   # or, for ad-hoc runs, exit the current container and `docker run` again
 
 Verify the new version after restart:
@@ -446,7 +446,7 @@ def format_managed_message(action: str = "modify this Council installation") -> 
         return (
             f"Cannot {action}: this Council installation is managed by NixOS "
             f"(COUNCIL_MANAGED={env_hint}).\n"
-            "Edit services.ai-council.settings in your configuration.nix and run:\n"
+            "Edit services.pokelabs-council.settings in your configuration.nix and run:\n"
             "  sudo nixos-rebuild switch"
         )
 
@@ -456,7 +456,7 @@ def format_managed_message(action: str = "modify this Council installation") -> 
             f"Cannot {action}: this Council installation is managed by Homebrew "
             f"(COUNCIL_MANAGED={env_hint}).\n"
             "Use:\n"
-            "  brew upgrade ai-council"
+            "  brew upgrade pokelabs-council"
         )
 
     return (
@@ -506,7 +506,7 @@ def get_container_exec_info() -> Optional[dict]:
     # All other exceptions (PermissionError, malformed data, etc.) propagate
 
     backend = info.get("backend", "docker")
-    container_name = info.get("container_name", "ai-council")
+    container_name = info.get("container_name", "pokelabs-council")
     exec_user = info.get("exec_user", "council")
     council_bin = info.get("council_bin", "/data/current-package/bin/council")
 
@@ -1836,7 +1836,7 @@ DEFAULT_CONFIG = {
         #     with the active virtualenv/conda env's python, so project deps
         #     (pandas, torch, project packages) and relative paths resolve.
         #   strict            — scripts run in an isolated temp directory with
-        #     ai-council's own python (sys.executable). Maximum isolation
+        #     pokelabs-council's own python (sys.executable). Maximum isolation
         #     and reproducibility; project deps and relative paths won't work.
         # Env scrubbing (strips *_API_KEY, *_TOKEN, *_SECRET, ...) and the
         # tool whitelist apply identically in both modes.
@@ -1895,11 +1895,11 @@ DEFAULT_CONFIG = {
     # Remotely-hosted model catalog manifest.  When enabled, the CLI fetches
     # curated model lists for OpenRouter and Poke Portal from this URL,
     # falling back to the in-repo snapshot on network failure.  Lets us
-    # update model picker lists without shipping a ai-council release.
+    # update model picker lists without shipping a pokelabs-council release.
     # The default URL is served by the docs site GitHub Pages deploy.
     "model_catalog": {
         "enabled": True,
-        "url": "https://ai-council.pokelabs.com/docs/api/model-catalog.json",
+        "url": "https://pokelabs-council.pokelabs.com/docs/api/model-catalog.json",
         # Disk cache TTL in hours.  Beyond this, the CLI refetches on the
         # next /model or `council model` invocation; network failures
         # silently fall back to the stale cache.
@@ -3151,7 +3151,7 @@ OPTIONAL_ENV_VARS = {
         "advanced": True,
     },
     "API_SERVER_MODEL_NAME": {
-        "description": "Model name advertised on /v1/models. Defaults to the profile name (or 'ai-council' for the default profile). Useful for multi-user setups with OpenWebUI.",
+        "description": "Model name advertised on /v1/models. Defaults to the profile name (or 'pokelabs-council' for the default profile). Useful for multi-user setups with OpenWebUI.",
         "prompt": "API server model name",
         "url": None,
         "password": False,

@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Coding-Agent, Codex, OpenAI, Code-Review, Refactoring]
-    related_skills: [claude-code, ai-council]
+    related_skills: [claude-code, pokelabs-council]
 ---
 
 # Codex CLI

@@ -2,7 +2,7 @@
 
 The agent's system prompt is built once per session and reused across all
 turns — only context compression triggers a rebuild.  This keeps the
-upstream prefix cache warm.  See ``ai-council-dev``'s
+upstream prefix cache warm.  See ``pokelabs-council-dev``'s
 ``references/system-prompt-invariant.md`` for the invariants and
 ``references/self-improvement-loop.md`` for how the background-review
 fork inherits the cached prompt verbatim.
@@ -98,7 +98,7 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
         # Fallback to hardcoded identity
         stable_parts.append(DEFAULT_AGENT_IDENTITY)
 
-    # Pointer to the ai-council skill + docs for user questions about Council itself.
+    # Pointer to the pokelabs-council skill + docs for user questions about Council itself.
     stable_parts.append(AI_COUNCIL_HELP_GUIDANCE)
 
     # Universal task-completion / no-fabrication guidance.  Applied to ALL
@@ -289,7 +289,7 @@ def build_system_prompt_parts(agent: Any, system_message: Optional[str] = None) 
 
     if not agent.skip_context_files:
         # Use TERMINAL_CWD for context file discovery when set (gateway
-        # mode).  The gateway process runs from the ai-council install
+        # mode).  The gateway process runs from the pokelabs-council install
         # dir, so os.getcwd() would pick up the repo's AGENTS.md and
         # other dev files — inflating token usage by ~10k for no benefit.
         _context_cwd = os.getenv("TERMINAL_CWD") or None

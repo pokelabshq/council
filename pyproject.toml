@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ai-council"
+name = "pokelabs-council"
 version = "0.15.1"
-description = "The self-improving AI agent — creates skills from experience, improves them during use, and runs anywhere"
+description = "PokeLabs Council — The self-improving AI agent built by Poke Labs — creates skills from experience, improves them during use, and runs anywhere"
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Poke Labs" }]
@@ -138,23 +138,23 @@ azure-identity = ["azure-identity==1.25.3"]
 termux = [
   # Baseline Android / Termux path for reliable fresh installs.
   "python-telegram-bot[webhooks]==22.6",
-  "ai-council[cron]",
-  "ai-council[cli]",
-  "ai-council[pty]",
-  "ai-council[mcp]",
-  "ai-council[honcho]",
-  "ai-council[acp]",
+  "pokelabs-council[cron]",
+  "pokelabs-council[cli]",
+  "pokelabs-council[pty]",
+  "pokelabs-council[mcp]",
+  "pokelabs-council[honcho]",
+  "pokelabs-council[acp]",
 ]
 termux-all = [
   # Best-effort "install all" profile for Termux. Same policy as [all]:
   # only includes extras that aren't covered by `tools/lazy_deps.py`.
   # Backends like telegram/slack/dingtalk/feishu/honcho lazy-install at
   # first use, so they're no longer eager-installed here.
-  "ai-council[termux]",
-  "ai-council[google]",
-  "ai-council[homeassistant]",
-  "ai-council[sms]",
-  "ai-council[web]",
+  "pokelabs-council[termux]",
+  "pokelabs-council[google]",
+  "pokelabs-council[homeassistant]",
+  "pokelabs-council[sms]",
+  "pokelabs-council[web]",
 ]
 dingtalk = ["dingtalk-stream==0.24.3", "alibabacloud-dingtalk==2.2.42", "qrcode==7.4.2"]
 feishu = ["lark-oapi==1.5.3", "qrcode==7.4.2"]
@@ -200,23 +200,23 @@ all = [
   # [all], `uv sync --locked` on Windows tried to build it from sdist
   # and failed on `make`. Lazy-install routes that build to first use,
   # where the user is expected to have a toolchain available.
-  "ai-council[cron]",
-  "ai-council[cli]",
-  "ai-council[dev]",
-  "ai-council[pty]",
-  "ai-council[mcp]",
-  "ai-council[homeassistant]",
-  "ai-council[sms]",
-  "ai-council[acp]",
-  "ai-council[google]",
-  "ai-council[web]",
-  "ai-council[youtube]",
+  "pokelabs-council[cron]",
+  "pokelabs-council[cli]",
+  "pokelabs-council[dev]",
+  "pokelabs-council[pty]",
+  "pokelabs-council[mcp]",
+  "pokelabs-council[homeassistant]",
+  "pokelabs-council[sms]",
+  "pokelabs-council[acp]",
+  "pokelabs-council[google]",
+  "pokelabs-council[web]",
+  "pokelabs-council[youtube]",
 ]
 
 [project.scripts]
-council = "council_cli.main:main"
-ai-council = "run_agent:main"
-council-acp = "acp_adapter.entry:main"
+pokelabs = "council_cli.main:main"
+pokelabs-council = "run_agent:main"
+pokelabs-council-acp = "acp_adapter.entry:main"
 
 [tool.setuptools]
 py-modules = ["run_agent", "model_tools", "toolsets", "batch_runner", "trajectory_compressor", "toolset_distributions", "cli", "council_bootstrap", "council_constants", "council_state", "council_time", "council_logging", "utils", "mcp_serve"]

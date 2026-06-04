@@ -7,7 +7,7 @@ license: MIT
 metadata:
   council:
     tags: [docker, s6, supervision, gateway, profiles]
-    related_skills: [ai-council, ai-council-dev]
+    related_skills: [pokelabs-council, pokelabs-council-dev]
 ---
 
 # Council s6-overlay Container Supervision
@@ -133,8 +133,8 @@ Edit `S6ServiceManager._render_run_script` in `council_cli/service_manager.py`. 
 ### Run the docker test harness
 
 ```sh
-docker build -t ai-council-harness:latest .
-COUNCIL_TEST_IMAGE=ai-council-harness:latest scripts/run_tests.sh tests/docker/ -v
+docker build -t pokelabs-council-harness:latest .
+COUNCIL_TEST_IMAGE=pokelabs-council-harness:latest scripts/run_tests.sh tests/docker/ -v
 # Expect 19 passed, 0 xfailed against the s6 image
 ```
 
@@ -172,5 +172,5 @@ Check whether something is invoking `s6-svscanctl -t` or `/run/s6/basedir/bin/ha
 
 ## Related skills
 
-- `ai-council-dev`: General ai-council codebase navigation
+- `pokelabs-council-dev`: General pokelabs-council codebase navigation
 - `council-tool-quirks`: Specific Council-tool workarounds (sed/grep/etc.) — load when debugging the s6 stack's interaction with council built-in tools.

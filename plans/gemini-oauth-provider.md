@@ -77,4 +77,4 @@ Add a first-class `gemini` provider that authenticates via Google OAuth, using t
 ## Reference implementations
 - clawdbot: `extensions/google/oauth.flow.ts` (PKCE + localhost server)
 - pi-mono: `packages/ai/src/utils/oauth/google-gemini-cli.ts` (same flow)
-- ai-council Copilot OAuth: `council_cli/main.py` `_copilot_device_flow()` (different flow type but same lifecycle pattern)
+- pokelabs-council Copilot OAuth: `council_cli/main.py` `_copilot_device_flow()` (different flow type but same lifecycle pattern)

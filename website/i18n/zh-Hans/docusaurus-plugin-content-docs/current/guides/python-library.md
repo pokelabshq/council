@@ -27,7 +27,7 @@ uv pip install git+https://github.com/pokelabshq/council.git
 也可以在 `requirements.txt` 中固定版本：
 
 ```text
-ai-council @ git+https://github.com/pokelabshq/council.git
+pokelabs-council @ git+https://github.com/pokelabshq/council.git
 ```
 
 :::tip

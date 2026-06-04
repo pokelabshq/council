@@ -1,12 +1,12 @@
 ---
 sidebar_position: 14
 title: "API Server"
-description: "Expose ai-council as an OpenAI-compatible API for any frontend"
+description: "Expose pokelabs-council as an OpenAI-compatible API for any frontend"
 ---
 
 # API Server
 
-The API server exposes ai-council as an OpenAI-compatible HTTP endpoint. Any frontend that speaks the OpenAI format — Open WebUI, LobeChat, LibreChat, NextChat, ChatBox, and hundreds more — can connect to ai-council and use it as a backend.
+The API server exposes pokelabs-council as an OpenAI-compatible HTTP endpoint. Any frontend that speaks the OpenAI format — Open WebUI, LobeChat, LibreChat, NextChat, ChatBox, and hundreds more — can connect to pokelabs-council and use it as a backend.
 
 Your agent handles requests with its full toolset (terminal, file operations, web search, memory, skills) and returns the final response. When streaming, tool progress indicators appear inline so frontends can show what the agent is doing.
 
@@ -48,7 +48,7 @@ Point any OpenAI-compatible client at `http://localhost:8642/v1`:
 curl http://localhost:8642/v1/chat/completions \
   -H "Authorization: Bearer change-me-local-dev" \
   -H "Content-Type: application/json" \
-  -d '{"model": "ai-council", "messages": [{"role": "user", "content": "Hello!"}]}'
+  -d '{"model": "pokelabs-council", "messages": [{"role": "user", "content": "Hello!"}]}'
 ```
 
 Or connect Open WebUI, LobeChat, or any other frontend — see the [Open WebUI integration guide](/user-guide/messaging/open-webui) for step-by-step instructions.
@@ -62,7 +62,7 @@ Standard OpenAI Chat Completions format. Stateless — the full conversation is 
 **Request:**
 ```json
 {
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "messages": [
     {"role": "system", "content": "You are a Python expert."},
     {"role": "user", "content": "Write a fibonacci function"}
@@ -77,7 +77,7 @@ Standard OpenAI Chat Completions format. Stateless — the full conversation is 
   "id": "chatcmpl-abc123",
   "object": "chat.completion",
   "created": 1710000000,
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "choices": [{
     "index": 0,
     "message": {"role": "assistant", "content": "Here's a fibonacci function..."},
@@ -91,7 +91,7 @@ Standard OpenAI Chat Completions format. Stateless — the full conversation is 
 
 ```json
 {
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "messages": [
     {
       "role": "user",
@@ -119,7 +119,7 @@ OpenAI Responses API format. Supports server-side conversation state via `previo
 **Request:**
 ```json
 {
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "input": "What files are in my project?",
   "instructions": "You are a helpful coding assistant.",
   "store": true
@@ -132,7 +132,7 @@ OpenAI Responses API format. Supports server-side conversation state via `previo
   "id": "resp_abc123",
   "object": "response",
   "status": "completed",
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "output": [
     {"type": "function_call", "name": "terminal", "arguments": "{\"command\": \"ls\"}", "call_id": "call_1"},
     {"type": "function_call_output", "call_id": "call_1", "output": "README.md src/ tests/"},
@@ -146,7 +146,7 @@ OpenAI Responses API format. Supports server-side conversation state via `previo
 
 ```json
 {
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "input": [
     {
       "role": "user",
@@ -196,7 +196,7 @@ Delete a stored response.
 
 ### GET /v1/models
 
-Lists the agent as an available model. The advertised model name defaults to the [profile](/user-guide/profiles) name (or `ai-council` for the default profile). Required by most frontends for model discovery.
+Lists the agent as an available model. The advertised model name defaults to the [profile](/user-guide/profiles) name (or `pokelabs-council` for the default profile). Required by most frontends for model discovery.
 
 ### GET /v1/capabilities
 
@@ -205,8 +205,8 @@ Returns a machine-readable description of the API server's stable surface for ex
 ```json
 {
   "object": "council.api_server.capabilities",
-  "platform": "ai-council",
-  "model": "ai-council",
+  "platform": "pokelabs-council",
+  "model": "pokelabs-council",
   "auth": {"type": "bearer", "required": true},
   "features": {
     "chat_completions": true,
@@ -256,7 +256,7 @@ Poll the current run state. This is useful for dashboards that need status witho
   "run_id": "run_abc123",
   "status": "completed",
   "session_id": "space-session",
-  "model": "ai-council",
+  "model": "pokelabs-council",
   "output": "Done.",
   "usage": {"input_tokens": 50, "output_tokens": 200, "total_tokens": 250}
 }
@@ -370,7 +370,7 @@ Rules: max 256 chars, control characters (`\r`, `\n`, `\x00`) are rejected, and 
 
 ## System Prompt Handling
 
-When a frontend sends a `system` message (Chat Completions) or `instructions` field (Responses API), ai-council **layers it on top** of its core system prompt. Your agent keeps all its tools, memory, and skills — the frontend's system prompt adds extra instructions.
+When a frontend sends a `system` message (Chat Completions) or `instructions` field (Responses API), pokelabs-council **layers it on top** of its core system prompt. Your agent keeps all its tools, memory, and skills — the frontend's system prompt adds extra instructions.
 
 This means you can customize behavior per-frontend without losing capabilities:
 - Open WebUI system prompt: "You are a Python expert. Always include type hints."
@@ -387,7 +387,7 @@ Authorization: Bearer ***
 Configure the key via `API_SERVER_KEY` env var. If you need a browser to call Council directly, also set `API_SERVER_CORS_ORIGINS` to an explicit allowlist.
 
 :::warning Security
-The API server gives full access to ai-council's toolset, **including terminal commands**. `API_SERVER_KEY` is **required for every deployment**, including the default loopback bind on `127.0.0.1`. Keep `API_SERVER_CORS_ORIGINS` narrow to control browser access when you explicitly allow browser callers.
+The API server gives full access to pokelabs-council's toolset, **including terminal commands**. `API_SERVER_KEY` is **required for every deployment**, including the default loopback bind on `127.0.0.1`. Keep `API_SERVER_CORS_ORIGINS` narrow to control browser access when you explicitly allow browser callers.
 :::
 
 ## Configuration
@@ -401,7 +401,7 @@ The API server gives full access to ai-council's toolset, **including terminal c
 | `API_SERVER_HOST` | `127.0.0.1` | Bind address (localhost only by default) |
 | `API_SERVER_KEY` | _(required)_ | Bearer token for auth |
 | `API_SERVER_CORS_ORIGINS` | _(none)_ | Comma-separated allowed browser origins |
-| `API_SERVER_MODEL_NAME` | _(profile name)_ | Model name on `/v1/models`. Defaults to profile name, or `ai-council` for default profile. |
+| `API_SERVER_MODEL_NAME` | _(profile name)_ | Model name on `/v1/models`. Defaults to profile name, or `pokelabs-council` for default profile. |
 
 ### config.yaml
 

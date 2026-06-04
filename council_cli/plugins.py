@@ -4,13 +4,13 @@ Council Plugin System
 
 Discovers, loads, and manages plugins from four sources:
 
-1. **Bundled plugins** – ``<repo>/plugins/<name>/`` (shipped with ai-council;
+1. **Bundled plugins** – ``<repo>/plugins/<name>/`` (shipped with pokelabs-council;
    ``memory/`` and ``context_engine/`` subdirs are excluded — they have their
    own discovery paths)
 2. **User plugins**   – ``~/.council/plugins/<name>/``
 3. **Project plugins** – ``./.council/plugins/<name>/`` (opt-in via
    ``COUNCIL_ENABLE_PROJECT_PLUGINS``)
-4. **Pip plugins**     – packages that expose the ``ai_council.plugins``
+4. **Pip plugins**     – packages that expose the ``pokelabs_council.plugins``
    entry-point group.
 
 Later sources override earlier ones on name collision, so a user or project
@@ -166,7 +166,7 @@ VALID_HOOKS: Set[str] = {
     "post_approval_response",
 }
 
-ENTRY_POINTS_GROUP = "ai_council.plugins"
+ENTRY_POINTS_GROUP = "pokelabs_council.plugins"
 
 _NS_PARENT = "council_plugins"
 

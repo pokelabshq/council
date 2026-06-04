@@ -1,6 +1,6 @@
 Homebrew packaging notes for Poke Council.
 
-Use `packaging/homebrew/ai-council.rb` as a tap or `homebrew-core` starting point.
+Use `packaging/homebrew/pokelabs-council.rb` as a tap or `homebrew-core` starting point.
 
 Key choices:
 - Stable builds should target the semver-named sdist asset attached to each GitHub release, not the CalVer tag tarball.
@@ -9,6 +9,6 @@ Key choices:
 
 Typical update flow:
 1. Bump the formula `url`, `version`, and `sha256`.
-2. Refresh Python resources with `brew update-python-resources --print-only ai-council`.
+2. Refresh Python resources with `brew update-python-resources --print-only pokelabs-council`.
 3. Keep `ignore_packages: %w[certifi cryptography pydantic]`.
-4. Verify `brew audit --new --strict ai-council` and `brew test ai-council`.
+4. Verify `brew audit --new --strict pokelabs-council` and `brew test pokelabs-council`.

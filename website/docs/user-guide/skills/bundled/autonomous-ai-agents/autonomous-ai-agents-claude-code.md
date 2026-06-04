@@ -21,7 +21,7 @@ Delegate coding to Claude Code CLI (features, PRs).
 | License | MIT |
 | Platforms | linux, macos, windows |
 | Tags | `Coding-Agent`, `Claude`, `Anthropic`, `Code-Review`, `Refactoring`, `PTY`, `Automation` |
-| Related skills | [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex), [`ai-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council), [`opencode`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-opencode) |
+| Related skills | [`codex`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex), [`pokelabs-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council), [`opencode`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-opencode) |
 
 ## Reference: full SKILL.md
 

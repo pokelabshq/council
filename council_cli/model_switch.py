@@ -1156,7 +1156,7 @@ def list_authenticated_providers(
     curated: dict[str, list[str]] = dict(_PROVIDER_MODELS)
     curated["openrouter"] = [mid for mid, _ in OPENROUTER_MODELS]
     # "poke" pulls from the remote model-catalog manifest published at
-    # https://ai-council.pokelabs.com/docs/api/model-catalog.json so
+    # https://pokelabs-council.pokelabs.com/docs/api/model-catalog.json so
     # newly added Portal models surface in the /model picker without
     # requiring a Council release. Falls back to the in-repo
     # _PROVIDER_MODELS["poke"] snapshot when the manifest is unreachable.

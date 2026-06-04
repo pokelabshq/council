@@ -44,7 +44,7 @@ council setup
 council chat
 ```
 
-After `nix profile install`, `council`, `ai-council`, and `council-acp` are on your PATH. From here, the workflow is identical to the [standard installation](./installation.md) — `council setup` walks you through provider selection, `council gateway install` sets up a launchd (macOS) or systemd user service, and config lives in `~/.council/`.
+After `nix profile install`, `council`, `pokelabs-council`, and `council-acp` are on your PATH. From here, the workflow is identical to the [standard installation](./installation.md) — `council setup` walks you through provider selection, `council gateway install` sets up a launchd (macOS) or systemd user service, and config lives in `~/.council/`.
 
 :::warning Messaging platforms (Discord, Telegram, Slack)
 The default package doesn't include messaging platform libraries — they were moved to on-demand installation, which can't work in Nix's read-only environment. If you plan to connect the agent to Discord, Telegram, or Slack, install the `messaging` variant:
@@ -67,7 +67,7 @@ The `full` variant adds ~700 MB to the closure. If you only need messaging platf
 
 ```bash
 git clone https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 nix build
 ./result/bin/council setup
 ```
@@ -91,14 +91,14 @@ This module requires NixOS. For non-NixOS systems (macOS, other Linux distros), 
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    ai-council.url = "github:pokelabshq/council";
+    pokelabs-council.url = "github:pokelabshq/council";
   };
 
-  outputs = { nixpkgs, ai-council, ... }: {
+  outputs = { nixpkgs, pokelabs-council, ... }: {
     nixosConfigurations.your-host = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
-        ai-council.nixosModules.default
+        pokelabs-council.nixosModules.default
         ./configuration.nix
       ];
     };
@@ -111,7 +111,7 @@ This module requires NixOS. For non-NixOS systems (macOS, other Linux distros), 
 ```nix
 # configuration.nix
 { config, ... }: {
-  services.ai-council = {
+  services.pokelabs-council = {
     enable = true;
     settings.model.default = "anthropic/claude-sonnet-4";
     environmentFiles = [ config.sops.secrets."council-env".path ];
@@ -130,7 +130,7 @@ echo "OPENROUTER_API_KEY=sk-or-your-key" | sudo install -m 0600 -o council /dev/
 ```
 
 ```nix
-services.ai-council.environmentFiles = [ "/var/lib/council/env" ];
+services.pokelabs-council.environmentFiles = [ "/var/lib/council/env" ];
 ```
 :::
 
@@ -151,7 +151,7 @@ When `container.enable = true` and `addToSystemPackages = true`, **every** `coun
 Set `container.hostUsers` to create a `~/.council` symlink to the service state directory, so the host CLI and the container share sessions, config, and memories:
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   container.enable = true;
   container.hostUsers = [ "your-username" ];
   addToSystemPackages = true;
@@ -181,10 +181,10 @@ After `nixos-rebuild switch`, check that the service is running:
 
 ```bash
 # Check service status
-systemctl status ai-council
+systemctl status pokelabs-council
 
 # Watch logs (Ctrl+C to stop)
-journalctl -u ai-council -f
+journalctl -u pokelabs-council -f
 
 # If addToSystemPackages is true, test the CLI
 council version
@@ -207,7 +207,7 @@ To enable container mode, add one line:
 
 ```nix
 {
-  services.ai-council = {
+  services.pokelabs-council = {
     enable = true;
     container.enable = true;
     # ... rest of config is identical
@@ -229,14 +229,14 @@ The `settings` option accepts an arbitrary attrset that is rendered as `config.y
 
 ```nix
 # base.nix
-services.ai-council.settings = {
+services.pokelabs-council.settings = {
   model.default = "anthropic/claude-sonnet-4";
   toolsets = [ "all" ];
   terminal = { backend = "local"; timeout = 180; };
 };
 
 # personality.nix
-services.ai-council.settings = {
+services.pokelabs-council.settings = {
   display = { compact = false; personality = "kawaii"; };
   memory = { memory_enabled = true; user_profile_enabled = true; };
 };
@@ -257,7 +257,7 @@ Run `nix build .#configKeys && cat result` to see every leaf config key extracte
 
 ```nix
 { config, ... }: {
-  services.ai-council = {
+  services.pokelabs-council = {
     enable = true;
     container.enable = true;
 
@@ -319,7 +319,7 @@ Run `nix build .#configKeys && cat result` to see every leaf config key extracte
 If you'd rather manage `config.yaml` entirely outside Nix, use `configFile`:
 
 ```nix
-services.ai-council.configFile = /etc/council/config.yaml;
+services.pokelabs-council.configFile = /etc/council/config.yaml;
 ```
 
 This bypasses `settings` entirely — no merge, no generation. The file is copied as-is to `$COUNCIL_HOME/config.yaml` on each activation.
@@ -333,7 +333,7 @@ Quick reference for the most common things Nix users want to customize:
 | Change the LLM model | `settings.model.default` | `"anthropic/claude-sonnet-4"` |
 | Use a different provider endpoint | `settings.model.base_url` | `"https://openrouter.ai/api/v1"` |
 | Add API keys | `environmentFiles` | `[ config.sops.secrets."council-env".path ]` |
-| Give the agent a personality | `${services.ai-council.stateDir}/.council/SOUL.md` | manage the file directly |
+| Give the agent a personality | `${services.pokelabs-council.stateDir}/.council/SOUL.md` | manage the file directly |
 | Add MCP tool servers | `mcpServers.<name>` | See [MCP Servers](#mcp-servers) |
 | Enable Discord/Telegram/Slack | `extraDependencyGroups` | `[ "messaging" ]` |
 | Mount host directories into container | `container.extraVolumes` | `[ "/data:/data:rw" ]` |
@@ -342,7 +342,7 @@ Quick reference for the most common things Nix users want to customize:
 | Share state between host CLI and container | `container.hostUsers` | `[ "sidbin" ]` |
 | Make extra tools available to the agent | `extraPackages` | `[ pkgs.pandoc pkgs.imagemagick ]` |
 | Use a custom base image | `container.image` | `"ubuntu:24.04"` |
-| Override the council package | `package` | `inputs.ai-council.packages.${system}.default.override { ... }` |
+| Override the council package | `package` | `inputs.pokelabs-council.packages.${system}.default.override { ... }` |
 | Change state directory | `stateDir` | `"/opt/council"` |
 | Set the agent's working directory | `workingDirectory` | `"/home/user/projects"` |
 
@@ -354,7 +354,7 @@ Quick reference for the most common things Nix users want to customize:
 Values in Nix expressions end up in `/nix/store`, which is world-readable. Always use `environmentFiles` with a secrets manager.
 :::
 
-Both `environment` (non-secret vars) and `environmentFiles` (secret files) are merged into `$COUNCIL_HOME/.env` at activation time (`nixos-rebuild switch`). Council reads this file on every startup, so changes take effect with a `systemctl restart ai-council` — no container recreation needed.
+Both `environment` (non-secret vars) and `environmentFiles` (secret files) are merged into `$COUNCIL_HOME/.env` at activation time (`nixos-rebuild switch`). Council reads this file on every startup, so changes take effect with a `systemctl restart pokelabs-council` — no container recreation needed.
 
 ### sops-nix
 
@@ -366,7 +366,7 @@ Both `environment` (non-secret vars) and `environmentFiles` (secret files) are m
     secrets."council-env" = { format = "yaml"; };
   };
 
-  services.ai-council.environmentFiles = [
+  services.pokelabs-council.environmentFiles = [
     config.sops.secrets."council-env".path
   ];
 }
@@ -388,7 +388,7 @@ council-env: |
 {
   age.secrets.council-env.file = ./secrets/council-env.age;
 
-  services.ai-council.environmentFiles = [
+  services.pokelabs-council.environmentFiles = [
     config.age.secrets.council-env.path
   ];
 }
@@ -400,7 +400,7 @@ For platforms requiring OAuth (e.g., Discord), use `authFile` to seed credential
 
 ```nix
 {
-  services.ai-council = {
+  services.pokelabs-council = {
     authFile = config.sops.secrets."council/auth.json".path;
     # authFileForceOverwrite = true;  # overwrite on every activation
   };
@@ -418,11 +418,11 @@ The `documents` option installs files into the agent's working directory (the `w
 - **`USER.md`** — context about the user the agent is interacting with.
 - Any other files you place here are visible to the agent as workspace files.
 
-The agent identity file is separate: Council loads its primary `SOUL.md` from `$COUNCIL_HOME/SOUL.md`, which in the NixOS module is `${services.ai-council.stateDir}/.council/SOUL.md`. Putting `SOUL.md` in `documents` only creates a workspace file and will not replace the main persona file.
+The agent identity file is separate: Council loads its primary `SOUL.md` from `$COUNCIL_HOME/SOUL.md`, which in the NixOS module is `${services.pokelabs-council.stateDir}/.council/SOUL.md`. Putting `SOUL.md` in `documents` only creates a workspace file and will not replace the main persona file.
 
 ```nix
 {
-  services.ai-council.documents = {
+  services.pokelabs-council.documents = {
     "USER.md" = ./documents/USER.md;  # path reference, copied from Nix store
   };
 }
@@ -440,7 +440,7 @@ The `mcpServers` option declaratively configures [MCP (Model Context Protocol)](
 
 ```nix
 {
-  services.ai-council.mcpServers = {
+  services.pokelabs-council.mcpServers = {
     filesystem = {
       command = "npx";
       args = [ "-y" "@modelcontextprotocol/server-filesystem" "/data/workspace" ];
@@ -462,7 +462,7 @@ Environment variables in `env` values are resolved from `$COUNCIL_HOME/.env` at 
 
 ```nix
 {
-  services.ai-council.mcpServers.remote-api = {
+  services.pokelabs-council.mcpServers.remote-api = {
     url = "https://mcp.example.com/v1/mcp";
     headers.Authorization = "Bearer \${MCP_REMOTE_API_KEY}";
     timeout = 180;
@@ -476,7 +476,7 @@ Set `auth = "oauth"` for servers using OAuth 2.1. Council implements the full PK
 
 ```nix
 {
-  services.ai-council.mcpServers.my-oauth-server = {
+  services.pokelabs-council.mcpServers.my-oauth-server = {
     url = "https://mcp.example.com/mcp";
     auth = "oauth";
   };
@@ -494,7 +494,7 @@ The first OAuth authorization requires a browser-based consent flow. In a headle
 
 ```bash
 # Container mode
-docker exec -it ai-council \
+docker exec -it pokelabs-council \
   council mcp add my-oauth-server --url https://mcp.example.com/mcp --auth oauth
 
 # Native mode
@@ -521,7 +521,7 @@ Some MCP servers can request LLM completions from the agent:
 
 ```nix
 {
-  services.ai-council.mcpServers.analysis = {
+  services.pokelabs-council.mcpServers.analysis = {
     command = "npx";
     args = [ "-y" "analysis-server" ];
     sampling = {
@@ -552,7 +552,7 @@ When council runs via the NixOS module, the following CLI commands are **blocked
 This prevents drift between what Nix declares and what's on disk. Detection uses two signals:
 
 1. **`COUNCIL_MANAGED=true`** environment variable — set by the systemd service, visible to the gateway process
-2. **`.managed` marker file** in `COUNCIL_HOME` — set by the activation script, visible to interactive shells (e.g., `docker exec -it ai-council council config set ...` is also blocked)
+2. **`.managed` marker file** in `COUNCIL_HOME` — set by the activation script, visible to interactive shells (e.g., `docker exec -it pokelabs-council council config set ...` is also blocked)
 
 To change configuration, edit your Nix config and run `sudo nixos-rebuild switch`.
 
@@ -569,7 +569,7 @@ When container mode is enabled, council runs inside a persistent Ubuntu containe
 ```
 Host                                    Container
 ────                                    ─────────
-/nix/store/...-ai-council-0.1.0  ──►  /nix/store/... (ro)
+/nix/store/...-pokelabs-council-0.1.0  ──►  /nix/store/... (ro)
 ~/.council -> /var/lib/council/.council       (symlink bridge, per hostUsers)
 /var/lib/council/                    ──►  /data/          (rw)
   ├── current-package -> /nix/store/...    (symlink, updated each rebuild)
@@ -596,7 +596,7 @@ The Nix-built binary works inside the Ubuntu container because `/nix/store` is b
 
 | Event | Container recreated? | `/data` (state) | `/home/council` | Writable layer (`apt`/`pip`/`npm`) |
 |---|---|---|---|---|
-| `systemctl restart ai-council` | No | Persists | Persists | Persists |
+| `systemctl restart pokelabs-council` | No | Persists | Persists | Persists |
 | `nixos-rebuild switch` (code change) | No (symlink updated) | Persists | Persists | Persists |
 | Host reboot | No | Persists | Persists | Persists |
 | `nix-collect-garbage` | No (GC root) | Persists | Persists | Persists |
@@ -627,7 +627,7 @@ The NixOS module supports declarative plugin installation — no imperative `cou
 For plugins that are just a source tree with `plugin.yaml` + `__init__.py` (e.g., [council-lcm](https://github.com/stephenschoettler/council-lcm)):
 
 ```nix
-services.ai-council.extraPlugins = [
+services.pokelabs-council.extraPlugins = [
   (pkgs.fetchFromGitHub {
     owner = "stephenschoettler";
     repo = "council-lcm";
@@ -641,10 +641,10 @@ Plugins are symlinked into `$COUNCIL_HOME/plugins/` at activation time. Council 
 
 ### Entry-Point Plugins (`extraPythonPackages`)
 
-For pip-packaged plugins that register via `[project.entry-points."ai_council.plugins"]` (e.g., [rtk-council](https://github.com/ogallotti/rtk-council)):
+For pip-packaged plugins that register via `[project.entry-points."pokelabs_council.plugins"]` (e.g., [rtk-council](https://github.com/ogallotti/rtk-council)):
 
 ```nix
-services.ai-council.extraPythonPackages = [
+services.pokelabs-council.extraPythonPackages = [
   (pkgs.python312Packages.buildPythonPackage {
     pname = "rtk-council";
     version = "1.0.0";
@@ -664,16 +664,16 @@ The package's `site-packages` is added to PYTHONPATH in the council wrapper. `im
 
 ### Optional Dependency Groups (`extraDependencyGroups`)
 
-For optional extras declared in ai-council's `pyproject.toml`, use `extraDependencyGroups` to include them in the sealed venv at build time. This is required for any extra not in the default `[all]` set — on Nix, runtime installation into the read-only store is not possible.
+For optional extras declared in pokelabs-council's `pyproject.toml`, use `extraDependencyGroups` to include them in the sealed venv at build time. This is required for any extra not in the default `[all]` set — on Nix, runtime installation into the read-only store is not possible.
 
 ```nix
 # Enable Discord, Telegram, Slack
-services.ai-council.extraDependencyGroups = [ "messaging" ];
+services.pokelabs-council.extraDependencyGroups = [ "messaging" ];
 ```
 
 ```nix
 # Enable a memory provider
-services.ai-council = {
+services.pokelabs-council = {
   extraDependencyGroups = [ "hindsight" ];
   settings.memory.provider = "hindsight";
 };
@@ -717,7 +717,7 @@ Or use the pre-built `#messaging` or `#full` flake packages instead of per-extra
 A directory plugin with third-party Python dependencies needs both options:
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   extraPlugins = [ my-plugin-src ];          # plugin source
   extraPythonPackages = [ pkgs.python312Packages.redis ];  # its Python dep
   extraPackages = [ pkgs.redis ];            # system binary it needs
@@ -730,12 +730,12 @@ External flakes can override the package directly:
 
 ```nix
 {
-  inputs.ai-council.url = "github:pokelabshq/council";
-  outputs = { ai-council, nixpkgs, ... }: {
-    nixpkgs.overlays = [ ai-council.overlays.default ];
+  inputs.pokelabs-council.url = "github:pokelabshq/council";
+  outputs = { pokelabs-council, nixpkgs, ... }: {
+    nixpkgs.overlays = [ pokelabs-council.overlays.default ];
     # Then:
-    #   pkgs.ai-council.override { extraPythonPackages = [...]; }
-    #   pkgs.ai-council.override { extraDependencyGroups = [ "hindsight" ]; }
+    #   pkgs.pokelabs-council.override { extraPythonPackages = [...]; }
+    #   pkgs.pokelabs-council.override { extraDependencyGroups = [ "hindsight" ]; }
   };
 }
 ```
@@ -745,7 +745,7 @@ External flakes can override the package directly:
 Plugins still need to be enabled in `config.yaml`. Add them via the declarative settings:
 
 ```nix
-services.ai-council.settings.plugins.enabled = [
+services.pokelabs-council.settings.plugins.enabled = [
   "council-lcm"
   "rtk-rewrite"
 ];
@@ -764,7 +764,7 @@ A build-time collision check prevents plugin packages from shadowing core counci
 The flake provides a development shell with Python 3.12, uv, Node.js, and all runtime tools:
 
 ```bash
-cd ai-council
+cd pokelabs-council
 nix develop
 
 # Shell provides:
@@ -781,7 +781,7 @@ council chat
 The included `.envrc` activates the dev shell automatically:
 
 ```bash
-cd ai-council
+cd pokelabs-council
 direnv allow    # one-time
 # Subsequent entries are near-instant (stamp file skips dep install)
 ```
@@ -808,7 +808,7 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 
 | Check | What it tests |
 |---|---|
-| `package-contents` | `council` and `ai-council` binaries exist and `council version` runs |
+| `package-contents` | `council` and `pokelabs-council` binaries exist and `council version` runs |
 | `entry-points-sync` | Every `[project.scripts]` entry in `pyproject.toml` has a wrapped binary in the Nix package |
 | `cli-commands` | `council --help` exposes `gateway` and `config` subcommands |
 | `managed-guard` | `COUNCIL_MANAGED=true council config set ...` prints the NixOS error |
@@ -825,8 +825,8 @@ nix build .#checks.x86_64-linux.config-roundtrip    # merge script preserves use
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `enable` | `bool` | `false` | Enable the ai-council service |
-| `package` | `package` | `ai-council` | The ai-council package to use |
+| `enable` | `bool` | `false` | Enable the pokelabs-council service |
+| `package` | `package` | `pokelabs-council` | The pokelabs-council package to use |
 | `user` | `str` | `"council"` | System user |
 | `group` | `str` | `"council"` | System group |
 | `createUser` | `bool` | `true` | Auto-create user/group |
@@ -940,7 +940,7 @@ Same layout, mounted into the container:
 
 ```bash
 # Update the flake input (run from the directory containing flake.nix)
-cd /etc/nixos && nix flake update ai-council
+cd /etc/nixos && nix flake update pokelabs-council
 
 # Rebuild
 sudo nixos-rebuild switch
@@ -960,21 +960,21 @@ All `docker` commands below work the same with `podman`. Substitute accordingly 
 
 ```bash
 # Both modes use the same systemd unit
-journalctl -u ai-council -f
+journalctl -u pokelabs-council -f
 
 # Container mode: also available directly
-docker logs -f ai-council
+docker logs -f pokelabs-council
 ```
 
 ### Container Inspection
 
 ```bash
-systemctl status ai-council
-docker ps -a --filter name=ai-council
-docker inspect ai-council --format='{{.State.Status}}'
-docker exec -it ai-council bash
-docker exec ai-council readlink /data/current-package
-docker exec ai-council cat /data/.container-identity
+systemctl status pokelabs-council
+docker ps -a --filter name=pokelabs-council
+docker inspect pokelabs-council --format='{{.State.Status}}'
+docker exec -it pokelabs-council bash
+docker exec pokelabs-council readlink /data/current-package
+docker exec pokelabs-council cat /data/.container-identity
 ```
 
 ### Force Container Recreation
@@ -982,10 +982,10 @@ docker exec ai-council cat /data/.container-identity
 If you need to reset the writable layer (fresh Ubuntu):
 
 ```bash
-sudo systemctl stop ai-council
-docker rm -f ai-council
+sudo systemctl stop pokelabs-council
+docker rm -f pokelabs-council
 sudo rm /var/lib/council/.container-identity
-sudo systemctl start ai-council
+sudo systemctl start pokelabs-council
 ```
 
 ### Verify Secrets Are Loaded
@@ -997,13 +997,13 @@ If the agent starts but can't authenticate with the LLM provider, check that the
 sudo -u council cat /var/lib/council/.council/.env
 
 # Container mode
-docker exec ai-council cat /data/.council/.env
+docker exec pokelabs-council cat /data/.council/.env
 ```
 
 ### GC Root Verification
 
 ```bash
-nix-store --query --roots $(docker exec ai-council readlink /data/current-package)
+nix-store --query --roots $(docker exec pokelabs-council readlink /data/current-package)
 ```
 
 ### Common Issues
@@ -1011,11 +1011,11 @@ nix-store --query --roots $(docker exec ai-council readlink /data/current-packag
 | Symptom | Cause | Fix |
 |---|---|---|
 | `Cannot save configuration: managed by NixOS` | CLI guards active | Edit `configuration.nix` and `nixos-rebuild switch` |
-| `No adapter available for discord` (or telegram/slack) | Messaging deps missing from the sealed Nix venv | Install `#messaging` variant: `nix profile install ...#messaging`. For NixOS module: `extraDependencyGroups = [ "messaging" ]`. Check `journalctl -u ai-council` for `FeatureUnavailable` or `requirements not met` for the underlying error. |
+| `No adapter available for discord` (or telegram/slack) | Messaging deps missing from the sealed Nix venv | Install `#messaging` variant: `nix profile install ...#messaging`. For NixOS module: `extraDependencyGroups = [ "messaging" ]`. Check `journalctl -u pokelabs-council` for `FeatureUnavailable` or `requirements not met` for the underlying error. |
 | Container recreated unexpectedly | `extraVolumes`, `extraOptions`, or `image` changed | Expected — writable layer resets. Reinstall packages or use a custom image |
-| `council version` shows old version | Container not restarted | `systemctl restart ai-council` |
+| `council version` shows old version | Container not restarted | `systemctl restart pokelabs-council` |
 | Permission denied on `/var/lib/council` | State dir is `0750 council:council` | Use `docker exec` or `sudo -u council` |
 | `nix-collect-garbage` removed council | GC root missing | Restart the service (preStart recreates the GC root) |
-| `no container with name or ID "ai-council"` (Podman) | Podman rootful container not visible to regular user | Add passwordless sudo for podman (see [Container Mode](#container-mode) section) |
+| `no container with name or ID "pokelabs-council"` (Podman) | Podman rootful container not visible to regular user | Add passwordless sudo for podman (see [Container Mode](#container-mode) section) |
 | `unable to find user council` | Container still starting (entrypoint hasn't created user yet) | Wait a few seconds and retry — the CLI retries automatically |
-| Tool added via `extraPackages` not found in terminal | Requires `nixos-rebuild switch` to update the per-user profile | Rebuild and restart: `nixos-rebuild switch && systemctl restart ai-council` |
+| Tool added via `extraPackages` not found in terminal | Requires `nixos-rebuild switch` to update the per-user profile | Rebuild and restart: `nixos-rebuild switch && systemctl restart pokelabs-council` |

@@ -379,7 +379,7 @@ Or check via the CLI:
 
 ```bash
 # Activate the venv and run the web tools module directly
-source ~/.council/ai-council/.venv/bin/activate
+source ~/.council/pokelabs-council/.venv/bin/activate
 python -m tools.web_tools
 ```
 

@@ -81,7 +81,7 @@ Why these packages?
 
 ```bash
 git clone --recurse-submodules https://github.com/pokelabshq/council.git
-cd ai-council
+cd pokelabs-council
 ```
 
 If you already cloned without submodules:

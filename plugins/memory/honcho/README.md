@@ -199,13 +199,13 @@ The Honcho session name determines which conversation bucket memory lands in. Re
 | 2 | `/title` command (mid-session rename) | `"refactor-auth"` |
 | 3 | Gateway session key (Telegram, Discord, etc.) | `"agent-main-telegram-dm-8439114563"` |
 | 4 | `per-session` strategy | Council session ID (`20260415_a3f2b1`) |
-| 5 | `per-repo` strategy | Git root directory name (`ai-council`) |
+| 5 | `per-repo` strategy | Git root directory name (`pokelabs-council`) |
 | 6 | `per-directory` strategy | Current directory basename (`src`) |
 | 7 | `global` strategy | Workspace name (`council`) |
 
 Gateway platforms always resolve via priority 3 (per-chat isolation) regardless of `sessionStrategy`. The strategy setting only affects CLI sessions.
 
-If `sessionPeerPrefix` is `true`, the peer name is prepended: `eri-ai-council`.
+If `sessionPeerPrefix` is `true`, the peer name is prepended: `eri-pokelabs-council`.
 
 #### What each strategy produces
 

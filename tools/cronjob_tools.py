@@ -48,7 +48,7 @@ from cron.jobs import (
 #      bodies, often security docs, postmortems, runbooks discussing attack
 #      patterns in PROSE). Reusing the strict patterns here false-positives
 #      every time a skill *describes* a command — see #3968 follow-up: the
-#      `ai-council-dev` skill contains a security postmortem mentioning
+#      `pokelabs-council-dev` skill contains a security postmortem mentioning
 #      `cat ~/.council/.env`, which tripped `read_secrets` and silently
 #      killed all PR-scout jobs.
 #

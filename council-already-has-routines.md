@@ -127,7 +127,7 @@ A nightly backlog triage on Sonnet costs roughly $0.02-0.05. A monitoring check 
 Poke Council is open source and free. The automation infrastructure — cron scheduler, webhook platform, skill system, multi-platform delivery — is built in.
 
 ```bash
-pip install ai-council
+pip install pokelabs-council
 council setup
 ```
 
@@ -149,9 +149,9 @@ council webhook subscribe pr-review \
   --deliver github_comment
 ```
 
-Full automation templates gallery: [ai-council.pokelabs.com/docs/guides/automation-templates](https://ai-council.pokelabs.com/docs/guides/automation-templates)
+Full automation templates gallery: [pokelabs-council.pokelabs.com/docs/guides/automation-templates](https://pokelabs-council.pokelabs.com/docs/guides/automation-templates)
 
-Documentation: [ai-council.pokelabs.com](https://ai-council.pokelabs.com)
+Documentation: [pokelabs-council.pokelabs.com](https://pokelabs-council.pokelabs.com)
 
 GitHub: [github.com/pokelabshq/council](https://github.com/pokelabshq/council)
 

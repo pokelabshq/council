@@ -188,7 +188,7 @@ def _paste_to_tasks(ctx, raw_args: str) -> str:
 A third worked example, this time with image input, lives in the
 [`council-example-plugins`](https://github.com/PokeLabs/council-example-plugins/tree/main/plugin-llm-example)
 repo (companion repo for reference plugins — not bundled with
-ai-council itself). For the async surface (`acomplete()` /
+pokelabs-council itself). For the async surface (`acomplete()` /
 `acomplete_structured()` with `asyncio.gather()`), see
 [`plugin-llm-async-example`](https://github.com/PokeLabs/council-example-plugins/tree/main/plugin-llm-async-example)
 in the same repo.

@@ -179,7 +179,7 @@ def _version_tuple(v: str) -> tuple[int, ...]:
     return tuple(parts)
 
 
-def _fetch_pypi_latest(package: str = "ai-council") -> Optional[str]:
+def _fetch_pypi_latest(package: str = "pokelabs-council") -> Optional[str]:
     """Fetch the latest version of a package from PyPI. Returns None on failure."""
     try:
         import urllib.request
@@ -247,11 +247,11 @@ def check_for_updates() -> Optional[int]:
         behind = _check_via_rev(embedded_rev)
     else:
         # Prefer the running code's location over the profile-scoped path.
-        # $COUNCIL_HOME/ai-council/ may be a stale copy from --clone-all;
+        # $COUNCIL_HOME/pokelabs-council/ may be a stale copy from --clone-all;
         # Path(__file__) always resolves to the actual installed checkout.
         repo_dir = Path(__file__).parent.parent.resolve()
         if not (repo_dir / ".git").exists():
-            repo_dir = council_home / "ai-council"
+            repo_dir = council_home / "pokelabs-council"
         if not (repo_dir / ".git").exists():
             behind = check_via_pypi()
         else:
@@ -271,13 +271,13 @@ def _resolve_repo_dir() -> Optional[Path]:
     """Return the active Council git checkout, or None if this isn't a git install.
 
     Prefers the running code's location over the profile-scoped path
-    because ``$COUNCIL_HOME/ai-council/`` may be a stale copy carried
+    because ``$COUNCIL_HOME/pokelabs-council/`` may be a stale copy carried
     over by ``--clone-all``.
     """
     repo_dir = Path(__file__).parent.parent.resolve()
     if not (repo_dir / ".git").exists():
         council_home = get_council_home()
-        repo_dir = council_home / "ai-council"
+        repo_dir = council_home / "pokelabs-council"
     return repo_dir if (repo_dir / ".git").exists() else None
 
 
@@ -704,7 +704,7 @@ def build_welcome_banner(console: "Console", model: str, cwd: str,
     except Exception:
         pass  # Never break the banner over an update check
 
-    # Pip-install warning — `pip install ai-council` is not the supported
+    # Pip-install warning — `pip install pokelabs-council` is not the supported
     # install path (it exists on PyPI for internal/CI reasons, not end users).
     # Such installs miss the git checkout + installer-managed deps, so updates,
     # self-update, and issue triage don't behave correctly. Warn, don't block.

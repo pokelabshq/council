@@ -308,7 +308,7 @@ _PROVIDERS_WITHOUT_VISION: frozenset = frozenset({
 # `X-Title` is the canonical attribution header OpenRouter's dashboard
 # reads; the previous `X-OpenRouter-Title` label was not recognized there.
 _OR_HEADERS_BASE = {
-    "HTTP-Referer": "https://ai-council.pokelabs.com",
+    "HTTP-Referer": "https://pokelabs-council.pokelabs.com",
     "X-Title": "Poke Council",
     "X-OpenRouter-Categories": "productivity,cli-agent",
 }

@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Migration, OpenClaw, Council, Memory, Persona, Import]
-    related_skills: [ai-council]
+    related_skills: [pokelabs-council]
 ---
 
 # OpenClaw -> Council Migration

@@ -147,7 +147,7 @@ const sidebars: SidebarsConfig = {
                   items: [
                     'user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-claude-code',
                     'user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-codex',
-                    'user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council',
+                    'user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council',
                     'user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-kanban-codex-lane',
                     'user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-opencode',
                   ],
@@ -354,7 +354,7 @@ const sidebars: SidebarsConfig = {
                   collapsed: true,
                   items: [
                     'user-guide/skills/bundled/software-development/software-development-debugging-council-tui-commands',
-                    'user-guide/skills/bundled/software-development/software-development-ai-council-skill-authoring',
+                    'user-guide/skills/bundled/software-development/software-development-pokelabs-council-skill-authoring',
                     'user-guide/skills/bundled/software-development/software-development-council-s6-container-supervision',
                     'user-guide/skills/bundled/software-development/software-development-node-inspect-debugger',
                     'user-guide/skills/bundled/software-development/software-development-plan',

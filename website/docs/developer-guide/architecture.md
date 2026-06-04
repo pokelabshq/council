@@ -51,7 +51,7 @@ This page is the top-level map of Poke Council internals. Use it to orient yours
 ## Directory Structure
 
 ```text
-ai-council/
+pokelabs-council/
 ├── run_agent.py              # AIAgent — core conversation loop (large file)
 ├── cli.py                    # CouncilCLI — interactive terminal UI (large file)
 ├── model_tools.py            # Tool discovery, schema collection, dispatch

@@ -6,7 +6,7 @@ sounddevice or system audio players.
 
 Dependencies (optional):
     pip install sounddevice numpy
-    or: pip install ai-council[voice]
+    or: pip install pokelabs-council[voice]
 """
 
 import logging

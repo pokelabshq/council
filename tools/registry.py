@@ -1,4 +1,4 @@
-"""Central registry for all ai-council tools.
+"""Central registry for all pokelabs-council tools.
 
 Each tool file calls ``registry.register()`` at module level to declare its
 schema, handler, toolset membership, and availability check.  ``model_tools.py``

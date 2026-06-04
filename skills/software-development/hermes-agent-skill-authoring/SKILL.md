@@ -1,5 +1,5 @@
 ---
-name: ai-council-skill-authoring
+name: pokelabs-council-skill-authoring
 description: "Author in-repo SKILL.md: frontmatter, validator, structure."
 version: 1.0.0
 author: Poke Council
@@ -7,7 +7,7 @@ license: MIT
 platforms: [linux, macos, windows]
 metadata:
   council:
-    tags: [skills, authoring, ai-council, conventions, skill-md]
+    tags: [skills, authoring, pokelabs-council, conventions, skill-md]
     related_skills: [writing-plans, requesting-code-review]
 ---
 
@@ -18,13 +18,13 @@ metadata:
 There are two places a SKILL.md can live:
 
 1. **User-local:** `~/.council/skills/<maybe-category>/<name>/SKILL.md` — personal, not shared. Created via `skill_manage(action='create')`.
-2. **In-repo (this skill is about this case):** `/home/bb/ai-council/skills/<category>/<name>/SKILL.md` — committed, shipped with the package. Use `write_file` + `git add`. `skill_manage(action='create')` does NOT target this tree.
+2. **In-repo (this skill is about this case):** `/home/bb/pokelabs-council/skills/<category>/<name>/SKILL.md` — committed, shipped with the package. Use `write_file` + `git add`. `skill_manage(action='create')` does NOT target this tree.
 
 ## When to Use
 
 - User asks you to add a skill "in this branch / repo / commit"
-- You're committing a reusable workflow that should ship with ai-council
-- You're editing an existing skill under `/home/bb/ai-council/skills/` (use `patch` for small edits, `write_file` for rewrites; `skill_manage` still works for patch on in-repo skills, but not for `create`)
+- You're committing a reusable workflow that should ship with pokelabs-council
+- You're editing an existing skill under `/home/bb/pokelabs-council/skills/` (use `patch` for small edits, `write_file` for rewrites; `skill_manage` still works for patch on in-repo skills, but not for `create`)
 
 ## Required Frontmatter
 

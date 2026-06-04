@@ -437,7 +437,7 @@ cat ~/.council/logs/gateway.log | tail -50
 **解决方案：**
 ```bash
 # 安装核心消息网关依赖项
-pip install "ai-council[messaging]"  # Telegram、Discord、Slack 及共享网关依赖
+pip install "pokelabs-council[messaging]"  # Telegram、Discord、Slack 及共享网关依赖
 
 # 检查端口冲突
 lsof -i :8080
@@ -557,7 +557,7 @@ council chat --continue
 **解决方案：**
 ```bash
 # 确保 MCP 依赖项已安装（标准安装中已包含）
-cd ~/.council/ai-council && uv pip install -e ".[mcp]"
+cd ~/.council/pokelabs-council && uv pip install -e ".[mcp]"
 
 # 对于基于 npm 的服务器，确保 Node.js 可用
 node --version
@@ -796,7 +796,7 @@ council profile import ./work-backup.tar.gz work
 
 **手动备选方案（rsync）：** 如果您倾向于直接复制文件，请排除代码仓库：
 ```bash
-rsync -av --exclude='ai-council' ~/.council/ newmachine:~/.council/
+rsync -av --exclude='pokelabs-council' ~/.council/ newmachine:~/.council/
 ```
 
 :::tip

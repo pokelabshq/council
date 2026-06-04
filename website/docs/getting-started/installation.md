@@ -30,7 +30,7 @@ Open PowerShell and run:
 iex (irm https://raw.githubusercontent.com/pokelabshq/council/main/scripts/install.ps1)
 ```
 
-The installer handles **everything**: `uv`, Python 3.11, Node.js 22, `ripgrep`, `ffmpeg`, **and a portable Git Bash** (PortableGit — a self-contained Git-for-Windows distribution that ships `bash.exe` and the full POSIX toolchain Council uses for shell commands; on 32-bit Windows the installer falls back to MinGit, which lacks bash and disables terminal-tool / agent-browser features).  It clones the repo under `%LOCALAPPDATA%\council\ai-council`, creates a virtualenv, and adds `council` to your **User PATH**.  Restart your terminal (or open a new PowerShell window) after the install so PATH picks up.
+The installer handles **everything**: `uv`, Python 3.11, Node.js 22, `ripgrep`, `ffmpeg`, **and a portable Git Bash** (PortableGit — a self-contained Git-for-Windows distribution that ships `bash.exe` and the full POSIX toolchain Council uses for shell commands; on 32-bit Windows the installer falls back to MinGit, which lacks bash and disables terminal-tool / agent-browser features).  It clones the repo under `%LOCALAPPDATA%\council\pokelabs-council`, creates a virtualenv, and adds `council` to your **User PATH**.  Restart your terminal (or open a new PowerShell window) after the install so PATH picks up.
 
 **How Git is handled:**
 1. If `git` is already on your PATH, the installer uses your existing install.
@@ -85,8 +85,8 @@ Where the installer puts things depends on whether you're installing as a normal
 | Installer | Code lives at | `council` binary | Data directory |
 |---|---|---|---|
 | pip install | Python site-packages | `~/.local/bin/council` (console_scripts) | `~/.council/` |
-| Per-user (git installer) | `~/.council/ai-council/` | `~/.local/bin/council` (symlink) | `~/.council/` |
-| Root-mode (`sudo curl … \| sudo bash`) | `/usr/local/lib/ai-council/` | `/usr/local/bin/council` | `/root/.council/` (or `$COUNCIL_HOME`) |
+| Per-user (git installer) | `~/.council/pokelabs-council/` | `~/.local/bin/council` (symlink) | `~/.council/` |
+| Root-mode (`sudo curl … \| sudo bash`) | `/usr/local/lib/pokelabs-council/` | `/usr/local/bin/council` | `/root/.council/` (or `$COUNCIL_HOME`) |
 
 The root-mode **FHS layout** (`/usr/local/lib/…`, `/usr/local/bin/council`) matches where other system-wide developer tools land on Linux. It's useful for shared-machine deployments where one system install should serve every user. Per-user config (auth, skills, sessions) still lives under each user's `~/.council/` or explicit `COUNCIL_HOME`.
 
@@ -177,10 +177,10 @@ Running Council as a dedicated unprivileged user (e.g. a `council` systemd servi
    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
    # Option B — symlink system-wide (run as an admin)
-   sudo ln -s /home/council/.council/ai-council/venv/bin/council /usr/local/bin/council
+   sudo ln -s /home/council/.council/pokelabs-council/venv/bin/council /usr/local/bin/council
    ```
 
-4. **Verify:** `council doctor` should now run cleanly. If you get `ModuleNotFoundError: No module named 'dotenv'`, you're invoking the repo source `council` file (`~/.council/ai-council/council`) with system Python instead of the venv launcher (`~/.council/ai-council/venv/bin/council`) — fix step 3.
+4. **Verify:** `council doctor` should now run cleanly. If you get `ModuleNotFoundError: No module named 'dotenv'`, you're invoking the repo source `council` file (`~/.council/pokelabs-council/council`) with system Python instead of the venv launcher (`~/.council/pokelabs-council/venv/bin/council`) — fix step 3.
 
 The same pattern works on Arch (the installer uses pacman with the same sudo-detection logic), Fedora/RHEL, and openSUSE — those distros don't support `--with-deps` at all, so an administrator always installs the system libraries separately. The relevant `dnf`/`zypper` commands are printed by the installer.
 
@@ -198,4 +198,4 @@ For more diagnostics, run `council doctor` — it will tell you exactly what's m
 
 ## Install method auto-detection
 
-Council auto-detects whether it was installed via `pip`, the git installer, Homebrew, or NixOS, and `council update` prints the matching update command for that path. There's no env var to set — the detection is based on the install layout (Python site-packages, `~/.council/ai-council/`, Homebrew prefix, or Nix store path). `council doctor` also surfaces the detected method under its environment summary.
+Council auto-detects whether it was installed via `pip`, the git installer, Homebrew, or NixOS, and `council update` prints the matching update command for that path. There's no env var to set — the detection is based on the install layout (Python site-packages, `~/.council/pokelabs-council/`, Homebrew prefix, or Nix store path). `council doctor` also surfaces the detected method under its environment summary.

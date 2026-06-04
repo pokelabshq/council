@@ -20,7 +20,7 @@ description: "调试 Council TUI slash 命令：Python、gateway、Ink UI"
 | 作者 | Poke Council |
 | 许可证 | MIT |
 | 平台 | linux, macos, windows |
-| 标签 | `debugging`, `ai-council`, `tui`, `slash-commands`, `typescript`, `python` |
+| 标签 | `debugging`, `pokelabs-council`, `tui`, `slash-commands`, `typescript`, `python` |
 | 相关 skill | [`python-debugpy`](/user-guide/skills/bundled/software-development/software-development-python-debugpy)、[`node-inspect-debugger`](/user-guide/skills/bundled/software-development/software-development-node-inspect-debugger)、[`systematic-debugging`](/user-guide/skills/bundled/software-development/software-development-systematic-debugging) |
 
 ## 参考：完整 SKILL.md
@@ -154,7 +154,7 @@ TUI frontend (ui-tui/src/app/slash/)        <- 本地处理器 + fallthrough
 
 1. 重新构建 TUI：
    ```bash
-   cd /home/bb/ai-council && npm --prefix ui-tui run build
+   cd /home/bb/pokelabs-council && npm --prefix ui-tui run build
    ```
 
 2. 运行 TUI 并测试命令：

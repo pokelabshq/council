@@ -31,7 +31,7 @@ council acp / council-acp / python -m acp_adapter
   -> acp.run_agent(agent, use_unstable_protocol=True)
 ```
 
-The Zed ACP Registry path launches the same adapter through `uvx --from 'ai-council[acp]==<version>' council-acp`, pointed at the `ai-council` PyPI release.
+The Zed ACP Registry path launches the same adapter through `uvx --from 'pokelabs-council[acp]==<version>' council-acp`, pointed at the `pokelabs-council` PyPI release.
 
 Stdout is reserved for ACP JSON-RPC transport. Human-readable logs go to stderr.
 

@@ -433,7 +433,7 @@ def _is_kimi_family_endpoint(base_url: str | None, model: str | None = None) -> 
 
     Used to decide whether to drop Anthropic's ``thinking`` kwarg and to
     preserve unsigned reasoning_content-derived thinking blocks on replay.
-    See ai-council#13848, #17057.
+    See pokelabs-council#13848, #17057.
     """
     if _is_kimi_coding_endpoint(base_url):
         return True
@@ -462,7 +462,7 @@ def _is_deepseek_anthropic_endpoint(base_url: str | None) -> bool:
     policy used for Kimi's ``/coding`` endpoint.  The match is pinned to
     the ``/anthropic`` path so the OpenAI-compatible ``api.deepseek.com``
     base URL (which never reaches this adapter) is not misclassified.
-    See ai-council#16748.
+    See pokelabs-council#16748.
     """
     if not base_url_host_matches(base_url or "", "api.deepseek.com"):
         return False
@@ -1658,7 +1658,7 @@ def _convert_assistant_message(m: Dict[str, Any]) -> Dict[str, Any]:
     # Kimi's /coding endpoint (Anthropic protocol) requires assistant
     # tool-call messages to carry reasoning_content when thinking is
     # enabled server-side.  Preserve it as a thinking block so Kimi
-    # can validate the message history.  See ai-council#13848.
+    # can validate the message history.  See pokelabs-council#13848.
     #
     # Accept empty string "" — _copy_reasoning_content_for_api()
     # injects "" as a tier-3 fallback for Kimi tool-call messages
@@ -1872,8 +1872,8 @@ def _manage_thinking_signatures(
     and will reject them outright.  Kimi's /coding and DeepSeek's /anthropic
     endpoints speak the Anthropic protocol upstream but require unsigned
     thinking blocks (synthesised from ``reasoning_content``) to round-trip on
-    replayed assistant tool-call messages.  See ai-council#13848 (Kimi) and
-    ai-council#16748 (DeepSeek).
+    replayed assistant tool-call messages.  See pokelabs-council#13848 (Kimi) and
+    pokelabs-council#16748 (DeepSeek).
 
     Mutates ``result`` in place.
     """
@@ -2136,7 +2136,7 @@ def build_anthropic_kwargs(
                 text = block.get("text", "")
                 text = text.replace("Poke Council", "Claude Code")
                 text = text.replace("Council agent", "Claude Code")
-                text = text.replace("ai-council", "claude-code")
+                text = text.replace("pokelabs-council", "claude-code")
                 text = text.replace("Poke Labs", "Anthropic")
                 block["text"] = text
 

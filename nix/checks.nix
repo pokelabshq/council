@@ -6,8 +6,8 @@
 { inputs, ... }: {
   perSystem = { pkgs, lib, self', ... }:
     let
-      ai-council = self'.packages.default;
-      councilVenv = ai-council.councilVenv;
+      pokelabs-council = self'.packages.default;
+      councilVenv = pokelabs-council.councilVenv;
 
       configMergeScript = pkgs.callPackage ./configMergeScript.nix { };
 
@@ -63,12 +63,12 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         package-contents = pkgs.runCommand "council-package-contents" { } ''
           set -e
           echo "=== Checking binaries ==="
-          test -x ${ai-council}/bin/council || (echo "FAIL: council binary missing"; exit 1)
-          test -x ${ai-council}/bin/ai-council || (echo "FAIL: ai-council binary missing"; exit 1)
+          test -x ${pokelabs-council}/bin/council || (echo "FAIL: council binary missing"; exit 1)
+          test -x ${pokelabs-council}/bin/pokelabs-council || (echo "FAIL: pokelabs-council binary missing"; exit 1)
           echo "PASS: All binaries present"
 
           echo "=== Checking version ==="
-          ${ai-council}/bin/council version 2>&1 | grep -qi "council" || (echo "FAIL: version check"; exit 1)
+          ${pokelabs-council}/bin/council version 2>&1 | grep -qi "council" || (echo "FAIL: version check"; exit 1)
           echo "PASS: Version check"
 
           echo "=== All checks passed ==="
@@ -80,8 +80,8 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         entry-points-sync = pkgs.runCommand "council-entry-points-sync" { } ''
           set -e
           echo "=== Checking entry points match pyproject.toml [project.scripts] ==="
-          for bin in council ai-council council-acp; do
-            test -x ${ai-council}/bin/$bin || (echo "FAIL: $bin binary missing from Nix package"; exit 1)
+          for bin in council pokelabs-council council-acp; do
+            test -x ${pokelabs-council}/bin/$bin || (echo "FAIL: $bin binary missing from Nix package"; exit 1)
             echo "PASS: $bin present"
           done
 
@@ -95,8 +95,8 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
           export HOME=$(mktemp -d)
 
           echo "=== Checking council --help ==="
-          ${ai-council}/bin/council --help 2>&1 | grep -q "gateway" || (echo "FAIL: gateway subcommand missing"; exit 1)
-          ${ai-council}/bin/council --help 2>&1 | grep -q "config" || (echo "FAIL: config subcommand missing"; exit 1)
+          ${pokelabs-council}/bin/council --help 2>&1 | grep -q "gateway" || (echo "FAIL: gateway subcommand missing"; exit 1)
+          ${pokelabs-council}/bin/council --help 2>&1 | grep -q "config" || (echo "FAIL: config subcommand missing"; exit 1)
           echo "PASS: All subcommands accessible"
 
           echo "=== All CLI checks passed ==="
@@ -108,14 +108,14 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         bundled-skills = pkgs.runCommand "council-bundled-skills" { } ''
           set -e
           echo "=== Checking bundled skills ==="
-          test -d ${ai-council}/share/ai-council/skills || (echo "FAIL: skills directory missing"; exit 1)
+          test -d ${pokelabs-council}/share/pokelabs-council/skills || (echo "FAIL: skills directory missing"; exit 1)
           echo "PASS: skills directory exists"
 
-          SKILL_COUNT=$(find ${ai-council}/share/ai-council/skills -name "SKILL.md" | wc -l)
+          SKILL_COUNT=$(find ${pokelabs-council}/share/pokelabs-council/skills -name "SKILL.md" | wc -l)
           test "$SKILL_COUNT" -gt 0 || (echo "FAIL: no SKILL.md files found in skills directory"; exit 1)
           echo "PASS: $SKILL_COUNT bundled skills found"
 
-          grep -q "COUNCIL_BUNDLED_SKILLS" ${ai-council}/bin/council || \
+          grep -q "COUNCIL_BUNDLED_SKILLS" ${pokelabs-council}/bin/council || \
             (echo "FAIL: COUNCIL_BUNDLED_SKILLS not in wrapper"; exit 1)
           echo "PASS: COUNCIL_BUNDLED_SKILLS set in wrapper"
 
@@ -128,14 +128,14 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         bundled-plugins = pkgs.runCommand "council-bundled-plugins" { } ''
           set -e
           echo "=== Checking bundled plugins ==="
-          test -d ${ai-council}/share/ai-council/plugins || (echo "FAIL: plugins directory missing"; exit 1)
+          test -d ${pokelabs-council}/share/pokelabs-council/plugins || (echo "FAIL: plugins directory missing"; exit 1)
           echo "PASS: plugins directory exists"
 
-          test -f ${ai-council}/share/ai-council/plugins/platforms/irc/plugin.yaml || \
+          test -f ${pokelabs-council}/share/pokelabs-council/plugins/platforms/irc/plugin.yaml || \
             (echo "FAIL: irc plugin manifest missing"; exit 1)
           echo "PASS: irc plugin manifest present"
 
-          grep -q "COUNCIL_BUNDLED_PLUGINS" ${ai-council}/bin/council || \
+          grep -q "COUNCIL_BUNDLED_PLUGINS" ${pokelabs-council}/bin/council || \
             (echo "FAIL: COUNCIL_BUNDLED_PLUGINS not in wrapper"; exit 1)
           echo "PASS: COUNCIL_BUNDLED_PLUGINS set in wrapper"
 
@@ -148,15 +148,15 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         bundled-tui = pkgs.runCommand "council-bundled-tui" { } ''
           set -e
           echo "=== Checking bundled TUI ==="
-          test -d ${ai-council}/ui-tui || (echo "FAIL: ui-tui directory missing"; exit 1)
+          test -d ${pokelabs-council}/ui-tui || (echo "FAIL: ui-tui directory missing"; exit 1)
           echo "PASS: ui-tui directory exists"
 
-          test -f ${ai-council}/ui-tui/dist/entry.js || (echo "FAIL: compiled entry.js missing"; exit 1)
+          test -f ${pokelabs-council}/ui-tui/dist/entry.js || (echo "FAIL: compiled entry.js missing"; exit 1)
           echo "PASS: compiled entry.js present"
 
           # self-contained bundle; no runtime node_modules expected
 
-          grep -q "COUNCIL_TUI_DIR" ${ai-council}/bin/council || \
+          grep -q "COUNCIL_TUI_DIR" ${pokelabs-council}/bin/council || \
             (echo "FAIL: COUNCIL_TUI_DIR not in wrapper"; exit 1)
           echo "PASS: COUNCIL_TUI_DIR set in wrapper"
 
@@ -170,11 +170,11 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         council-node = pkgs.runCommand "council-node-version" { } ''
           set -e
           echo "=== Checking COUNCIL_NODE in wrapper ==="
-          grep -q "COUNCIL_NODE" ${ai-council}/bin/council || \
+          grep -q "COUNCIL_NODE" ${pokelabs-council}/bin/council || \
             (echo "FAIL: COUNCIL_NODE not set in wrapper"; exit 1)
           echo "PASS: COUNCIL_NODE present in wrapper"
 
-          COUNCIL_NODE=$(sed -n "s/^export COUNCIL_NODE='\(.*\)'/\1/p" ${ai-council}/bin/council)
+          COUNCIL_NODE=$(sed -n "s/^export COUNCIL_NODE='\(.*\)'/\1/p" ${pokelabs-council}/bin/council)
           test -x "$COUNCIL_NODE" || (echo "FAIL: COUNCIL_NODE=$COUNCIL_NODE not executable"; exit 1)
           echo "PASS: COUNCIL_NODE executable at $COUNCIL_NODE"
 
@@ -202,8 +202,8 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
           }
 
           echo "=== Checking COUNCIL_MANAGED guards ==="
-          check_blocked "config set" ${ai-council}/bin/council config set model foo
-          check_blocked "config edit" ${ai-council}/bin/council config edit
+          check_blocked "config set" ${pokelabs-council}/bin/council config set model foo
+          check_blocked "config edit" ${pokelabs-council}/bin/council config edit
 
           echo "=== All guard checks passed ==="
           mkdir -p $out
@@ -213,7 +213,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         # Verify extraPythonPackages PYTHONPATH injection
         extra-python-packages = let
           testPkg = pkgs.python312Packages.pyfiglet;
-          councilWithExtra = ai-council.override {
+          councilWithExtra = pokelabs-council.override {
             extraPythonPackages = [ testPkg ];
           };
         in pkgs.runCommand "council-extra-python-packages" { } ''
@@ -229,7 +229,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
           echo "PASS: test package path found in wrapper"
 
           echo "=== Checking base package has no PYTHONPATH ==="
-          if grep -q "PYTHONPATH" ${ai-council}/bin/council; then
+          if grep -q "PYTHONPATH" ${pokelabs-council}/bin/council; then
             echo "FAIL: base package should not have PYTHONPATH"; exit 1
           fi
           echo "PASS: base package clean"
@@ -241,7 +241,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
 
         # Verify extraDependencyGroups passes through to python.nix
         extra-dependency-groups = let
-          councilWithGroups = ai-council.override {
+          councilWithGroups = pokelabs-council.override {
             extraDependencyGroups = [ "honcho" ];
           };
         in pkgs.runCommand "council-extra-dependency-groups" { } ''

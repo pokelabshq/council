@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Coding-Agent, OpenCode, Autonomous, Refactoring, Code-Review]
-    related_skills: [claude-code, codex, ai-council]
+    related_skills: [claude-code, codex, pokelabs-council]
 ---
 
 # OpenCode CLI

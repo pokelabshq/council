@@ -24,13 +24,13 @@ PyPI releases track **tagged versions** (major and minor releases), not every co
 
 ```bash
 council update --check    # see if a newer release is on PyPI
-council update            # runs pip install --upgrade ai-council
+council update            # runs pip install --upgrade pokelabs-council
 ```
 
 Or manually:
 
 ```bash
-pip install --upgrade ai-council    # or: uv pip install --upgrade ai-council
+pip install --upgrade pokelabs-council    # or: uv pip install --upgrade pokelabs-council
 ```
 
 :::tip
@@ -169,7 +169,7 @@ This pulls the latest code, updates dependencies, and restarts running gateways.
 If you installed manually (not via the quick installer):
 
 ```bash
-cd /path/to/ai-council
+cd /path/to/pokelabs-council
 export VIRTUAL_ENV="$(pwd)/venv"
 
 # Pull latest code
@@ -188,7 +188,7 @@ council config migrate   # Interactively add any missing options
 If an update introduces a problem, you can roll back to a previous version:
 
 ```bash
-cd /path/to/ai-council
+cd /path/to/pokelabs-council
 
 # List recent versions
 git log --oneline -10
@@ -220,10 +220,10 @@ If you installed via Nix flake, updates are managed through the Nix package mana
 
 ```bash
 # Update the flake input
-nix flake update ai-council
+nix flake update pokelabs-council
 
 # Or rebuild with the latest
-nix profile upgrade ai-council
+nix profile upgrade pokelabs-council
 ```
 
 Nix installations are immutable — rollback is handled by Nix's generation system:
@@ -249,7 +249,7 @@ The uninstaller gives you the option to keep your configuration files (`~/.counc
 ### pip installs
 
 ```bash
-pip uninstall ai-council
+pip uninstall pokelabs-council
 rm -rf ~/.council            # Optional — keep if you plan to reinstall
 ```
 
@@ -257,7 +257,7 @@ rm -rf ~/.council            # Optional — keep if you plan to reinstall
 
 ```bash
 rm -f ~/.local/bin/council
-rm -rf /path/to/ai-council
+rm -rf /path/to/pokelabs-council
 rm -rf ~/.council            # Optional — keep if you plan to reinstall
 ```
 

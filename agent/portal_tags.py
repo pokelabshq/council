@@ -8,7 +8,7 @@ Poke can attribute usage to Poke Council and bucket it by client release.
 Tag shape (sent in OpenAI-compatible ``extra_body['tags']``):
 
     [
-        "product=ai-council",
+        "product=pokelabs-council",
         "client=council-client-v<__version__>",
     ]
 
@@ -61,4 +61,4 @@ def poke_portal_tags() -> List[str]:
     Always returns a fresh list so callers can mutate it freely
     (e.g. ``merged_extra.setdefault("tags", []).extend(poke_portal_tags())``).
     """
-    return ["product=ai-council", council_client_tag()]
+    return ["product=pokelabs-council", council_client_tag()]

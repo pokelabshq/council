@@ -192,7 +192,7 @@ DEFAULT_BOARD = "default"
 
 # Slug validator: lowercase alphanumerics, digits, hyphens; 1–64 chars.
 # Strict enough to stop traversal (`..`) and embedded path separators, loose
-# enough that kebab-case names like ``atm10-server`` or ``ai-council``
+# enough that kebab-case names like ``atm10-server`` or ``pokelabs-council``
 # pass without fuss. Board names with display formatting (spaces, emoji)
 # live in ``board.json``; the slug is just the directory name.
 _BOARD_SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9\-_]{0,63}$")

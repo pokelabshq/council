@@ -598,7 +598,7 @@ describe('createSlashHandler', () => {
             }
 
             if (method === 'command.dispatch') {
-              return Promise.resolve({ type: 'skill', message: skillMessage, name: 'ai-council-dev' })
+              return Promise.resolve({ type: 'skill', message: skillMessage, name: 'pokelabs-council-dev' })
             }
 
             return Promise.resolve({})
@@ -609,9 +609,9 @@ describe('createSlashHandler', () => {
     })
 
     const h = createSlashHandler(ctx)
-    expect(h('/ai-council-dev')).toBe(true)
+    expect(h('/pokelabs-council-dev')).toBe(true)
     await vi.waitFor(() => {
-      expect(ctx.transcript.sys).toHaveBeenCalledWith('⚡ loading skill: ai-council-dev')
+      expect(ctx.transcript.sys).toHaveBeenCalledWith('⚡ loading skill: pokelabs-council-dev')
     })
     expect(ctx.transcript.send).toHaveBeenCalledWith(skillMessage)
   })

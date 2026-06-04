@@ -51,7 +51,7 @@ description: "与 Poke Council 的第一次对话——从安装到开始聊天�
 **方式 A — pip（最简单）：**
 
 ```bash
-pip install ai-council
+pip install pokelabs-council
 council postinstall     # 可选：安装 Node.js、浏览器、ripgrep、ffmpeg 并运行 setup
 ```
 
@@ -257,8 +257,8 @@ council config set terminal.backend ssh       # 远程服务器
 
 ```bash
 # 在 Council 安装目录下运行（curl 安装器在 Linux/macOS 上将其放置于
-# ~/.council/ai-council，在 Windows 上为 %LOCALAPPDATA%\council\ai-council）：
-cd ~/.council/ai-council
+# ~/.council/pokelabs-council，在 Windows 上为 %LOCALAPPDATA%\council\pokelabs-council）：
+cd ~/.council/pokelabs-council
 uv pip install -e ".[voice]"
 # 包含 faster-whisper，用于免费的本地语音转文字
 ```
@@ -294,7 +294,7 @@ ACP 支持已包含在标准 `[all]` 扩展中，因此 curl 安装器已默认�
 council acp
 ```
 
-（如果安装时未包含 `[all]`，请先运行 `cd ~/.council/ai-council && uv pip install -e ".[acp]"`。）
+（如果安装时未包含 `[all]`，请先运行 `cd ~/.council/pokelabs-council && uv pip install -e ".[acp]"`。）
 
 参阅 [ACP 编辑器集成](../user-guide/features/acp.md)。
 

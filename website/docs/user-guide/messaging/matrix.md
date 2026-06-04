@@ -246,7 +246,7 @@ E2EE requires the `mautrix` library with encryption extras and the `libolm` C li
 pip install 'mautrix[encryption]'
 
 # Or install with council extras
-pip install 'ai-council[matrix]'
+pip install 'pokelabs-council[matrix]'
 ```
 
 You also need `libolm` installed on your system:
@@ -428,7 +428,7 @@ pip install 'mautrix[encryption]'
 Or with Council extras:
 
 ```bash
-pip install 'ai-council[matrix]'
+pip install 'pokelabs-council[matrix]'
 ```
 
 ### Encryption errors / "could not decrypt event"
@@ -527,7 +527,7 @@ history, so other clients trust it immediately.
 
 ## Proxy Mode (E2EE on macOS)
 
-Matrix E2EE requires `libolm`, which doesn't compile on macOS ARM64 (Apple Silicon). The `ai-council[matrix]` extra is gated to Linux only. If you're on macOS, proxy mode lets you run E2EE in a Docker container on a Linux VM while the actual agent runs natively on macOS with full access to your local files, memory, and skills.
+Matrix E2EE requires `libolm`, which doesn't compile on macOS ARM64 (Apple Silicon). The `pokelabs-council[matrix]` extra is gated to Linux only. If you're on macOS, proxy mode lets you run E2EE in a Docker container on a Linux VM while the actual agent runs natively on macOS with full access to your local files, memory, and skills.
 
 ### How It Works
 
@@ -608,7 +608,7 @@ services:
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y libolm-dev && rm -rf /var/lib/apt/lists/*
-RUN pip install 'ai-council[matrix]'
+RUN pip install 'pokelabs-council[matrix]'
 
 CMD ["council", "gateway"]
 ```

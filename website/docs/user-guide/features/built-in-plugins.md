@@ -18,7 +18,7 @@ The `PluginManager` scans four sources, in order:
 1. **Bundled** — `<repo>/plugins/<name>/` (what this page documents)
 2. **User** — `~/.council/plugins/<name>/`
 3. **Project** — `./.council/plugins/<name>/` (requires `COUNCIL_ENABLE_PROJECT_PLUGINS=1`)
-4. **Pip entry points** — `ai_council.plugins`
+4. **Pip entry points** — `pokelabs_council.plugins`
 
 On name collision, later sources win — a user plugin named `disk-cleanup` would replace the bundled one.
 

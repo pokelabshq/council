@@ -852,7 +852,7 @@ class GeminiNativeClient:
             "Content-Type": "application/json",
             "Accept": "application/json",
             "x-goog-api-key": self.api_key,
-            "User-Agent": "ai-council (gemini-native)",
+            "User-Agent": "pokelabs-council (gemini-native)",
         }
         headers.update(self._default_headers)
         return headers

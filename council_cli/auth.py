@@ -110,12 +110,12 @@ QWEN_ACCESS_TOKEN_REFRESH_SKEW_SECONDS = 120
 DEFAULT_SPOTIFY_ACCOUNTS_BASE_URL = "https://accounts.spotify.com"
 DEFAULT_SPOTIFY_API_BASE_URL = "https://api.spotify.com/v1"
 DEFAULT_SPOTIFY_REDIRECT_URI = "http://127.0.0.1:43827/spotify/callback"
-SPOTIFY_DOCS_URL = "https://ai-council.pokelabs.com/docs/user-guide/features/spotify"
+SPOTIFY_DOCS_URL = "https://pokelabs-council.pokelabs.com/docs/user-guide/features/spotify"
 SPOTIFY_DASHBOARD_URL = "https://developer.spotify.com/dashboard"
 SPOTIFY_ACCESS_TOKEN_REFRESH_SKEW_SECONDS = 120
 
-XAI_OAUTH_DOCS_URL = "https://ai-council.pokelabs.com/docs/guides/xai-grok-oauth"
-OAUTH_OVER_SSH_DOCS_URL = "https://ai-council.pokelabs.com/docs/guides/oauth-over-ssh"
+XAI_OAUTH_DOCS_URL = "https://pokelabs-council.pokelabs.com/docs/guides/xai-grok-oauth"
+OAUTH_OVER_SSH_DOCS_URL = "https://pokelabs-council.pokelabs.com/docs/guides/oauth-over-ssh"
 DEFAULT_SPOTIFY_SCOPE = " ".join((
     "user-modify-playback-state",
     "user-read-playback-state",
@@ -2860,7 +2860,7 @@ def _spotify_interactive_setup(redirect_uri_hint: str) -> str:
     print("Steps:")
     print(f"  1. Opening {SPOTIFY_DASHBOARD_URL} in your browser...")
     print("  2. Click 'Create app' and fill in:")
-    print("       App name:     anything (e.g. ai-council)")
+    print("       App name:     anything (e.g. pokelabs-council)")
     print("       Description:  anything")
     print(f"       Redirect URI: {redirect_uri_hint}")
     print("       API/SDK:      Web API")
@@ -6390,7 +6390,7 @@ def _xai_oauth_build_authorize_url(
     # `plan=generic` opts the consent screen into xAI's generic OAuth plan
     # tier instead of falling back to the per-account default. Without it,
     # accounts.x.ai rejects loopback OAuth from non-allowlisted clients.
-    # `referrer=ai-council` lets xAI attribute Council-originated logins
+    # `referrer=pokelabs-council` lets xAI attribute Council-originated logins
     # in their OAuth server logs (we still impersonate the upstream Grok-CLI
     # client_id; this is best-effort attribution until xAI mints us our own).
     authorize_params = {
@@ -6403,7 +6403,7 @@ def _xai_oauth_build_authorize_url(
         "state": state,
         "nonce": nonce,
         "plan": "generic",
-        "referrer": "ai-council",
+        "referrer": "pokelabs-council",
     }
     return f"{authorization_endpoint}?{urlencode(authorize_params)}"
 

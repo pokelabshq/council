@@ -734,7 +734,7 @@ council debug share --local      # Print report to terminal (no upload)
 council backup [options]
 ```
 
-Create a zip archive of your Council configuration, skills, sessions, and data. The backup excludes the ai-council codebase itself.
+Create a zip archive of your Council configuration, skills, sessions, and data. The backup excludes the pokelabs-council codebase itself.
 
 | Option | Description |
 |--------|-------------|
@@ -748,7 +748,7 @@ The backup uses SQLite's `backup()` API for safe copying, so it works correctly 
 
 - `*.db-wal`, `*.db-shm`, `*.db-journal` — SQLite's WAL / shared-memory / journal sidecars. The `*.db` file already got a consistent snapshot via `sqlite3.backup()`; shipping the live sidecars alongside it would let a restore see a half-committed state.
 - `checkpoints/` — per-session trajectory caches. Hash-keyed and regenerated per session; wouldn't port cleanly to another install anyway.
-- The `ai-council` code itself (this is a user-data backup, not a repo snapshot).
+- The `pokelabs-council` code itself (this is a user-data backup, not a repo snapshot).
 
 ### Examples
 
@@ -1334,14 +1334,14 @@ council claw migrate --source /home/user/old-openclaw
 council dashboard [options]
 ```
 
-Launch the web dashboard — a browser-based UI for managing configuration, API keys, and monitoring sessions. Requires `pip install ai-council[web]` (FastAPI + Uvicorn). The embedded browser Chat tab requires `--tui` plus the `pty` extra. See [Web Dashboard](/user-guide/features/web-dashboard) for full documentation.
+Launch the web dashboard — a browser-based UI for managing configuration, API keys, and monitoring sessions. Requires `pip install pokelabs-council[web]` (FastAPI + Uvicorn). The embedded browser Chat tab requires `--tui` plus the `pty` extra. See [Web Dashboard](/user-guide/features/web-dashboard) for full documentation.
 
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--port` | `9119` | Port to run the web server on |
 | `--host` | `127.0.0.1` | Bind address |
 | `--no-open` | — | Don't auto-open the browser |
-| `--tui` | off | Enable the in-browser Chat tab by running `council --tui` behind a PTY/WebSocket bridge. Requires `pip install 'ai-council[web,pty]'` and a POSIX PTY environment such as Linux, macOS, or WSL2. |
+| `--tui` | off | Enable the in-browser Chat tab by running `council --tui` behind a PTY/WebSocket bridge. Requires `pip install 'pokelabs-council[web,pty]'` and a POSIX PTY environment such as Linux, macOS, or WSL2. |
 | `--insecure` | off | Allow binding to non-localhost hosts. Exposes dashboard credentials on the network; use only behind trusted network controls. |
 | `--stop` | — | Stop running `council dashboard` processes and exit. |
 | `--status` | — | List running `council dashboard` processes and exit. |
@@ -1421,9 +1421,9 @@ council completion fish > ~/.config/fish/completions/council.fish
 council update [--gateway] [--check] [--no-backup] [--backup] [--yes]
 ```
 
-Pulls the latest `ai-council` code and reinstalls dependencies in your venv, then re-runs the post-install hooks (MCP servers, skills sync, completion install). Safe to run on a live install.
+Pulls the latest `pokelabs-council` code and reinstalls dependencies in your venv, then re-runs the post-install hooks (MCP servers, skills sync, completion install). Safe to run on a live install.
 
-**pip installs:** `council update` detects pip-based installations automatically — it queries PyPI for the latest release and runs `pip install --upgrade ai-council` instead of `git pull`. PyPI releases track tagged versions (major/minor releases), not every commit on `main`. Use `--check` to see if a newer PyPI release is available without installing.
+**pip installs:** `council update` detects pip-based installations automatically — it queries PyPI for the latest release and runs `pip install --upgrade pokelabs-council` instead of `git pull`. PyPI releases track tagged versions (major/minor releases), not every commit on `main`. Use `--check` to see if a newer PyPI release is available without installing.
 
 | Option | Description |
 |--------|-------------|
@@ -1446,7 +1446,7 @@ Additional behavior:
 |---------|-------------|
 | `council version` | Print version information. |
 | `council update` | Pull latest changes and reinstall dependencies. |
-| `council postinstall` | Internal bootstrap. Runs once after `pip install ai-council` (or `council update` on pip installs) to install non-Python dependencies that pip cannot provide — Node.js runtime, headless browser, ripgrep, ffmpeg — and then trigger `council setup` if the profile has not been configured yet. Safe to re-run idempotently. |
+| `council postinstall` | Internal bootstrap. Runs once after `pip install pokelabs-council` (or `council update` on pip installs) to install non-Python dependencies that pip cannot provide — Node.js runtime, headless browser, ripgrep, ffmpeg — and then trigger `council setup` if the profile has not been configured yet. Safe to re-run idempotently. |
 | `council uninstall [--full] [--yes]` | Remove Council, optionally deleting all config/data. |
 
 ## See also

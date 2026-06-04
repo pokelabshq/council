@@ -602,7 +602,7 @@ terminal:
 # ~/.council/.env
 TERMINAL_SSH_HOST=agent-worker.local
 TERMINAL_SSH_USER=council
-TERMINAL_SSH_KEY=~/.ssh/ai_council_key
+TERMINAL_SSH_KEY=~/.ssh/pokelabs_council_key
 ```
 
 SSH 连接详情保存在 `.env`（而非 `config.yaml`）中，以避免随 profile 导出时被检入或共享。这样可以将 gateway 的消息连接与 Agent 的命令执行分离。
@@ -629,7 +629,7 @@ council doctor --ack <advisory-id>
 
 ### 可选依赖的懒加载安装
 
-许多功能（Mistral TTS、ElevenLabs、Honcho 记忆、Bedrock、Slack、Matrix 等）依赖并非每个用户都需要的 Python 包。Council 在首次使用时**懒加载**安装这些包，而非在 `ai-council[all]` 下急切安装。实现位于 `tools/lazy_deps.py`。
+许多功能（Mistral TTS、ElevenLabs、Honcho 记忆、Bedrock、Slack、Matrix 等）依赖并非每个用户都需要的 Python 包。Council 在首次使用时**懒加载**安装这些包，而非在 `pokelabs-council[all]` 下急切安装。实现位于 `tools/lazy_deps.py`。
 
 此方案解决的权衡问题：
 

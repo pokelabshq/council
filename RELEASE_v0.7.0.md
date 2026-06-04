@@ -183,7 +183,7 @@
 ### Skills System
 - **Size limits for agent writes** and **fuzzy matching for skill patch** — prevents oversized skill writes and improves edit reliability ([#4414](https://github.com/pokelabshq/council/pull/4414))
 - **Validate hub bundle paths** before install — blocks path traversal in skill bundles ([#3986](https://github.com/pokelabshq/council/pull/3986))
-- **Unified ai-council and ai-council-setup** into single skill ([#4332](https://github.com/pokelabshq/council/pull/4332))
+- **Unified pokelabs-council and pokelabs-council-setup** into single skill ([#4332](https://github.com/pokelabshq/council/pull/4332))
 - **Skill metadata type check** in extract_skill_conditions ([#4479](https://github.com/pokelabshq/council/pull/4479))
 
 ### New/Updated Skills

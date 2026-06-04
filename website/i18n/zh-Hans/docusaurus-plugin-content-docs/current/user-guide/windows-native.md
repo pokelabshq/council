@@ -43,13 +43,13 @@ iex (irm https://raw.githubusercontent.com/pokelabshq/council/main/scripts/insta
 | `-NoVenv` | 关闭 | 跳过 venv 创建（高级用法——由你自行管理 Python） |
 | `-SkipSetup` | 关闭 | 跳过安装后的 `council setup` 向导 |
 | `-CouncilHome` | `%LOCALAPPDATA%\council` | 覆盖数据目录 |
-| `-InstallDir` | `%LOCALAPPDATA%\council\ai-council` | 覆盖代码存放位置 |
+| `-InstallDir` | `%LOCALAPPDATA%\council\pokelabs-council` | 覆盖代码存放位置 |
 
 安装程序会自动重试不稳定的 git 拉取，并剥离下载的 `install.ps1` 内容中的 BOM，因此 HTTP 传输中携带的 UTF-8 BOM 不再会破坏 `[scriptblock]::Create((irm ...))` 形式。
 
 ### 桌面安装程序（备选方案）
 
-也提供了一个轻量 GUI 安装程序——如果你更倾向于双击 `.exe` 而非打开 PowerShell，可以使用它。下载 Council Desktop，运行安装程序，首次启动时 GUI 会在后台调用 `install.ps1` 来配置 Python（通过 `uv`）、Node、PortableGit 以及下文描述的其余依赖引导流程。首次运行后，桌面应用与 PowerShell 安装的 `council` CLI 共享同一个 `%LOCALAPPDATA%\council\ai-council` 安装目录和 `%USERPROFILE%\.council` 数据目录——可以在 GUI 和 CLI 之间自由切换。
+也提供了一个轻量 GUI 安装程序——如果你更倾向于双击 `.exe` 而非打开 PowerShell，可以使用它。下载 Council Desktop，运行安装程序，首次启动时 GUI 会在后台调用 `install.ps1` 来配置 Python（通过 `uv`）、Node、PortableGit 以及下文描述的其余依赖引导流程。首次运行后，桌面应用与 PowerShell 安装的 `council` CLI 共享同一个 `%LOCALAPPDATA%\council\pokelabs-council` 安装目录和 `%USERPROFILE%\.council` 数据目录——可以在 GUI 和 CLI 之间自由切换。
 
 如果你想要熟悉的 Windows 安装体验，或者要将 Council 交给非开发者使用，请使用桌面安装程序；如果你已经在终端中，请使用 PowerShell 一行命令。
 
@@ -75,7 +75,7 @@ iex (irm https://raw.githubusercontent.com/pokelabshq/council/main/scripts/insta
 2. **通过 `uv` 安装 Python 3.11**。无需预先安装 Python。
 3. **安装 Node.js 22**（优先使用 winget，否则将便携式 Node 压缩包解压到 `%LOCALAPPDATA%\council\node`）。用于浏览器工具和 WhatsApp 桥接。
 4. **安装便携式 Git** — 如果 `git` 已在 PATH 中，安装程序直接使用；否则从官方 `git-for-windows` 发布版下载精简的自包含 **PortableGit**（约 45 MB）到 `%LOCALAPPDATA%\council\git`。无需管理员权限，不写入 Windows 安装程序注册表，不干扰系统上的其他任何内容。
-5. **将仓库克隆**到 `%LOCALAPPDATA%\council\ai-council` 并在其中创建 virtualenv。
+5. **将仓库克隆**到 `%LOCALAPPDATA%\council\pokelabs-council` 并在其中创建 virtualenv。
 6. **分层 `uv pip install`** — 先尝试 `.[all]`，如果 `git+https` 依赖在 GitHub 限速时失败，则逐步回退到更小的集合（`[messaging,dashboard,ext]` → `[messaging]` → `.`）。防止"单次失败导致裸安装"的故障模式。
 7. **根据 `.env` 自动安装消息 SDK** — 如果存在 `TELEGRAM_BOT_TOKEN` / `DISCORD_BOT_TOKEN` / `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN` / `WHATSAPP_ENABLED`，则运行 `python -m ensurepip --upgrade` 并针对性地调用 `pip install`，确保各平台 SDK 可正常导入。
 8. **设置 `COUNCIL_GIT_BASH_PATH`** 为解析后的 `bash.exe` 路径，使 Council 在新 shell 中能确定性地找到它。
@@ -206,7 +206,7 @@ council gateway uninstall   # 移除 schtasks 条目、Startup 快捷方式、pi
 
 | 路径 | 内容 |
 |---|---|
-| `%LOCALAPPDATA%\council\ai-council\` | Git 检出 + venv。可安全执行 `Remove-Item -Recurse` 后重新安装。 |
+| `%LOCALAPPDATA%\council\pokelabs-council\` | Git 检出 + venv。可安全执行 `Remove-Item -Recurse` 后重新安装。 |
 | `%LOCALAPPDATA%\council\git\` | PortableGit（仅在安装程序配置时存在）。 |
 | `%LOCALAPPDATA%\council\node\` | 便携式 Node.js（仅在安装程序配置时存在）。 |
 | `%LOCALAPPDATA%\council\bin\` | `council.cmd` 垫片，已添加到用户 PATH。 |
@@ -266,7 +266,7 @@ TELEGRAM_BOT_TOKEN=...
 council uninstall
 ```
 
-这是干净的卸载路径——移除 schtasks 条目、Startup 文件夹快捷方式、`council.cmd` 垫片，删除 `%LOCALAPPDATA%\council\ai-council\`，并从用户 PATH 中移除相关条目。它会保留 `%USERPROFILE%\.council\`（你的配置、认证、技能、会话、日志），以防你需要重新安装。
+这是干净的卸载路径——移除 schtasks 条目、Startup 文件夹快捷方式、`council.cmd` 垫片，删除 `%LOCALAPPDATA%\council\pokelabs-council\`，并从用户 PATH 中移除相关条目。它会保留 `%USERPROFILE%\.council\`（你的配置、认证、技能、会话、日志），以防你需要重新安装。
 
 彻底清除所有内容：
 

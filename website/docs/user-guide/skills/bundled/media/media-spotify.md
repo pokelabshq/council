@@ -31,7 +31,7 @@ The following is the complete skill definition that Council loads when this skil
 
 # Spotify
 
-Control the user's Spotify account via the Council Spotify toolset (7 tools). Setup guide: https://ai-council.pokelabs.com/docs/user-guide/features/spotify
+Control the user's Spotify account via the Council Spotify toolset (7 tools). Setup guide: https://pokelabs-council.pokelabs.com/docs/user-guide/features/spotify
 
 ## When to use this skill
 

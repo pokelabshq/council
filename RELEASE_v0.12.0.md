@@ -101,7 +101,7 @@
 - Fix: dedicated docs page per bundled + optional skill ([#14929](https://github.com/pokelabshq/council/pull/14929))
 - Fix: `google-workspace` shared COUNCIL_HOME helper + ship deps as optional extra ([#15405](https://github.com/pokelabshq/council/pull/15405))
 - Fix: auto-wrap ASCII-art code blocks in generated skill pages ([#16497](https://github.com/pokelabshq/council/pull/16497))
-- Point agent at `ai-council` skill + docs site for Council questions ([#16535](https://github.com/pokelabshq/council/pull/16535))
+- Point agent at `pokelabs-council` skill + docs site for Council questions ([#16535](https://github.com/pokelabshq/council/pull/16535))
 
 ---
 
@@ -425,7 +425,7 @@ The vast majority of the 360 fixes landed in the streaming/compression/tool-call
 
 - **Curator feature page** added to docs site ([#17563](https://github.com/pokelabshq/council/pull/17563))
 - **Document pin also blocking `skill_manage` writes** ([#17578](https://github.com/pokelabshq/council/pull/17578))
-- **Direct-URL skill install documented** across features, reference, guide, and `ai-council` skill ([#16355](https://github.com/pokelabshq/council/pull/16355))
+- **Direct-URL skill install documented** across features, reference, guide, and `pokelabs-council` skill ([#16355](https://github.com/pokelabshq/council/pull/16355))
 - **Hooks tutorial — build a BOOT.md startup checklist** (replaces the removed built-in hook) ([#17202](https://github.com/pokelabshq/council/pull/17202))
 - **ComfyUI docs: ask local vs cloud FIRST before hardware check** ([#17612](https://github.com/pokelabshq/council/pull/17612))
 - **Obliteratus skill: link YouTube video guide in SKILL.md** ([#15808](https://github.com/pokelabshq/council/pull/15808))

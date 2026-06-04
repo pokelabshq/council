@@ -57,19 +57,19 @@ What tools do you have available?
 ### CLI 麦克风 + 播放
 
 ```bash
-pip install "ai-council[voice]"
+pip install "pokelabs-council[voice]"
 ```
 
 ### 消息平台
 
 ```bash
-pip install "ai-council[messaging]"
+pip install "pokelabs-council[messaging]"
 ```
 
 ### 高级 ElevenLabs TTS
 
 ```bash
-pip install "ai-council[tts-premium]"
+pip install "pokelabs-council[tts-premium]"
 ```
 
 ### 本地 NeuTTS（可选）
@@ -81,7 +81,7 @@ python -m pip install -U neutts[all]
 ### 全部安装
 
 ```bash
-pip install "ai-council[all]"
+pip install "pokelabs-council[all]"
 ```
 
 ## 第三步：安装系统依赖
@@ -440,7 +440,7 @@ Council 加入 Discord 语音频道（VC），监听用户语音，转录后运�
 如果你想走最短的成功路径：
 
 1. 让文本 Council 正常工作
-2. 安装 `ai-council[voice]`
+2. 安装 `pokelabs-council[voice]`
 3. 使用本地 STT + Edge TTS 的 CLI 语音模式
 4. 然后在 Telegram 或 Discord 中启用 `/voice on`
 5. 只有在此之后，再尝试 Discord 语音频道模式

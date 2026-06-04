@@ -17,7 +17,7 @@ Usage::
 Output: ``website/static/api/model-catalog.json``
 
 Live URL (after ``deploy-site.yml`` runs on merge to main):
-``https://ai-council.pokelabs.com/docs/api/model-catalog.json``
+``https://pokelabs-council.pokelabs.com/docs/api/model-catalog.json``
 """
 
 from __future__ import annotations
@@ -44,8 +44,8 @@ def build_catalog() -> dict:
         "version": CATALOG_VERSION,
         "updated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "metadata": {
-            "source": "ai-council repo",
-            "docs": "https://ai-council.pokelabs.com/docs/reference/model-catalog",
+            "source": "pokelabs-council repo",
+            "docs": "https://pokelabs-council.pokelabs.com/docs/reference/model-catalog",
         },
         "providers": {
             "openrouter": {

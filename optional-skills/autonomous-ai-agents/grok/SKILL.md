@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   council:
     tags: [Coding-Agent, Grok, xAI, Code-Review, Refactoring, Automation]
-    related_skills: [codex, claude-code, ai-council]
+    related_skills: [codex, claude-code, pokelabs-council]
 ---
 
 # Grok Build CLI — Council Orchestration Guide

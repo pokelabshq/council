@@ -242,7 +242,7 @@ You can override the default in `~/.codex/config.toml` outside Council' managed 
 default_permissions = ":read-only"
 ```
 
-(Council will preserve your override on re-migration as long as it lives outside the `# managed by ai-council` markers.)
+(Council will preserve your override on re-migration as long as it lives outside the `# managed by pokelabs-council` markers.)
 
 ## Auxiliary tasks and ChatGPT subscription token cost
 
@@ -275,13 +275,13 @@ The self-improvement review fork inherits the main runtime via `_current_main_ru
 Council wraps everything it manages between two marker comments:
 
 ```toml
-# managed by ai-council — `council codex-runtime migrate` regenerates this section
+# managed by pokelabs-council — `council codex-runtime migrate` regenerates this section
 default_permissions = ":workspace"
 [mcp_servers.filesystem]
 ...
 [plugins."github@openai-curated"]
 ...
-# end ai-council managed section
+# end pokelabs-council managed section
 ```
 
 Anything **outside** that block is yours. Re-running migration (via `/codex-runtime codex_app_server` or whenever you toggle the runtime on) replaces the managed block in place but preserves user content above and below it verbatim. This means you can:

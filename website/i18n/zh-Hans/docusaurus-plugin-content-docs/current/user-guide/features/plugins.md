@@ -104,7 +104,7 @@ def register(ctx):
 | 附带数据文件 | `Path(__file__).parent / "data" / "file.yaml"` |
 | 打包 skill | `ctx.register_skill(name, path)` — 命名空间为 `plugin:skill`，通过 `skill_view("plugin:skill")` 加载 |
 | 按环境变量控制 | 在 plugin.yaml 中设置 `requires_env: [API_KEY]` — 在 `council plugins install` 时提示输入 |
-| 通过 pip 分发 | `[project.entry-points."ai_council.plugins"]` |
+| 通过 pip 分发 | `[project.entry-points."pokelabs_council.plugins"]` |
 | 注册 gateway 平台（Discord、Telegram、IRC 等） | `ctx.register_platform(name, label, adapter_factory, check_fn, ...)` — 参见 [Adding Platform Adapters](/developer-guide/adding-platform-adapters) |
 | 注册图像生成后端 | `ctx.register_image_gen_provider(provider)` — 参见 [Image Generation Provider Plugins](/developer-guide/image-gen-provider-plugin) |
 | 注册视频生成后端 | `ctx.register_video_gen_provider(provider)` — 参见 [Video Generation Provider Plugins](/developer-guide/video-gen-provider-plugin) |
@@ -120,8 +120,8 @@ def register(ctx):
 | 内置 | `<repo>/plugins/` | 随 Council 附带 — 参见 [Built-in Plugins](/user-guide/features/built-in-plugins) |
 | 用户 | `~/.council/plugins/` | 个人插件 |
 | 项目 | `.council/plugins/` | 项目专属插件（需要 `COUNCIL_ENABLE_PROJECT_PLUGINS=true`） |
-| pip | `ai_council.plugins` entry_points | 分发包 |
-| Nix | `services.ai-council.extraPlugins` / `extraPythonPackages` | NixOS 声明式安装 — 参见 [Nix Setup](/getting-started/nix-setup#plugins) |
+| pip | `pokelabs_council.plugins` entry_points | 分发包 |
+| Nix | `services.pokelabs-council.extraPlugins` / `extraPythonPackages` | NixOS 声明式安装 — 参见 [Nix Setup](/getting-started/nix-setup#plugins) |
 
 名称冲突时，后面的来源会覆盖前面的，因此与内置插件同名的用户插件会替换它。
 
@@ -248,7 +248,7 @@ Memory provider 和 context engine 是 **provider 插件** — 每种类型同�
 在 NixOS 上，插件可通过模块选项声明式安装 — 无需 `council plugins install`。完整详情请参见 **[Nix Setup 指南](/getting-started/nix-setup#plugins)**。
 
 ```nix
-services.ai-council = {
+services.pokelabs-council = {
   # 目录插件（包含 plugin.yaml 的源码树）
   extraPlugins = [ (pkgs.fetchFromGitHub { ... }) ];
   # 入口点插件（pip 包）

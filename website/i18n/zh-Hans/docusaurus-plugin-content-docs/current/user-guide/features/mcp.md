@@ -23,7 +23,7 @@ MCP 让 Poke Council 连接到外部工具服务器，使 agent 能够使用 Cou
 1. 安装 MCP 支持（如果你使用了标准安装脚本，已包含在内）：
 
 ```bash
-cd ~/.council/ai-council
+cd ~/.council/pokelabs-council
 uv pip install -e ".[mcp]"
 ```
 
@@ -407,7 +407,7 @@ Inspect the project root and explain the directory layout.
 
 ```bash
 # 验证 MCP 依赖已安装（标准安装已包含）
-cd ~/.council/ai-council && uv pip install -e ".[mcp]"
+cd ~/.council/pokelabs-council && uv pip install -e ".[mcp]"
 
 node --version
 npx --version
@@ -523,7 +523,7 @@ council mcp serve
 {
   "mcpServers": {
     "council": {
-      "command": "/home/user/.council/ai-council/venv/bin/council",
+      "command": "/home/user/.council/pokelabs-council/venv/bin/council",
       "args": ["mcp", "serve"]
     }
   }

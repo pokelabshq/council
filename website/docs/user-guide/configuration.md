@@ -176,7 +176,7 @@ terminal:
 
 Every Council-managed container is tagged with three labels so subsequent processes (and the orphan reaper) can identify it:
 
-- `ai-council=1` — marks it as Council-managed
+- `pokelabs-council=1` — marks it as Council-managed
 - `council-task-id=<sanitized task_id>` — keys the per-task reuse probe
 - `council-profile=<sanitized profile name>` — scopes reuse and reaping to the active Council profile
 
@@ -313,7 +313,7 @@ terminal:
 
 **Image handling:** Docker URLs (`docker://...`) are automatically converted to SIF files and cached. Existing `.sif` files are used directly.
 
-**Scratch directory:** Resolved in order: `TERMINAL_SCRATCH_DIR` → `TERMINAL_SANDBOX_DIR/singularity` → `/scratch/$USER/ai-council` (HPC convention) → `~/.council/sandboxes/singularity`.
+**Scratch directory:** Resolved in order: `TERMINAL_SCRATCH_DIR` → `TERMINAL_SANDBOX_DIR/singularity` → `/scratch/$USER/pokelabs-council` (HPC convention) → `~/.council/sandboxes/singularity`.
 
 **Isolation:** Uses `--containall --no-home` for full namespace isolation without mounting the host home directory.
 
@@ -1434,13 +1434,13 @@ Define custom commands that either run shell commands without invoking the LLM, 
 quick_commands:
   status:
     type: exec
-    command: systemctl status ai-council
+    command: systemctl status pokelabs-council
   disk:
     type: exec
     command: df -h /
   update:
     type: exec
-    command: cd ~/.council/ai-council && git pull && pip install -e .
+    command: cd ~/.council/pokelabs-council && git pull && pip install -e .
   gpu:
     type: exec
     command: nvidia-smi --query-gpu=name,utilization.gpu,memory.used,memory.total --format=csv,noheader

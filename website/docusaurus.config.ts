@@ -7,11 +7,11 @@ const config: Config = {
   tagline: 'The self-improving AI agent',
   favicon: 'img/favicon.ico',
 
-  url: 'https://ai-council.pokelabs.com',
+  url: 'https://pokelabs-council.pokelabs.com',
   baseUrl: '/docs/',
 
   organizationName: 'PokeLabs',
-  projectName: 'ai-council',
+  projectName: 'pokelabs-council',
 
   onBrokenLinks: 'warn',
 
@@ -84,7 +84,7 @@ const config: Config = {
   ],
 
   themeConfig: {
-    image: 'img/ai-council-banner.png',
+    image: 'img/pokelabs-council-banner.png',
     colorMode: {
       defaultMode: 'dark',
       respectPrefersColorScheme: true,
@@ -118,7 +118,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://ai-council.pokelabs.com',
+          href: 'https://pokelabs-council.pokelabs.com',
           label: 'Home',
           position: 'right',
         },

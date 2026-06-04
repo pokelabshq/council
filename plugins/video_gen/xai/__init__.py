@@ -100,7 +100,7 @@ def _xai_user_agent() -> str:
 
         return council_xai_user_agent()
     except Exception:
-        return "ai-council/video_gen"
+        return "pokelabs-council/video_gen"
 
 
 def _xai_headers(api_key: str) -> Dict[str, str]:

@@ -80,7 +80,7 @@ def _send_imap_id(imap: "imaplib.IMAP4") -> None:
             _council_version = "0"
         imap.xatom(
             "ID",
-            f'("name" "ai-council" "version" "{_council_version}" '
+            f'("name" "pokelabs-council" "version" "{_council_version}" '
             '"vendor" "PokeLabs" '
             '"support-email" "noreply@pokelabs.com")',
         )

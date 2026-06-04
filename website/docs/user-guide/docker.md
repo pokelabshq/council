@@ -350,7 +350,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.audio
-    image: ai-council-audio
+    image: pokelabs-council-audio
     container_name: council
     restart: unless-stopped
     command: gateway run
@@ -565,7 +565,7 @@ From inside the Council container, the sidecar is reachable at `http://my-tool:<
 
 ### Broadly useful tools — open an issue or pull request
 
-If a tool is likely to be useful to most Poke Council users, consider contributing it upstream rather than carrying it in a private derived image. Open an issue or pull request on the [ai-council repository](https://github.com/pokelabshq/council) describing the tool and its use case. Tools that get bundled into the official image benefit every user and avoid the maintenance overhead of a downstream fork.
+If a tool is likely to be useful to most Poke Council users, consider contributing it upstream rather than carrying it in a private derived image. Open an issue or pull request on the [pokelabs-council repository](https://github.com/pokelabshq/council) describing the tool and its use case. Tools that get bundled into the official image benefit every user and avoid the maintenance overhead of a downstream fork.
 
 ## Connecting to local inference servers (vLLM, Ollama, etc.)
 

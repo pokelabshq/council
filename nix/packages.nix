@@ -4,7 +4,7 @@
   perSystem =
     { pkgs, lib, inputs', ... }:
     let
-      councilAgent = pkgs.callPackage ./ai-council.nix {
+      councilAgent = pkgs.callPackage ./pokelabs-council.nix {
         inherit (inputs) uv2nix pyproject-nix pyproject-build-systems;
         npm-lockfile-fix = inputs'.npm-lockfile-fix.packages.default;
         # Only embed clean revs — dirtyRev doesn't represent any upstream

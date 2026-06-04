@@ -14,7 +14,7 @@ Poke Council 支持在 CLI 和消息平台上进行完整的语音交互。通�
 
 使用语音功能前，请确保已完成以下准备：
 
-1. **已安装 Poke Council** — `pip install ai-council`（参见 [安装](/getting-started/installation)）
+1. **已安装 Poke Council** — `pip install pokelabs-council`（参见 [安装](/getting-started/installation)）
 2. **已配置 LLM 提供商** — 运行 `council model` 或在 `~/.council/.env` 中设置首选提供商的凭据
 3. **基础设置正常** — 运行 `council` 验证 Agent 能够响应文字消息，再启用语音功能
 
@@ -40,19 +40,19 @@ Poke Council 支持在 CLI 和消息平台上进行完整的语音交互。通�
 
 ```bash
 # CLI 语音模式（麦克风 + 音频播放）
-pip install "ai-council[voice]"
+pip install "pokelabs-council[voice]"
 
 # Discord + Telegram 消息（包含 discord.py[voice] 以支持语音频道）
-pip install "ai-council[messaging]"
+pip install "pokelabs-council[messaging]"
 
 # 高级 TTS（ElevenLabs）
-pip install "ai-council[tts-premium]"
+pip install "pokelabs-council[tts-premium]"
 
 # 本地 TTS（NeuTTS，可选）
 python -m pip install -U neutts[all]
 
 # 一次性安装所有内容
-pip install "ai-council[all]"
+pip install "pokelabs-council[all]"
 ```
 
 | 扩展包 | 包含的包 | 用途 |

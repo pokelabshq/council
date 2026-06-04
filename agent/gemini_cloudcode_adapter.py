@@ -705,7 +705,7 @@ class GeminiCloudCodeClient:
             "Content-Type": "application/json",
             "Accept": "application/json",
             "Authorization": f"Bearer {access_token}",
-            "User-Agent": "ai-council (gemini-cli-compat)",
+            "User-Agent": "pokelabs-council (gemini-cli-compat)",
             "X-Goog-Api-Client": "gl-python/council",
             "x-activity-request-id": str(uuid.uuid4()),
         }

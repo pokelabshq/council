@@ -51,7 +51,7 @@ Pick the row that matches your goal:
 **Option A — pip (simplest):**
 
 ```bash
-pip install ai-council
+pip install pokelabs-council
 council postinstall     # optional: installs Node.js, browser, ripgrep, ffmpeg + runs setup
 ```
 
@@ -271,8 +271,8 @@ council config set terminal.backend ssh       # Remote server
 
 ```bash
 # From the Council install directory (the curl installer placed it at
-# ~/.council/ai-council on Linux/macOS or %LOCALAPPDATA%\council\ai-council on Windows):
-cd ~/.council/ai-council
+# ~/.council/pokelabs-council on Linux/macOS or %LOCALAPPDATA%\council\pokelabs-council on Windows):
+cd ~/.council/pokelabs-council
 uv pip install -e ".[voice]"
 # Includes faster-whisper for free local speech-to-text
 ```
@@ -308,7 +308,7 @@ ACP support ships with the standard `[all]` extras, so the curl installer alread
 council acp
 ```
 
-(If you installed without `[all]`, run `cd ~/.council/ai-council && uv pip install -e ".[acp]"` first.)
+(If you installed without `[all]`, run `cd ~/.council/pokelabs-council && uv pip install -e ".[acp]"` first.)
 
 See [ACP Editor Integration](../user-guide/features/acp.md).
 

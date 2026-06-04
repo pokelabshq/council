@@ -68,7 +68,7 @@ council memory setup        # 选择 "honcho" — 运行 Honcho 专属的安装�
 
 旧版 `council honcho setup` 命令仍然有效（现在会重定向到 `council memory setup`），但只有在 Honcho 被选为激活记忆提供者后才会注册。
 
-**配置：** `$COUNCIL_HOME/honcho.json`（profile 本地）或 `~/.honcho/config.json`（全局）。解析顺序：`$COUNCIL_HOME/honcho.json` > `~/.council/honcho.json` > `~/.honcho/config.json`。参见[配置参考](https://github.com/council-ai/ai-council/blob/main/plugins/memory/honcho/README.md)和 [Honcho 集成指南](https://docs.honcho.dev/v3/guides/integrations/council)。
+**配置：** `$COUNCIL_HOME/honcho.json`（profile 本地）或 `~/.honcho/config.json`（全局）。解析顺序：`$COUNCIL_HOME/honcho.json` > `~/.council/honcho.json` > `~/.honcho/config.json`。参见[配置参考](https://github.com/council-ai/pokelabs-council/blob/main/plugins/memory/honcho/README.md)和 [Honcho 集成指南](https://docs.honcho.dev/v3/guides/integrations/council)。
 
 <details>
 <summary>完整配置参考</summary>
@@ -255,7 +255,7 @@ council honcho sync
 
 </details>
 
-参见[配置参考](https://github.com/council-ai/ai-council/blob/main/plugins/memory/honcho/README.md)和 [Honcho 集成指南](https://docs.honcho.dev/v3/guides/integrations/council)。
+参见[配置参考](https://github.com/council-ai/pokelabs-council/blob/main/plugins/memory/honcho/README.md)和 [Honcho 集成指南](https://docs.honcho.dev/v3/guides/integrations/council)。
 
 
 ---

@@ -388,7 +388,7 @@ AUTHOR_MAP = {
     # Temporary tool-progress cleanup salvage (May 2026)
     "Mrcharlesiv@gmail.com": "mrcharlesiv",
     "nbot@liizfq.top": "liizfq",
-    "274096618+ai-council-dhabibi@users.noreply.github.com": "dhabibi",
+    "274096618+pokelabs-council-dhabibi@users.noreply.github.com": "dhabibi",
     "dejie.guo@gmail.com": "JayGwod",
     "133716830+0xKingBack@users.noreply.github.com": "0xKingBack",
     "daixin1204@gmail.com": "SimbaKingjoe",
@@ -1160,7 +1160,7 @@ AUTHOR_MAP = {
     "me+github7604@versun.org": "Versun",  # co-author only
     "my.vesper.nine@gmail.com": "kevin-ho",  # salvage: PR #15488 author @kevin-ho
     "noreply@paperclip.ing": "Paperclip",  # co-author only
-    "teknium@ai-council": "teknium1",
+    "teknium@pokelabs-council": "teknium1",
     "web3blind@gmail.com": "web3blind",
     "ztzheng@163.com": "chengoak",  # PR #17467
     "24110240104@m.fudan.edu.cn": "YuShu",  # co-author only
@@ -1524,7 +1524,7 @@ def _update_acp_registry_versions(semver: str) -> None:
         manifest["version"] = semver
         uvx = manifest.get("distribution", {}).get("uvx", {})
         if "package" in uvx:
-            uvx["package"] = f"ai-council[acp]=={semver}"
+            uvx["package"] = f"pokelabs-council[acp]=={semver}"
         # Preserve trailing newline + 2-space indent the file already uses.
         ACP_REGISTRY_MANIFEST.write_text(
             json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

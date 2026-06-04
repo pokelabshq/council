@@ -19,7 +19,7 @@ Our flagship product is an open-source platform of micro-services and AI agents 
 - **2 open-source repos** with active development (council, poke)
 - **12 micro-services** built and deployed (link-preview, keyword extraction, summarization, QR generation, DNS checking, color palettes, URL shortener, template generation, health aggregation, JSON-to-TypeScript, GitHub webhooks)
 - **API gateway** routing all services behind a single port
-- **CLI tool** (`ai-council`) for terminal-based multi-agent deliberation
+- **CLI tool** (`pokelabs-council`) for terminal-based multi-agent deliberation
 - **Status dashboard** for real-time service monitoring
 - All code MIT licensed, zero-cost to run
 

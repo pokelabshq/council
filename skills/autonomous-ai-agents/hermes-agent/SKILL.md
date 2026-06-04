@@ -1,5 +1,5 @@
 ---
-name: ai-council
+name: pokelabs-council
 description: "Configure, extend, or contribute to Poke Council."
 version: 2.1.0
 author: Poke Council + Teknium
@@ -29,7 +29,7 @@ People use Council for software development, research, system administration, da
 
 **This skill helps you work with Poke Council effectively** — setting it up, configuring features, spawning additional agent instances, troubleshooting issues, finding the right commands and settings, and understanding how the system works when you need to extend or contribute to it.
 
-**Docs:** https://ai-council.pokelabs.com/docs/
+**Docs:** https://pokelabs-council.pokelabs.com/docs/
 
 ## Quick Start
 
@@ -153,7 +153,7 @@ council gateway setup        Configure platforms
 
 Supported platforms: Telegram, Discord, Slack, WhatsApp, Signal, Email, SMS, Matrix, Mattermost, Home Assistant, DingTalk, Feishu, WeCom, BlueBubbles (iMessage), Weixin (WeChat), API Server, Webhooks. Open WebUI connects via the API Server adapter.
 
-Platform docs: https://ai-council.pokelabs.com/docs/user-guide/messaging/
+Platform docs: https://pokelabs-council.pokelabs.com/docs/user-guide/messaging/
 
 ### Sessions
 
@@ -232,7 +232,7 @@ council uninstall            Uninstall Council
 
 Type these during an interactive chat session. New commands land fairly
 often; if something below looks stale, run `/help` in-session for the
-authoritative list or see the [live slash commands reference](https://ai-council.pokelabs.com/docs/reference/slash-commands).
+authoritative list or see the [live slash commands reference](https://pokelabs-council.pokelabs.com/docs/reference/slash-commands).
 The registry of record is `council_cli/commands.py` — every consumer
 (autocomplete, Telegram menu, Slack mapping, `/help`) derives from it.
 
@@ -342,7 +342,7 @@ $COUNCIL_HOME/skills/        Installed skills
 ~/.council/state.db          Canonical session store (SQLite + FTS5)
 ~/.council/logs/             Gateway and error logs
 ~/.council/auth.json         OAuth tokens and credential pools
-~/.council/ai-council/     Source code (if git-installed)
+~/.council/pokelabs-council/     Source code (if git-installed)
 ```
 
 Profiles use `~/.council/profiles/<name>/` with the same layout.
@@ -365,7 +365,7 @@ Edit with `council config edit` or `council config set section.key value`.
 | `delegation` | `model`, `provider`, `base_url`, `api_key`, `max_iterations` (50), `reasoning_effort` |
 | `checkpoints` | `enabled`, `max_snapshots` (50) |
 
-Full config reference: https://ai-council.pokelabs.com/docs/user-guide/configuration
+Full config reference: https://pokelabs-council.pokelabs.com/docs/user-guide/configuration
 
 ### Providers
 
@@ -395,7 +395,7 @@ Full config reference: https://ai-council.pokelabs.com/docs/user-guide/configura
 | Custom endpoint | Config | `model.base_url` + `model.api_key` in config.yaml |
 | GitHub Copilot ACP | External | `COPILOT_CLI_PATH` or Copilot CLI |
 
-Full provider docs: https://ai-council.pokelabs.com/docs/integrations/providers
+Full provider docs: https://pokelabs-council.pokelabs.com/docs/integrations/providers
 
 ### Toolsets
 
@@ -655,7 +655,7 @@ the `cronjob` tool, the `council cron` CLI (`list`, `add`, `edit`,
   header/footer instead of being mirrored into the target gateway
   session (keeps role alternation intact).
 
-User docs: https://ai-council.pokelabs.com/docs/user-guide/features/cron
+User docs: https://pokelabs-council.pokelabs.com/docs/user-guide/features/cron
 
 ### Curator (skill lifecycle)
 
@@ -676,7 +676,7 @@ so nothing is lost.
 
 Config: `curator.*` (`enabled`, `interval_hours`, `min_idle_hours`,
 `stale_after_days`, `archive_after_days`, `backup.*`).
-User docs: https://ai-council.pokelabs.com/docs/user-guide/features/curator
+User docs: https://pokelabs-council.pokelabs.com/docs/user-guide/features/curator
 
 ### Kanban (multi-agent work queue)
 
@@ -705,7 +705,7 @@ sessions still have zero `kanban_*` schema footprint unless configured.
   `COUNCIL_KANBAN_BOARD` pinned in env); tenant is a soft namespace
   within a board for workspace-path + memory-key isolation.
 
-User docs: https://ai-council.pokelabs.com/docs/user-guide/features/kanban
+User docs: https://pokelabs-council.pokelabs.com/docs/user-guide/features/kanban
 
 ---
 
@@ -856,32 +856,32 @@ council config set auxiliary.vision.model <model_name>
 
 | Looking for... | Location |
 |----------------|----------|
-| Config options | `council config edit` or [Configuration docs](https://ai-council.pokelabs.com/docs/user-guide/configuration) |
-| Available tools | `council tools list` or [Tools reference](https://ai-council.pokelabs.com/docs/reference/tools-reference) |
-| Slash commands | `/help` in session or [Slash commands reference](https://ai-council.pokelabs.com/docs/reference/slash-commands) |
-| Skills catalog | `council skills browse` or [Skills catalog](https://ai-council.pokelabs.com/docs/reference/skills-catalog) |
-| Provider setup | `council model` or [Providers guide](https://ai-council.pokelabs.com/docs/integrations/providers) |
-| Platform setup | `council gateway setup` or [Messaging docs](https://ai-council.pokelabs.com/docs/user-guide/messaging/) |
-| MCP servers | `council mcp list` or [MCP guide](https://ai-council.pokelabs.com/docs/user-guide/features/mcp) |
-| Profiles | `council profile list` or [Profiles docs](https://ai-council.pokelabs.com/docs/user-guide/profiles) |
-| Cron jobs | `council cron list` or [Cron docs](https://ai-council.pokelabs.com/docs/user-guide/features/cron) |
-| Memory | `council memory status` or [Memory docs](https://ai-council.pokelabs.com/docs/user-guide/features/memory) |
-| Env variables | `council config env-path` or [Env vars reference](https://ai-council.pokelabs.com/docs/reference/environment-variables) |
-| CLI commands | `council --help` or [CLI reference](https://ai-council.pokelabs.com/docs/reference/cli-commands) |
+| Config options | `council config edit` or [Configuration docs](https://pokelabs-council.pokelabs.com/docs/user-guide/configuration) |
+| Available tools | `council tools list` or [Tools reference](https://pokelabs-council.pokelabs.com/docs/reference/tools-reference) |
+| Slash commands | `/help` in session or [Slash commands reference](https://pokelabs-council.pokelabs.com/docs/reference/slash-commands) |
+| Skills catalog | `council skills browse` or [Skills catalog](https://pokelabs-council.pokelabs.com/docs/reference/skills-catalog) |
+| Provider setup | `council model` or [Providers guide](https://pokelabs-council.pokelabs.com/docs/integrations/providers) |
+| Platform setup | `council gateway setup` or [Messaging docs](https://pokelabs-council.pokelabs.com/docs/user-guide/messaging/) |
+| MCP servers | `council mcp list` or [MCP guide](https://pokelabs-council.pokelabs.com/docs/user-guide/features/mcp) |
+| Profiles | `council profile list` or [Profiles docs](https://pokelabs-council.pokelabs.com/docs/user-guide/profiles) |
+| Cron jobs | `council cron list` or [Cron docs](https://pokelabs-council.pokelabs.com/docs/user-guide/features/cron) |
+| Memory | `council memory status` or [Memory docs](https://pokelabs-council.pokelabs.com/docs/user-guide/features/memory) |
+| Env variables | `council config env-path` or [Env vars reference](https://pokelabs-council.pokelabs.com/docs/reference/environment-variables) |
+| CLI commands | `council --help` or [CLI reference](https://pokelabs-council.pokelabs.com/docs/reference/cli-commands) |
 | Gateway logs | `~/.council/logs/gateway.log` |
 | Session files | `council sessions browse` (reads state.db) |
-| Source code | `~/.council/ai-council/` |
+| Source code | `~/.council/pokelabs-council/` |
 
 ---
 
 ## Contributor Quick Reference
 
-For occasional contributors and PR authors. Full developer docs: https://ai-council.pokelabs.com/docs/developer-guide/
+For occasional contributors and PR authors. Full developer docs: https://pokelabs-council.pokelabs.com/docs/developer-guide/
 
 ### Project Layout
 
 ```
-ai-council/
+pokelabs-council/
 ├── run_agent.py          # AIAgent — core conversation loop
 ├── model_tools.py        # Tool discovery and dispatch
 ├── toolsets.py           # Toolset definitions

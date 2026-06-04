@@ -24,13 +24,13 @@ PyPI 发布版本跟踪**带标签的版本**（主版本和次版本发布）�
 
 ```bash
 council update --check    # 查看 PyPI 上是否有更新的版本
-council update            # 执行 pip install --upgrade ai-council
+council update            # 执行 pip install --upgrade pokelabs-council
 ```
 
 或手动执行：
 
 ```bash
-pip install --upgrade ai-council    # 或：uv pip install --upgrade ai-council
+pip install --upgrade pokelabs-council    # 或：uv pip install --upgrade pokelabs-council
 ```
 
 :::tip
@@ -157,7 +157,7 @@ council version
 如果你是手动安装的（未使用快速安装脚本）：
 
 ```bash
-cd /path/to/ai-council
+cd /path/to/pokelabs-council
 export VIRTUAL_ENV="$(pwd)/venv"
 
 # Pull latest code
@@ -176,7 +176,7 @@ council config migrate   # Interactively add any missing options
 如果更新引入了问题，可以回滚到之前的版本：
 
 ```bash
-cd /path/to/ai-council
+cd /path/to/pokelabs-council
 
 # List recent versions
 git log --oneline -10
@@ -208,10 +208,10 @@ uv pip install -e ".[all]"
 
 ```bash
 # Update the flake input
-nix flake update ai-council
+nix flake update pokelabs-council
 
 # Or rebuild with the latest
-nix profile upgrade ai-council
+nix profile upgrade pokelabs-council
 ```
 
 Nix 安装是不可变的 — 回滚由 Nix 的 generation 系统处理：
@@ -237,7 +237,7 @@ council uninstall
 ### pip 安装方式
 
 ```bash
-pip uninstall ai-council
+pip uninstall pokelabs-council
 rm -rf ~/.council            # 可选 — 如计划重新安装则保留
 ```
 
@@ -245,7 +245,7 @@ rm -rf ~/.council            # 可选 — 如计划重新安装则保留
 
 ```bash
 rm -f ~/.local/bin/council
-rm -rf /path/to/ai-council
+rm -rf /path/to/pokelabs-council
 rm -rf ~/.council            # 可选 — 如计划重新安装则保留
 ```
 

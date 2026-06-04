@@ -558,7 +558,7 @@ This is the only hook whose return value matters. When a `pre_llm_call` callback
 
 ```python
 # Dict with context key
-return {"context": "Recalled memories:\n- User prefers dark mode\n- Last project: ai-council"}
+return {"context": "Recalled memories:\n- User prefers dark mode\n- Last project: pokelabs-council"}
 
 # Plain string (equivalent to the dict form above)
 return "Recalled memories:\n- User prefers dark mode"
@@ -1066,7 +1066,7 @@ For sharing plugins publicly, add an entry point to your Python package:
 
 ```toml
 # pyproject.toml
-[project.entry-points."ai_council.plugins"]
+[project.entry-points."pokelabs_council.plugins"]
 my-plugin = "my_plugin_package"
 ```
 
@@ -1082,7 +1082,7 @@ NixOS users can install your plugin declaratively if you provide a `pyproject.to
 **Entry-point plugins** (recommended for distribution):
 ```nix
 # User's configuration.nix
-services.ai-council.extraPythonPackages = [
+services.pokelabs-council.extraPythonPackages = [
   (pkgs.python312Packages.buildPythonPackage {
     pname = "my-plugin";
     version = "1.0.0";
@@ -1100,7 +1100,7 @@ services.ai-council.extraPythonPackages = [
 
 **Directory plugins** (no `pyproject.toml` needed):
 ```nix
-services.ai-council.extraPlugins = [
+services.pokelabs-council.extraPlugins = [
   (pkgs.fetchFromGitHub {
     owner = "you";
     repo = "council-my-plugin";

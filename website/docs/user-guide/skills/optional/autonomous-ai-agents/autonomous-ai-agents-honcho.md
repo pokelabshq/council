@@ -21,7 +21,7 @@ Configure and use Honcho memory with Council -- cross-session user modeling, mul
 | License | MIT |
 | Platforms | linux, macos, windows |
 | Tags | `Honcho`, `Memory`, `Profiles`, `Observation`, `Dialectic`, `User-Modeling`, `Session-Summary` |
-| Related skills | [`ai-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-ai-council) |
+| Related skills | [`pokelabs-council`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-pokelabs-council) |
 
 ## Reference: full SKILL.md
 

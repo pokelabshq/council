@@ -1142,7 +1142,7 @@ def _openrouter_model_is_free(pricing: Any) -> bool:
 def _openrouter_model_supports_tools(item: Any) -> bool:
     """Return True when the model's ``supported_parameters`` advertise tool calling.
 
-    ai-council is tool-calling-first — every provider path assumes the model
+    pokelabs-council is tool-calling-first — every provider path assumes the model
     can invoke tools. Models that don't advertise ``tools`` in their
     ``supported_parameters`` (e.g. image-only or completion-only models) cannot
     be driven by the agent loop and would fail at the first tool call.
@@ -1215,7 +1215,7 @@ def fetch_openrouter_models(
         live_item = live_by_id.get(preferred_id)
         if live_item is None:
             continue
-        # Hide models that don't advertise tool-calling support — ai-council
+        # Hide models that don't advertise tool-calling support — pokelabs-council
         # requires it and surfacing them leads to immediate runtime failures
         # when the user selects them. Ported from Kilo-Org/kilocode#9068.
         if not _openrouter_model_supports_tools(live_item):

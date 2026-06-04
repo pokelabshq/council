@@ -2,7 +2,7 @@
 Backup and import commands for council CLI.
 
 `council backup` creates a zip archive of the entire ~/.council/ directory
-(excluding the ai-council repo and transient files).
+(excluding the pokelabs-council repo and transient files).
 
 `council import` restores from a backup zip, overlaying onto the current
 COUNCIL_HOME root.
@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # Directory names to skip entirely (matched against each path component)
 _EXCLUDED_DIRS = {
-    "ai-council",     # the codebase repo — re-clone instead
+    "pokelabs-council",     # the codebase repo — re-clone instead
     "__pycache__",      # bytecode caches — regenerated on import
     ".git",             # nested git dirs (profiles shouldn't have these, but safety)
     "node_modules",     # js deps if website/ somehow leaks in
@@ -459,8 +459,8 @@ def run_import(args) -> None:
 
         # Guidance
         print()
-        if not (council_root / "ai-council").is_dir():
-            print("Note: The ai-council codebase was not included in the backup.")
+        if not (council_root / "pokelabs-council").is_dir():
+            print("Note: The pokelabs-council codebase was not included in the backup.")
             print("  If this is a fresh install, run: council update")
 
         if restored_profiles:

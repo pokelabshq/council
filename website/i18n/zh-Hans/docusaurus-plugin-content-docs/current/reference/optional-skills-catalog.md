@@ -1,12 +1,12 @@
 ---
 sidebar_position: 9
 title: "可选技能目录"
-description: "ai-council 附带的官方可选技能 — 通过 council skills install official/<category>/<skill> 安装"
+description: "pokelabs-council 附带的官方可选技能 — 通过 council skills install official/<category>/<skill> 安装"
 ---
 
 # 可选技能目录
 
-可选技能随 ai-council 一起发布，位于 `optional-skills/` 目录下，但**默认未激活**。请显式安装：
+可选技能随 pokelabs-council 一起发布，位于 `optional-skills/` 目录下，但**默认未激活**。请显式安装：
 
 ```bash
 council skills install official/<category>/<skill>
@@ -77,7 +77,7 @@ council skills uninstall <skill-name>
 
 | 技能 | 描述 |
 |-------|-------------|
-| [**agentmail**](/user-guide/skills/optional/email/email-agentmail) | 通过 AgentMail 为 agent 提供专属邮箱。使用 agent 专属邮件地址（如 ai-council@agentmail.to）自主发送、接收和管理邮件。 |
+| [**agentmail**](/user-guide/skills/optional/email/email-agentmail) | 通过 AgentMail 为 agent 提供专属邮箱。使用 agent 专属邮件地址（如 pokelabs-council@agentmail.to）自主发送、接收和管理邮件。 |
 
 ## finance
 
