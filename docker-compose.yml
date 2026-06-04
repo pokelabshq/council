@@ -20,6 +20,9 @@ services:
       - base64-tool
       - markdown-render
       - status-dashboard
+      - hash-gen
+      - uuid-gen
+      - timestamp-conv
     restart: unless-stopped
 
   sentiment:
@@ -104,4 +107,22 @@ services:
     build: ./poke-services/status-dashboard
     ports:
       - "8778:8778"
+    restart: unless-stopped
+
+  hash-gen:
+    build: ./poke-services/hash-gen
+    ports:
+      - "8779:8779"
+    restart: unless-stopped
+
+  uuid-gen:
+    build: ./poke-services/uuid-gen
+    ports:
+      - "8780:8780"
+    restart: unless-stopped
+
+  timestamp-conv:
+    build: ./poke-services/timestamp-conv
+    ports:
+      - "8781:8781"
     restart: unless-stopped
