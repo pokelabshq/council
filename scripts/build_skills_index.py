@@ -275,6 +275,50 @@ def batch_resolve_paths(skills: list, auth: GitHubAuth) -> list:
     return skills
 
 
+
+def load_previous_index() -> Optional[dict]:
+    """Load the previous skills index from disk if it exists."""
+    if not os.path.exists(OUTPUT_PATH):
+        return None
+    try:
+        with open(OUTPUT_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        age_hours = (time.time() - os.path.getmtime(OUTPUT_PATH)) / 3600
+        print(f"  Loaded previous index: {data.get('skill_count', 0)} skills "
+              f"(generated {age_hours:.1f}h ago)", flush=True)
+        return data
+    except Exception as e:
+        print(f"  Warning: could not load previous index: {e}", file=sys.stderr)
+        return None
+
+
+def merge_skills(previous: dict, new_skills: list, failed_sources: list) -> list:
+    """Merge new skills with previous index entries from failed sources.
+    
+    For sources that failed, keep entries from the previous index so the
+    catalog doesn't go stale. For sources that succeeded, use the new data.
+    """
+    if not previous or not failed_sources:
+        return new_skills
+    
+    failed_set = set(failed_sources)
+    # Keep previous entries only from sources that failed this time
+    kept_previous = [
+        s for s in previous.get("skills", [])
+        if s.get("source", "") in failed_set
+    ]
+    
+    if kept_previous:
+        print(f"  Recovery: keeping {len(kept_previous)} entries from previous "
+              f"index for failed sources: {failed_sources}", flush=True)
+    
+    # Build set of new identifiers to avoid duplicates
+    new_ids = {s["identifier"] for s in new_skills}
+    # Add previous entries that aren't already in new skills
+    recovered = [s for s in kept_previous if s["identifier"] not in new_ids]
+    
+    return new_skills + recovered
+
 def main():
     print("Building Council Skills Index...", flush=True)
     overall_start = time.time()
@@ -298,8 +342,16 @@ def main():
 
     all_skills: list[dict] = []
 
+    # Track which sources failed so we can recover from previous index
+    failed_sources: list[str] = []
+    previous_index = load_previous_index()
+
     # Crawl skills.sh
-    all_skills.extend(crawl_skills_sh(skills_sh_source))
+    skills_sh_results = crawl_skills_sh(skills_sh_source)
+    if not skills_sh_results:
+        failed_sources.append("skills.sh")
+        failed_sources.append("skills-sh")
+    all_skills.extend(skills_sh_results)
 
     # Crawl other sources in parallel.
     # Per-source soft caps — sources stop returning when they run out, so these
@@ -324,13 +376,22 @@ def main():
             limit = SOURCE_LIMITS.get(name, DEFAULT_SOURCE_LIMIT)
             futures[pool.submit(crawl_source, source, name, limit)] = name
         for future in as_completed(futures):
+            name = futures[future]
             try:
-                all_skills.extend(future.result())
+                result = future.result()
+                if not result:
+                    failed_sources.append(name)
+                all_skills.extend(result)
             except Exception as e:
-                print(f"  Error: {e}", file=sys.stderr)
+                failed_sources.append(name)
+                print(f"  Error from {name}: {e}", file=sys.stderr)
 
     # Batch resolve GitHub paths for skills.sh entries
     all_skills = batch_resolve_paths(all_skills, auth)
+
+    # Merge with previous index for any failed sources
+    if failed_sources:
+        all_skills = merge_skills(previous_index, all_skills, failed_sources)
 
     # Deduplicate by identifier
     seen: dict[str, dict] = {}
@@ -408,20 +469,34 @@ def main():
         )
 
     if health_errors:
-        print(
-            "\nERROR: skills index health check failed — refusing to ship "
-            "a degenerate index. Investigate the following sources:",
-            file=sys.stderr,
-        )
-        for line in health_errors:
-            print(line, file=sys.stderr)
-        print(
-            "\nIf the drop is expected (e.g. a hub is genuinely shutting "
-            "down), lower the floor in scripts/build_skills_index.py "
-            "EXPECTED_FLOORS in the same PR.",
-            file=sys.stderr,
-        )
-        sys.exit(2)
+        if failed_sources:
+            # We already recovered from previous index — warn but don't fail
+            print(
+                "\nWARNING: skills index health check flagged issues, "
+                "but failed sources were recovered from previous index:",
+                file=sys.stderr,
+            )
+            for line in health_errors:
+                print(line, file=sys.stderr)
+            print(
+                f"  Failed sources (recovered): {failed_sources}",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                "\nERROR: skills index health check failed — refusing to ship "
+                "a degenerate index. Investigate the following sources:",
+                file=sys.stderr,
+            )
+            for line in health_errors:
+                print(line, file=sys.stderr)
+            print(
+                "\nIf the drop is expected (e.g. a hub is genuinely shutting "
+                "down), lower the floor in scripts/build_skills_index.py "
+                "EXPECTED_FLOORS in the same PR.",
+                file=sys.stderr,
+            )
+            sys.exit(2)
 
 
 if __name__ == "__main__":
