@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   auto-merge:
-    if: github.actor == 'dependabot[bot]' || github.actor == 'github-actions[bot]'
+    if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,9 +23,14 @@ jobs:
         uses: dependabot/fetch-metadata@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Skip if no metadata
+        if: steps.meta.outputs.update-type == ''
+        run: echo "No Dependabot metadata — skipping"; exit 0
 
       - name: Auto-approve semver-minor and semver-patch
-        if: steps.meta.outputs.update-type != 'version-update:semver-major'
+        if: steps.meta.outputs.update-type != 'version-update:semver-major' && steps.meta.outputs.update-type != ''
         run: gh pr review "$PR_URL" --approve --body "Auto-approved: ${{ steps.meta.outputs.update-type }}"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
@@ -33,7 +38,10 @@ jobs:
 
       - name: Auto-merge semver-patch (squash)
         if: steps.meta.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr merge "$PR_URL" --squash --auto
+        run: |
+          # Wait for status checks to complete
+          gh pr checks "$PR_URL" --wait --interval 10 || true
+          gh pr merge "$PR_URL" --squash --auto
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
