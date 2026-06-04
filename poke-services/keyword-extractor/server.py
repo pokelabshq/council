@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Keyword Extractor — extracts keywords and key phrases from text."""
+import http.server, json, os, re
+from collections import Counter
+
+PORT = int(os.environ.get("PORT", 8766))
+
+STOP_WORDS = {"the","a","an","is","are","was","were","be","been","being","have","has","had","do","does","did","will","would","could","should","may","might","shall","can","need","dare","ought","used","to","of","in","for","on","with","at","by","from","as","into","through","during","before","after","above","below","between","out","off","over","under","again","further","then","once","here","there","when","where","why","how","all","each","every","both","few","more","most","other","some","such","no","nor","not","only","own","same","so","than","too","very","just","because","but","and","or","if","while","about","up","it","its","this","that","these","those","i","me","my","we","our","you","your","he","him","his","she","her","they","them","their","what","which","who","whom"}
+
+def extract_keywords(text, top_n=10):
+    words = re.findall(r'\b[a-z]{3,}\b', text.lower())
+    words = [w for w in words if w not in STOP_WORDS]
+    freq = Counter(words)
+    return [{"word": w, "count": c} for w, c in freq.most_common(top_n)]
+
+def extract_phrases(text, top_n=5):
+    words = re.findall(r'\b[a-z]{3,}\b', text.lower())
+    words = [w for w in words if w not in STOP_WORDS]
+    bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)]
+    freq = Counter(bigrams)
+    return [{"phrase": p, "count": c} for p, c in freq.most_common(top_n)]
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/api/health":
+            self._json(200, {"ok": True, "v": 1, "service": "keyword-extractor"})
+        else:
+            self._json(404, {"error": "Not found"})
+
+    def do_POST(self):
+        if self.path == "/api/extract":
+            length = int(self.headers.get("Content-Length", 0))
+            body = json.loads(self.rfile.read(length))
+            text = body.get("text", "")
+            top_n = body.get("top_n", 10)
+            if not text:
+                self._json(400, {"error": "text required"})
+                return
+            keywords = extract_keywords(text, top_n)
+            phrases = extract_phrases(text, min(top_n // 2, 5))
+            self._json(200, {"ok": True, "keywords": keywords, "phrases": phrases, "total_words": len(text.split())})
+        else:
+            self._json(404, {"error": "Not found"})
+
+    def _json(self, code, data):
+        self.send_response(code)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(data).encode())
+
+    def log_message(self, fmt, *args):
+        pass
+
+if __name__ == "__main__":
+    server = http.server.HTTPServer(("0.0.0.0", PORT), Handler)
+    print(f"Keyword extractor on :{PORT}")
+    server.serve_forever()
