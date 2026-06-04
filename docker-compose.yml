@@ -1,165 +1,107 @@
 version: "3.9"
 
-x-service: &service
-  restart: unless-stopped
-  networks:
-    - council
-
 services:
   gateway:
-    <<: *service
-    build:
-      context: .
-      dockerfile: poke-services/gateway/Dockerfile
+    build: ./gateway
     ports:
       - "8700:8700"
     depends_on:
-      - link-preview
-      - keyword
-      - summarize
-      - qr
-      - dns
-      - portal
-      - color
-      - url
-      - template-gen
-      - health-agg
-      - json2ts
-      - github-webhook
       - sentiment
-    environment:
-      - PORT=8700
-
-  link-preview:
-    <<: *service
-    build:
-      context: ./poke-services/link-preview
-      dockerfile: Dockerfile
-    ports:
-      - "8765:8765"
-    environment:
-      - PORT=8765
-
-  keyword:
-    <<: *service
-    build:
-      context: ./poke-services/keyword
-      dockerfile: Dockerfile
-    ports:
-      - "8766:8766"
-    environment:
-      - PORT=8766
-
-  summarize:
-    <<: *service
-    build:
-      context: ./poke-services/summarize
-      dockerfile: Dockerfile
-    ports:
-      - "8767:8767"
-    environment:
-      - PORT=8767
-
-  qr:
-    <<: *service
-    build:
-      context: ./poke-services/qr
-      dockerfile: Dockerfile
-    ports:
-      - "8768:8768"
-    environment:
-      - PORT=8768
-
-  dns:
-    <<: *service
-    build:
-      context: ./poke-services/dns
-      dockerfile: Dockerfile
-    ports:
-      - "8769:8769"
-    environment:
-      - PORT=8769
-
-  portal:
-    <<: *service
-    build:
-      context: ./poke-services/portal
-      dockerfile: Dockerfile
-    ports:
-      - "8770:8770"
-    environment:
-      - PORT=8770
-
-  color:
-    <<: *service
-    build:
-      context: ./poke-services/color
-      dockerfile: Dockerfile
-    ports:
-      - "8771:8771"
-    environment:
-      - PORT=8771
-
-  url:
-    <<: *service
-    build:
-      context: ./poke-services/url
-      dockerfile: Dockerfile
-    ports:
-      - "8772:8772"
-    environment:
-      - PORT=8772
-
-  template-gen:
-    <<: *service
-    build:
-      context: ./poke-services/template-gen
-      dockerfile: Dockerfile
-    ports:
-      - "8773:8773"
-    environment:
-      - PORT=8773
-
-  health-agg:
-    <<: *service
-    build:
-      context: ./poke-services/health-agg
-      dockerfile: Dockerfile
-    ports:
-      - "8774:8774"
-    environment:
-      - PORT=8774
-
-  json2ts:
-    <<: *service
-    build:
-      context: ./poke-services/json2ts
-      dockerfile: Dockerfile
-    ports:
-      - "8775:8775"
-    environment:
-      - PORT=8775
-
-  github-webhook:
-    <<: *service
-    build:
-      context: ./poke-services/github-webhook
-      dockerfile: Dockerfile
-    ports:
-      - "8776:8776"
-    environment:
-      - PORT=8776
+      - link-preview
+      - keyword-extractor
+      - qr-generator
+      - dns-lookup
+      - color-palette
+      - text-summary
+      - url-shortener
+      - password-generator
+      - timestamp-converter
+      - json-formatter
+      - base64-tool
+      - markdown-render
+      - status-dashboard
+    restart: unless-stopped
 
   sentiment:
-    <<: *service
-    build:
-      context: ./poke-services/sentiment
-      dockerfile: Dockerfile
+    build: ./poke-services/sentiment
     ports:
-      - "8777:8777"
-    environment:
-      - PORT=8777
+      - "8764:8764"
+    restart: unless-stopped
 
-networks:
-  council:
-    driver: bridge
+  link-preview:
+    build: ./poke-services/link-preview
+    ports:
+      - "8765:8765"
+    restart: unless-stopped
+
+  keyword-extractor:
+    build: ./poke-services/keyword-extractor
+    ports:
+      - "8766:8766"
+    restart: unless-stopped
+
+  qr-generator:
+    build: ./poke-services/qr-generator
+    ports:
+      - "8767:8767"
+    restart: unless-stopped
+
+  dns-lookup:
+    build: ./poke-services/dns-lookup
+    ports:
+      - "8768:8768"
+    restart: unless-stopped
+
+  color-palette:
+    build: ./poke-services/color-palette
+    ports:
+      - "8769:8769"
+    restart: unless-stopped
+
+  text-summary:
+    build: ./poke-services/text-summary
+    ports:
+      - "8770:8770"
+    restart: unless-stopped
+
+  url-shortener:
+    build: ./poke-services/url-shortener
+    ports:
+      - "8771:8771"
+    restart: unless-stopped
+
+  password-generator:
+    build: ./poke-services/password-generator
+    ports:
+      - "8772:8772"
+    restart: unless-stopped
+
+  timestamp-converter:
+    build: ./poke-services/timestamp-converter
+    ports:
+      - "8773:8773"
+    restart: unless-stopped
+
+  json-formatter:
+    build: ./poke-services/json-formatter
+    ports:
+      - "8774:8774"
+    restart: unless-stopped
+
+  base64-tool:
+    build: ./poke-services/base64-tool
+    ports:
+      - "8775:8775"
+    restart: unless-stopped
+
+  markdown-render:
+    build: ./poke-services/markdown-render
+    ports:
+      - "8776:8776"
+    restart: unless-stopped
+
+  status-dashboard:
+    build: ./poke-services/status-dashboard
+    ports:
+      - "8778:8778"
+    restart: unless-stopped
