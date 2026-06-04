@@ -20,6 +20,9 @@ SERVICES = {
     "base64":          ("localhost", 8775),
     "markdown":        ("localhost", 8776),
     "status":          ("localhost", 8778),
+    "hash-gen":        ("localhost", 8779),
+    "uuid-gen":        ("localhost", 8780),
+    "timestamp-conv":  ("localhost", 8781),
 }
 
 def proxy_request(method, service, path, body=None, headers=None):
