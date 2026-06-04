@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-services:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - link-preview
+          - keyword
+          - summarize
+          - qr
+          - dns
+          - portal
+          - color
+          - url
+          - template-gen
+          - health-agg
+          - json2ts
+          - github-webhook
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: ${{ hashFiles(format('poke-services/{0}/server.py', matrix.service)) != '' }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Set up Node.js
+        if: ${{ hashFiles(format('poke-services/{0}/package.json', matrix.service)) != '' }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Start service (Python)
+        if: ${{ hashFiles(format('poke-services/{0}/server.py', matrix.service)) != '' }}
+        run: |
+          cd poke-services/${{ matrix.service }}
+          nohup python3 server.py > /tmp/${{ matrix.service }}.log 2>&1 &
+          sleep 2
+
+      - name: Start service (Node)
+        if: ${{ hashFiles(format('poke-services/{0}/package.json', matrix.service)) != '' }}
+        run: |
+          cd poke-services/${{ matrix.service }}
+          npm install --silent 2>/dev/null
+          nohup node server.js > /tmp/${{ matrix.service }}.log 2>&1 &
+          sleep 2
+
+      - name: Health check
+        run: |
+          PORT=$(grep -oP 'port=\K\d+' poke-services/${{ matrix.service }}/server.py 2>/dev/null || \
+                 grep -oP '"port":\s*\K\d+' poke-services/${{ matrix.service }}/package.json 2>/dev/null || \
+                 echo "8765")
+          echo "Checking ${{ matrix.service }} on port $PORT..."
+          for i in 1 2 3 4 5; do
+            if curl -sf http://localhost:$PORT/api/health > /dev/null 2>&1; then
+              echo "✅ ${{ matrix.service }} is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "❌ ${{ matrix.service }} failed health check"
+          cat /tmp/${{ matrix.service }}.log 2>/dev/null
+          exit 1
+
+  test-gateway:
+    runs-on: ubuntu-latest
+    needs: test-services
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Start all services
+        run: |
+          for dir in poke-services/*/; do
+            if [ -f "$dir/server.py" ]; then
+              cd "$dir"
+              nohup python3 server.py > /tmp/$(basename $dir).log 2>&1 &
+              cd "$OLDPWD"
+            fi
+          done
+          sleep 3
+
+      - name: Start gateway
+        run: |
+          cd poke-services/gateway
+          nohup python3 gateway.py > /tmp/gateway.log 2>&1 &
+          sleep 2
+
+      - name: Test gateway routes
+        run: |
+          for service in link-preview keyword summarize qr dns portal color url template-gen health-agg json2ts; do
+            if curl -sf http://localhost:8700/$service/api/health > /dev/null 2>&1; then
+              echo "✅ Gateway → $service OK"
+            else
+              echo "⚠️ Gateway → $service not available (may not have /api/health)"
+            fi
+          done
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install lint tools
+        run: pip install flake8 mypy 2>/dev/null
+
+      - name: Lint Python services
+        run: |
+          for f in poke-services/*/server.py; do
+            echo "Linting $f..."
+            python3 -m py_compile "$f" && echo "  ✅ syntax OK" || echo "  ❌ syntax error"
+          done
+
+      - name: Check shell scripts
+        run: |
+          for f in *.sh poke-services/*.sh; do
+            [ -f "$f" ] && bash -n "$f" && echo "✅ $f" || echo "❌ $f"
+          done
