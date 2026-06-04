@@ -24,6 +24,7 @@ SERVICES = {
     "uuid-gen":        ("localhost", 8780),
     "timestamp-conv":  ("localhost", 8781),
     "barcode":         ("localhost", 8782),
+    "barcode":         ("localhost", 8782),
 }
 
 def proxy_request(method, service, path, body=None, headers=None):
