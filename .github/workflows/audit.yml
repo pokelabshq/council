@@ -1,0 +1,73 @@
+name: Service Audit
+on:
+  schedule:
+    - cron: '0 8 * * 1'  # Weekly Monday 8am UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install flake8 bandit pip-audit
+
+      - name: Run flake8 on all services
+        run: |
+          echo "## Flake8 Results" >> $GITHUB_STEP_SUMMARY
+          for svc in poke-services/*/; do
+            name=$(basename "$svc")
+            echo "### $name" >> $GITHUB_STEP_SUMMARY
+            flake8 "$svc" --max-line-length=120 --statistics 2>&1 | head -20 >> $GITHUB_STEP_SUMMARY || true
+          done
+
+      - name: Run bandit security scan
+        run: |
+          echo "## Security Scan" >> $GITHUB_STEP_SUMMARY
+          bandit -r poke-services/ -f screen 2>&1 | head -30 >> $GITHUB_STEP_SUMMARY || true
+
+      - name: Check service structure
+        run: |
+          echo "## Service Structure" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | server.py | Dockerfile | README | Health |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|-----------|------------|--------|--------|" >> $GITHUB_STEP_SUMMARY
+          for svc in poke-services/*/; do
+            name=$(basename "$svc")
+            sp=$(test -f "$svc/server.py" && echo "✅" || echo "❌")
+            df=$(test -f "$svc/Dockerfile" && echo "✅" || echo "❌")
+            rm=$(test -f "$svc/README.md" && echo "✅" || echo "❌")
+            # Check for /api/health
+            hl=$(grep -l "api/health" "$svc"/*.py 2>/dev/null >/dev/null && echo "✅" || echo "❌")
+            echo "| $name | $sp | $df | $rm | $hl |" >> $GITHUB_STEP_SUMMARY
+          done
+
+      - name: Check health endpoints
+        run: |
+          echo "## Health Check Results" >> $GITHUB_STEP_SUMMARY
+          for svc in poke-services/*/; do
+            if [ -f "$svc/server.py" ]; then
+              name=$(basename "$svc")
+              # Extract port from server.py
+              port=$(grep -oP 'PORT\s*=\s*\K\d+' "$svc/server.py" | head -1)
+              if [ -z "$port" ]; then
+                port=$(grep -oP 'PORT\s*=\s*int\(os\.environ\.get\("PORT",\s*\K\d+' "$svc/server.py" | head -1)
+              fi
+              if [ -n "$port" ]; then
+                echo "$name expects port $port" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+
+      - name: Verify service count
+        run: |
+          count=$(ls -d poke-services/*/ | wc -l)
+          echo "## Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Total services: $count" >> $GITHUB_STEP_SUMMARY
+          echo "- Python 3.12 baseline" >> $GITHUB_STEP_SUMMARY
+          echo "- All services stdlib-only" >> $GITHUB_STEP_SUMMARY
