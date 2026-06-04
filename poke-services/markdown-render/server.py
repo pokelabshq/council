@@ -6,7 +6,7 @@ PORT = int(os.environ.get("PORT", 8776))
 
 def render_md(text):
     # Code blocks
-    text = re.sub(r'```(\w*)\n(.*?)```', r'<pre><code class="language-\1">\2</code></pre>', text, flags=re.DOTALL)
+    text = re.sub(r'```(\w*)\n(.*?)```', r'<pre><code class="\1">\2</code></pre>', text, flags=re.DOTALL)
     # Inline code
     text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
     # Headers
@@ -15,7 +15,7 @@ def render_md(text):
     text = re.sub(r'^####\s+(.+)$', r'<h4>\1</h4>', text, flags=re.M)
     text = re.sub(r'^###\s+(.+)$', r'<h3>\1</h3>', text, flags=re.M)
     text = re.sub(r'^##\s+(.+)$', r'<h2>\1</h2>', text, flags=re.M)
-    text = re.sub(r'^#\s+(.+)$', r'<h1>\h1>', text, flags=re.M)
+    text = re.sub(r'^#\s+(.+)$', r'<h1>\1</h1>', text, flags=re.M)
     # Bold + italic
     text = re.sub(r'\*\*\*(.+?)\*\*\*', r'<strong><em>\1</em></strong>', text)
     text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
