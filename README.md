@@ -1,105 +1,97 @@
-# 🏛️ Council — Micro-Services Platform
+# Council — Micro-service Platform
 
-> **Poke Labs** builds autonomous AI tools. Council is our open-source micro-services platform: 12 services, 1 gateway, zero external API costs.
+A collection of 14 Python micro-services with a unified gateway, Docker deployment, and CI/CD.
 
 ## Quick Start
 
 ```bash
-# Clone
-git clone https://github.com/pokelabshq/council.git
-cd council
+# Run everything
+docker-compose up
 
-# Deploy all services + gateway
-chmod +x deploy.sh
-./deploy.sh
-
-# Verify everything is up
-./test.sh
+# Or run a single service
+cd poke-services/sentiment && python3 server.py
 ```
-
-All services are now running behind the gateway at `http://localhost:8700`.
 
 ## Services
 
-| Service | Port | Endpoint | Description |
-|---------|------|----------|-------------|
-| 🔗 Link Preview | 8765 | `/link-preview/api/preview` | Extract title, description, image from any URL |
-| 🔑 Keywords | 8766 | `/keyword/api/keywords` | Extract keywords and entities from text |
-| 📝 Summarize | 8767 | `/summarize/api/summarize` | Extractive text summarization |
-| 📱 QR Code | 8768 | `/qr/api/generate` | Generate SVG QR codes |
-| 🌐 DNS | 8769 | `/dns/api/check` | Query DNS records (A, AAAA, MX, TXT, CNAME) |
-| 🎨 Colors | 8771 | `/color/api/palette` | Generate color palettes from a base color |
-| 🔗 URL Shortener | 8772 | `/url/api/shorten` | Shorten URLs with analytics |
-| 📄 Templates | 8773 | `/template-gen/api/generate` | Generate project templates |
-| 💓 Health Agg | 8774 | `/health-agg/api/health` | Aggregate health across all services |
-| 📦 JSON→TS | 8775 | `/json2ts/api/convert` | Convert JSON to TypeScript interfaces |
-| 🔔 GitHub Webhooks | 8776 | `/github-webhook/api/webhook` | GitHub webhook handler |
-| 🚪 Portal | 8770 | `/portal/` | Service portal dashboard |
+| Service | Port | Description |
+|---------|------|-------------|
+| Gateway | 8700 | Unified API entry point — routes to all services |
+| Sentiment | 8764 | Analyzes text sentiment (positive/negative/neutral) |
+| Link Preview | 8765 | Extracts title, description, image from URLs |
+| Keyword Extractor | 8766 | Extracts keywords and key phrases from text |
+| QR Generator | 8767 | Generates QR codes as SVG |
+| DNS Lookup | 8768 | Resolves domain names to IP addresses |
+| Color Palette | 8769 | Generates harmonious color palettes |
+| Text Summary | 8770 | Extracts key sentences from text |
+| URL Shortener | 8771 | Creates short codes for long URLs |
+| Password Generator | 8772 | Generates secure random passwords |
+| Timestamp Converter | 8773 | Converts Unix timestamps to human dates |
+| JSON Formatter | 8774 | Validates, formats, and minifies JSON |
+| Base64 Tool | 8775 | Encodes/decodes base64 |
+| Markdown Renderer | 8776 | Converts Markdown to HTML |
+| Status Dashboard | 8778 | Live health monitor for all services |
 
-## API Gateway
+## API Usage
 
-All services are routed through a single gateway:
+All services expose a `POST /api/<action>` endpoint and `GET /api/health`.
 
-```
-http://localhost:8700/<service-name>/api/...
-```
+### Via Gateway (recommended)
 
-Example:
 ```bash
-curl -X POST http://localhost:8700/link-preview/api/preview \
+# Sentiment analysis
+curl -X POST http://localhost:8700/api/sentiment/analyze \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://github.com"}'
+  -d '{"text": "I love this project!"}'
 
-curl http://localhost:8700/health-agg/api/health
+# Generate QR code
+curl -X POST http://localhost:8700/api/qr/qr \
+  -H "Content-Type: application/json" \
+  -d '{"data": "https://pokelabs.org"}'
+
+# Color palette
+curl -X POST http://localhost:8700/api/colors/generate \
+  -H "Content-Type: application/json" \
+  -d '{"base": "#00d4ff", "count": 5, "mode": "analogous"}'
+```
+
+### Direct Service Access
+
+```bash
+curl -X POST http://localhost:8764/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Amazing work!"}'
+
+curl http://localhost:8765/api/health
 ```
 
 ## Architecture
 
 ```
-Client → Gateway (:8700) → Services (:8765-8776)
-              ↓
-         Health Agg (:8774)
-```
-
-- **Gateway**: Python reverse proxy with health aggregation
-- **Services**: Each is a standalone Python or Node.js server
-- **Health**: Every service exposes `/api/health`
-- **Auto-merge**: Dependabot PRs auto-merged for semver-patch updates
-
-## Development
-
-Each service is independent:
-
-```bash
-cd poke-services/link-preview
-python3 server.py &
-curl http://localhost:8765/api/health
+Client → Gateway (:8700) → Service (:8764-8778)
+                  ↓
+         Health checks
+         Routing
+         Service discovery
 ```
 
 ## Tech Stack
 
-- **Runtime**: Python 3.11+ / Node.js 20+
-- **Dependencies**: Zero external API keys needed
+- **Language**: Python 3.12 (stdlib only — no dependencies)
+- **Deployment**: Docker + docker-compose
+- **CI/CD**: GitHub Actions (lint, audit, auto-merge)
 - **License**: MIT
-- **CI**: GitHub Actions (lint + health checks + auto-merge)
 
-## Contributing
+## Adding a New Service
 
-1. Fork the repo
-2. Add your service in `poke-services/<name>/`
-3. Include `/api/health` endpoint
-4. Add to gateway routing in `gateway.py`
-5. Open a PR — CI runs automatically
+1. Create `poke-services/<name>/server.py`
+2. Include `GET /api/health` endpoint
+3. Add to `docker-compose.yml`
+4. Add to gateway `SERVICES` dict
+5. Add `Dockerfile`
 
-## Roadmap
+See [AGENTS.md](AGENTS.md) for coding standards and service template.
 
-- [ ] Authentication layer on gateway
-- [ ] Rate limiting per IP
-- [ ] Service discovery
-- [ ] Docker Compose setup
-- [ ] Kubernetes manifests
-- [ ] Hosted version at pokelabs.org
+## License
 
----
-
-**Built by [Poke Labs](https://pokelabs.org) 🦉 · MIT License · Toronto, Canada**
+MIT — Poke Labs
