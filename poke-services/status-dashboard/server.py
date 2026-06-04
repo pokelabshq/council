@@ -1,152 +1,145 @@
 #!/usr/bin/env python3
-"""Status Dashboard — Live health monitor for all Council services"""
-import http.server, json, urllib.request, os, threading, time
+"""Status Dashboard — Real-time health monitor for all Poke Labs services. Port: 8790."""
+import http.server, json, urllib.parse, os, urllib.request, urllib.error, time, threading
 
-PORT = int(os.environ.get("PORT", 8778))
+PORT = int(os.environ.get("PORT", 8790))
+GATEWAY = os.environ.get("GATEWAY_URL", "http://localhost:8700")
 
-SERVICES = [
-    ("link-preview", 8765),
-    ("keyword", 8766),
-    ("summarize", 8767),
-    ("qr", 8768),
-    ("dns", 8769),
-    ("portal", 8770),
-    ("color", 8771),
-    ("url", 8772),
-    ("template-gen", 8773),
-    ("health-agg", 8774),
-    ("json2ts", 8775),
-    ("github-webhook", 8776),
-    ("sentiment", 8777),
-]
-
-def check_service(name, port):
-    try:
-        req = urllib.request.urlopen(f"http://localhost:{port}/api/health", timeout=3)
-        data = json.loads(req.read())
-        return {"name": name, "port": port, "ok": True, "info": data}
-    except Exception as e:
-        return {"name": name, "port": port, "ok": False, "error": str(e)}
-
-def get_all_status():
-    results = []
-    threads = []
-    lock = threading.Lock()
-
-    def check(svc):
-        r = check_service(*svc)
-        with lock:
-            results.append(r)
-
-    for svc in SERVICES:
-        t = threading.Thread(target=check, args=(svc,))
-        threads.append(t)
-        t.start()
-
-    for t in threads:
-        t.join(timeout=5)
-
-    return sorted(results, key=lambda x: x["port"])
-
-DASHBOARD_HTML = """<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Council Status — Poke Labs</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'JetBrains Mono','Fira Code',monospace;background:#0a0a0f;color:#fff;min-height:100vh;padding:2rem}
-h1{font-size:1.5rem;margin-bottom:0.5rem}
-.sub{color:#666;font-size:0.8rem;margin-bottom:2rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem}
-.card{background:#111;border:1px solid #1a1a1a;border-radius:8px;padding:1.2rem;transition:border-color 0.3s}
-.card.ok{border-color:#22c55e33}
-.card.fail{border-color:#ef444433}
-.card h3{font-size:0.9rem;margin-bottom:0.3rem}
-.card .port{color:#555;font-size:0.7rem;margin-bottom:0.8rem}
-.card .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:bold;text-transform:uppercase}
-.badge.ok{background:#22c55e22;color:#22c55e}
-.badge.fail{background:#ef444422;color:#ef4444}
-.card .error{color:#ef4444;font-size:0.7rem;margin-top:0.5rem;word-break:break-all}
-.stats{display:flex;gap:2rem;margin-bottom:2rem;padding:1rem;background:#111;border-radius:8px;border:1px solid #1a1a1a}
-.stat{text-align:center}
-.stat .num{font-size:2rem;font-weight:bold}
-.stat .label{color:#666;font-size:0.7rem}
-.num.ok{color:#22c55e}
-.num.fail{color:#ef4444}
-.refresh{color:#444;font-size:0.7rem;margin-top:2rem}
-</style>
-</head>
-<body>
-<h1>🏛️ Council Status</h1>
-<p class="sub">Poke Labs Micro-Services Dashboard · Auto-refreshes every 10s</p>
-<div class="stats" id="stats"></div>
-<div class="grid" id="grid"></div>
-<p class="refresh">Last check: <span id="time"></span></p>
-<script>
-async function fetchStatus(){
-  try{
-    const r=await fetch('/api/status');
-    const data=await r.json();
-    const services=data.services||[];
-    const ok=services.filter(s=>s.ok).length;
-    const fail=services.length-ok;
-    document.getElementById('stats').innerHTML=`
-      <div class="stat"><div class="num ok">${ok}</div><div class="label">HEALTHY</div></div>
-      <div class="stat"><div class="num ${fail>0?'fail':'ok'}">${fail}</div><div class="label">DOWN</div></div>
-      <div class="stat"><div class="num">${services.length}</div><div class="label">TOTAL</div></div>
-      <div class="stat"><div class="num ok">${services.length?Math.round(ok/services.length*100):0}%</div><div class="label">UPTIME</div></div>
-    `;
-    document.getElementById('grid').innerHTML=services.map(s=>`
-      <div class="card ${s.ok?'ok':'fail'}">
-        <h3>${s.ok?'✅':'❌'} ${s.name}</h3>
-        <div class="port">:${s.port}</div>
-        <span class="badge ${s.ok?'ok':'fail'}">${s.ok?'healthy':'down'}</span>
-        ${s.error?`<div class="error">${s.error}</div>`:''}
-      </div>
-    `).join('');
-    document.getElementById('time').textContent=new Date().toLocaleTimeString();
-  }catch(e){
-    document.getElementById('grid').innerHTML=`<p style="color:#ef4444">Failed to fetch status: ${e.message}</p>`;
-  }
+# Service registry: name -> (port, health_path)
+SERVICES = {
+    "gateway":       (8700, "/health"),
+    "link-preview":  (8765, "/api/health"),
+    "sentiment":     (8770, "/api/health"),
+    "qr":            (8771, "/api/health"),
+    "dns":           (8772, "/api/health"),
+    "color":         (8773, "/api/health"),
+    "url":           (8774, "/api/health"),
+    "keyword":       (8775, "/api/health"),
+    "summarize":     (8776, "/api/health"),
+    "hash-gen":      (8777, "/api/health"),
+    "uuid-gen":      (8778, "/api/health"),
+    "timestamp-conv":(8781, "/api/health"),
+    "barcode":       (8782, "/api/health"),
 }
-fetchStatus();
-setInterval(fetchStatus,10000);
-</script>
-</body>
-</html>"""
+
+cache = {"results": {}, "ts": 0}
+cache_lock = threading.Lock()
+CACHE_TTL = 10  # seconds
+
+def check_service(name, port, path):
+    try:
+        url = f"http://localhost:{port}{path}"
+        req = urllib.request.Request(url, method="GET")
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            data = json.loads(resp.read())
+            return {"status": "up", "port": port, "data": data}
+    except Exception as e:
+        return {"status": "down", "port": port, "error": str(e)}
+
+def refresh_cache():
+    while True:
+        results = {}
+        for name, (port, path) in SERVICES.items():
+            results[name] = check_service(name, port, path)
+        with cache_lock:
+            cache["results"] = results
+            cache["ts"] = time.time()
+        time.sleep(CACHE_TTL)
 
 class Handler(http.server.BaseHTTPRequestHandler):
-    def do_GET(self):
-        if self.path == "/api/health":
-            self._json(200, {"ok": True, "v": 1, "service": "status-dashboard"})
-        elif self.path == "/api/status":
-            services = get_all_status()
-            ok = sum(1 for s in services if s.ok)
-            self._json(200, {
-                "services": services,
-                "summary": {"total": len(services), "ok": ok, "fail": len(services) - ok}
-            })
-        elif self.path == "/" or self.path == "/dashboard":
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html")
-            self.end_headers()
-            self.wfile.write(DASHBOARD_HTML.encode())
-        else:
-            self._json(404, {"error": "Not found"})
+    def log_message(self, *a): pass
 
-    def _json(self, code, data):
-        self.send_response(code)
+    def do_GET(self):
+        p = urllib.parse.urlparse(self.path)
+        if p.path == "/api/health":
+            self._respond(200, {"ok": True, "service": "status-dashboard", "v": 1})
+        elif p.path == "/api/status":
+            with cache_lock:
+                results = cache["results"]
+                ts = cache["ts"]
+            up = sum(1 for r in results.values() if r["status"] == "up")
+            total = len(results)
+            self._respond(200, {
+                "services": results,
+                "summary": {"up": up, "down": total - up, "total": total},
+                "cached_at": ts,
+                "fresh": time.time() - ts < CACHE_TTL * 2
+            })
+        elif p.path == "/" or p.path == "/index.html":
+            self._serve_dashboard()
+        else:
+            self._respond(404, {"error": "not found"})
+
+    def _serve_dashboard(self):
+        with cache_lock:
+            results = dict(cache["results"])
+            ts = cache["ts"]
+        up = sum(1 for r in results.values() if r["status"] == "up")
+        total = len(results) or 1
+
+        rows = ""
+        for name, info in sorted(results.items()):
+            status = info["status"]
+            emoji = "🟢" if status == "up" else "🔴"
+            port = info["port"]
+            detail = ""
+            if status == "up" and "data" in info:
+                d = info["data"]
+                ver = d.get("v", d.get("version", "?"))
+                detail = f"v{ver}"
+            elif "error" in info:
+                detail = info["error"][:40]
+            rows += f'<tr><td>{emoji} {name}</td><td>{status}</td><td>{port}</td><td>{detail}</td></tr>\n'
+
+        age = round(time.time() - ts, 1) if ts else "?"
+        html = f'''<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Poke Labs — Status</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0f;color:#fff;padding:2rem;line-height:1.6}}
+h1{{font-family:'JetBrains Mono',monospace;margin-bottom:.5rem}}
+.sub{{color:#666;margin-bottom:2rem}}
+.summary{{display:flex;gap:2rem;margin-bottom:2rem;flex-wrap:wrap}}
+.stat{{background:#111118;border:1px solid #1a1a24;border-radius:8px;padding:1rem 1.5rem;text-align:center}}
+.stat .num{{font-size:2rem;font-weight:700;font-family:'JetBrains Mono',mono}}
+.stat .label{{font-size:.8rem;color:#666}}
+.up{{color:#27c93f}}.down{{color:#ff5f56}}
+table{{width:100%;border-collapse:collapse;margin-top:1rem}}
+th{{text-align:left;padding:.75rem;border-bottom:2px solid #1a1a24;font-family:'JetBrains Mono',mono;font-size:.85rem;color:#666}}
+td{{padding:.65rem .75rem;border-bottom:1px solid #1a1a24;font-size:.9rem}}
+tr:hover{{background:#111118}}
+.refresh{{color:#666;font-size:.8rem;margin-top:1rem}}
+a{{color:#00d4ff}}
+</style></head><body>
+<h1>⚡ Poke Labs Status</h1>
+<p class="sub">Real-time health monitor for all Council services</p>
+<div class="summary">
+  <div class="stat"><div class="num up">{up}</div><div class="label">UP</div></div>
+  <div class="stat"><div class="num down">{total-up}</div><div class="label">DOWN</div></div>
+  <div class="stat"><div class="num">{total}</div><div class="label">TOTAL</div></div>
+</div>
+<table>
+<tr><th>Service</th><th>Status</th><th>Port</th><th>Info</th></tr>
+{rows}</table>
+<p class="refresh">Refreshes every {CACHE_TTL}s · Last update: {age}s ago · <a href="/api/status">JSON</a></p>
+<script>setTimeout(()=>location.reload(), {CACHE_TTL*1000});</script>
+</body></html>'''
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html")
+        self.end_headers()
+        self.wfile.write(html.encode())
+
+    def _respond(self, s, b):
+        self.send_response(s)
         self.send_header("Content-Type", "application/json")
         self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
-        self.wfile.write(json.dumps(data, indent=2).encode())
-
-    def log_message(self, fmt, *args):
-        pass
+        self.wfile.write(json.dumps(b).encode())
 
 if __name__ == "__main__":
-    server = http.server.HTTPServer(("0.0.0.0", PORT), Handler)
-    print(f"Status dashboard on :{PORT}")
-    server.serve_forever()
+    t = threading.Thread(target=refresh_cache, daemon=True)
+    t.start()
+    s = http.server.HTTPServer(("0.0.0.0", PORT), Handler)
+    print(f"Status Dashboard on port {PORT}")
+    s.serve_forever()
