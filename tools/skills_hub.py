@@ -60,6 +60,8 @@ INDEX_CACHE_TTL = 3600  # 1 hour
 
 _REDIRECT_STATUS_CODES = {301, 302, 303, 307, 308}
 _MAX_SKILL_FETCH_REDIRECTS = 5
+_MAX_SKILL_FETCH_RETRIES = 3
+_SKILL_FETCH_RETRY_BASE_DELAY = 1.0  # seconds, doubles each retry
 
 
 # ---------------------------------------------------------------------------
@@ -190,7 +192,11 @@ def _resolve_lock_install_path(install_path: str, skill_name: str) -> Path:
 
 
 def _guarded_http_get(url: str, *, timeout: int = 20) -> Optional[httpx.Response]:
-    """Fetch a URL with SSRF and redirect-target validation."""
+    """Fetch a URL with SSRF and redirect-target validation.
+
+    Retries up to _MAX_SKILL_FETCH_RETRIES times with exponential backoff
+    on transient errors (timeouts, connection errors, 5xx responses).
+    """
     current_url = url
 
     for _ in range(_MAX_SKILL_FETCH_REDIRECTS + 1):
@@ -207,10 +213,36 @@ def _guarded_http_get(url: str, *, timeout: int = 20) -> Optional[httpx.Response
             )
             return None
 
-        try:
-            resp = httpx.get(current_url, timeout=timeout, follow_redirects=False)
-        except httpx.HTTPError as exc:
-            logger.debug("Skills Hub fetch failed for %s: %s", current_url, exc)
+        # Retry loop with exponential backoff for transient errors
+        resp = None
+        for retry in range(_MAX_SKILL_FETCH_RETRIES + 1):
+            try:
+                resp = httpx.get(current_url, timeout=timeout, follow_redirects=False)
+            except httpx.HTTPError as exc:
+                logger.debug("Skills Hub fetch failed for %s: %s", current_url, exc)
+                if retry < _MAX_SKILL_FETCH_RETRIES:
+                    delay = _SKILL_FETCH_RETRY_BASE_DELAY * (2 ** retry)
+                    logger.info(
+                        "Retrying Skills Hub fetch for %s in %.1fs (attempt %d/%d)",
+                        current_url, delay, retry + 1, _MAX_SKILL_FETCH_RETRIES,
+                    )
+                    time.sleep(delay)
+                    continue
+                return None
+
+            # Retry on 5xx server errors
+            if resp.status_code >= 500 and retry < _MAX_SKILL_FETCH_RETRIES:
+                delay = _SKILL_FETCH_RETRY_BASE_DELAY * (2 ** retry)
+                logger.info(
+                    "Skills Hub fetch got %d for %s, retrying in %.1fs (attempt %d/%d)",
+                    resp.status_code, current_url, delay, retry + 1, _MAX_SKILL_FETCH_RETRIES,
+                )
+                time.sleep(delay)
+                continue
+
+            break
+
+        if resp is None:
             return None
 
         if resp.status_code in _REDIRECT_STATUS_CODES:
