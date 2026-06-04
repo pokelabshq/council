@@ -2,22 +2,23 @@ name: Build Skills Index
 
 on:
   schedule:
-    # Run twice daily: 6 AM and 6 PM UTC
     - cron: '0 6,18 * * *'
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - 'scripts/build_skills_index.py'
+      - 'skills/**'
+      - 'optional-skills/**'
+      - 'tools/skills_hub.py'
       - '.github/workflows/skills-index.yml'
 
 permissions:
   contents: read
-  actions: write   # to trigger deploy-site.yml on schedule
+  actions: write
 
 jobs:
   build-index:
-    # Only run on the upstream repository, not on forks
     if: github.repository == 'pokelabshq/council'
     runs-on: ubuntu-latest
     steps:
@@ -42,12 +43,18 @@ jobs:
           path: website/static/api/skills-index.json
           retention-days: 7
 
-  # Re-trigger the docs deploy so the refreshed index lands on the live site.
-  # The deploy itself is owned by deploy-site.yml (which crawls and deploys
-  # everything in one pipeline); we just kick it on a schedule.
+      - name: Commit index to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add website/static/api/skills-index.json
+          git diff --cached --quiet || git commit -m "chore: update skills-index.json [skip ci]"
+          git push
+
   trigger-deploy:
     needs: build-index
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    # Trigger deploy on schedule, push (skill changes), AND manual dispatch
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Deploy Site workflow
