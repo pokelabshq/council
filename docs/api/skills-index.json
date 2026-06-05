@@ -1,0 +1,161 @@
+{
+  "version": "1.0",
+  "generated": "2026-06-05T00:35:00Z",
+  "skills": [
+    {
+      "name": "apple",
+      "path": "skills/apple/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "autonomous-ai-agents",
+      "path": "skills/autonomous-ai-agents/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "creative",
+      "path": "skills/creative/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "data-science",
+      "path": "skills/data-science/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "devops",
+      "path": "skills/devops/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "dogfood",
+      "path": "skills/dogfood/",
+      "has_readme": false,
+      "has_skill_md": true,
+      "files": [
+        "SKILL.md"
+      ],
+      "description": "---"
+    },
+    {
+      "name": "email",
+      "path": "skills/email/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "gaming",
+      "path": "skills/gaming/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "github",
+      "path": "skills/github/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "index-cache",
+      "path": "skills/index-cache/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "lobehub_index.json"
+      ]
+    },
+    {
+      "name": "mcp",
+      "path": "skills/mcp/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "media",
+      "path": "skills/media/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "mlops",
+      "path": "skills/mlops/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "note-taking",
+      "path": "skills/note-taking/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "productivity",
+      "path": "skills/productivity/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "red-teaming",
+      "path": "skills/red-teaming/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "research",
+      "path": "skills/research/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "smart-home",
+      "path": "skills/smart-home/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "social-media",
+      "path": "skills/social-media/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "software-development",
+      "path": "skills/software-development/",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": []
+    },
+    {
+      "name": "yuanbao",
+      "path": "skills/yuanbao/",
+      "has_readme": false,
+      "has_skill_md": true,
+      "files": [
+        "SKILL.md"
+      ],
+      "description": "---"
+    }
+  ]
+}
