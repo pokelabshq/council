@@ -1,0 +1,852 @@
+[
+  {
+    "name": "1password",
+    "desc": "Use this skill when the user wants secrets managed through 1Password instead of plaintext env vars or files.",
+    "path": "optional-skills/security/1password/SKILL.md"
+  },
+  {
+    "name": "3-statement-model",
+    "desc": "---",
+    "path": "optional-skills/finance/3-statement-model/SKILL.md"
+  },
+  {
+    "name": "accelerate",
+    "desc": "# HuggingFace Accelerate - Unified Distributed Training",
+    "path": "optional-skills/mlops/accelerate/SKILL.md"
+  },
+  {
+    "name": "adversarial-ux-test",
+    "desc": "Think of it as an automated \"mom test\" \u2014 but angry.",
+    "path": "optional-skills/dogfood/adversarial-ux-test/SKILL.md"
+  },
+  {
+    "name": "agentmail",
+    "desc": "# AgentMail \u2014 Agent-Owned Email Inboxes",
+    "path": "optional-skills/email/agentmail/SKILL.md"
+  },
+  {
+    "name": "airtable",
+    "desc": "Work with Airtable's REST API directly via `curl` using the `terminal` tool. No MCP server, no OAuth flow, no Python SDK \u2014 just `curl` and a personal access token.",
+    "path": "skills/productivity/airtable/SKILL.md"
+  },
+  {
+    "name": "antigravity-cli",
+    "desc": "API, so there is nothing to authenticate from Council itself.",
+    "path": "optional-skills/autonomous-ai-agents/antigravity-cli/SKILL.md"
+  },
+  {
+    "name": "apple-notes",
+    "desc": "Use `memo` to manage Apple Notes directly from the terminal. Notes sync across all Apple devices via iCloud.",
+    "path": "skills/apple/apple-notes/SKILL.md"
+  },
+  {
+    "name": "apple-reminders",
+    "desc": "Use `remindctl` to manage Apple Reminders directly from the terminal. Tasks sync across all Apple devices via iCloud.",
+    "path": "skills/apple/apple-reminders/SKILL.md"
+  },
+  {
+    "name": "architecture-diagram",
+    "desc": "Generate professional, dark-themed technical architecture diagrams as standalone HTML files with inline SVG graphics. No external tools, no API keys, no rendering libraries \u2014 just write the HTML file and open it in a browser.",
+    "path": "skills/creative/architecture-diagram/SKILL.md"
+  },
+  {
+    "name": "arxiv",
+    "desc": "Search and retrieve academic papers from arXiv via their free REST API. No API key, no dependencies \u2014 just curl.",
+    "path": "skills/research/arxiv/SKILL.md"
+  },
+  {
+    "name": "ascii-art",
+    "desc": "Multiple tools for different ASCII art needs. All tools are local CLI programs or free REST APIs \u2014 no API keys required.",
+    "path": "skills/creative/ascii-art/SKILL.md"
+  },
+  {
+    "name": "ascii-video",
+    "desc": "# ASCII Video Production Pipeline",
+    "path": "skills/creative/ascii-video/SKILL.md"
+  },
+  {
+    "name": "audiocraft",
+    "desc": "Comprehensive guide to using Meta's AudioCraft for text-to-music and text-to-audio generation with MusicGen, AudioGen, and EnCodec.",
+    "path": "skills/mlops/models/audiocraft/SKILL.md"
+  },
+  {
+    "name": "axolotl",
+    "desc": "# Axolotl Skill",
+    "path": "optional-skills/mlops/training/axolotl/SKILL.md"
+  },
+  {
+    "name": "baoyu-article-illustrator",
+    "desc": "Analyze articles, identify illustration positions, generate images with **Type \u00d7 Style \u00d7 Palette** consistency.",
+    "path": "skills/creative/baoyu-article-illustrator/SKILL.md"
+  },
+  {
+    "name": "baoyu-comic",
+    "desc": "Create original knowledge comics with flexible art style \u00d7 tone combinations.",
+    "path": "skills/creative/baoyu-comic/SKILL.md"
+  },
+  {
+    "name": "baoyu-infographic",
+    "desc": "Two dimensions: **layout** (information structure) \u00d7 **style** (visual aesthetics). Freely combine any layout with any style.",
+    "path": "skills/creative/baoyu-infographic/SKILL.md"
+  },
+  {
+    "name": "bioinformatics",
+    "desc": "This skill is a gateway to two open-source bioinformatics skill libraries. Instead of bundling hundreds of domain-specific skills, it indexes them and fetches what you need on demand.",
+    "path": "optional-skills/research/bioinformatics/SKILL.md"
+  },
+  {
+    "name": "blackbox",
+    "desc": "The CLI is [open-source](https://github.com/blackboxaicode/cli) (GPL-3.0, TypeScript, forked from Gemini CLI) and supports interactive sessions, non-interactive one-shots, checkpointing, MCP, and vision model switching.",
+    "path": "optional-skills/autonomous-ai-agents/blackbox/SKILL.md"
+  },
+  {
+    "name": "blender-mcp",
+    "desc": "Control a running Blender instance from Council via socket on TCP port 9876.",
+    "path": "optional-skills/creative/blender-mcp/SKILL.md"
+  },
+  {
+    "name": "blogwatcher",
+    "desc": "Track blog and RSS/Atom feed updates with the `blogwatcher-cli` tool. Supports automatic feed discovery, HTML scraping fallback, OPML import, and read/unread article management.",
+    "path": "skills/research/blogwatcher/SKILL.md"
+  },
+  {
+    "name": "canvas",
+    "desc": "Read-only access to Canvas LMS for listing courses and assignments.",
+    "path": "optional-skills/productivity/canvas/SKILL.md"
+  },
+  {
+    "name": "chroma",
+    "desc": "The AI-native database for building LLM applications with memory.",
+    "path": "optional-skills/mlops/chroma/SKILL.md"
+  },
+  {
+    "name": "claude-code",
+    "desc": "Delegate coding tasks to [Claude Code](https://code.claude.com/docs/en/cli-reference) (Anthropic's autonomous coding agent CLI) via the Council terminal. Claude Code v2.x can read files, write code, run shell commands, spawn subagents, and manage git workflows autonomously.",
+    "path": "skills/autonomous-ai-agents/claude-code/SKILL.md"
+  },
+  {
+    "name": "claude-design",
+    "desc": "**Before starting, check for other web-design skills like `popular-web-designs` (ready-to-paste design systems for Stripe, Linear, Vercel, Notion, etc.) and `design-md` (Google's DESIGN.md token spec format).** If the user wants a known brand's look, load `popular-web-designs` alongside this one and let it supply the visual vocabulary. If the deliverable is a token spec file rather than a rendered artifact, use `design-md` instead. Full decision table below.",
+    "path": "skills/creative/claude-design/SKILL.md"
+  },
+  {
+    "name": "cli",
+    "desc": "All commands use the **terminal tool** to run `infsh` commands.",
+    "path": "optional-skills/devops/cli/SKILL.md"
+  },
+  {
+    "name": "clip",
+    "desc": "OpenAI's model that understands images from natural language.",
+    "path": "optional-skills/mlops/clip/SKILL.md"
+  },
+  {
+    "name": "code-wiki",
+    "desc": "This skill produces **reference documentation** (what/how). It does not produce strategic narrative (why \u2014 that's a different skill).",
+    "path": "optional-skills/software-development/code-wiki/SKILL.md"
+  },
+  {
+    "name": "codebase-inspection",
+    "desc": "Analyze repositories for lines of code, language breakdown, file counts, and code-vs-comment ratios using `pygount`.",
+    "path": "skills/github/codebase-inspection/SKILL.md"
+  },
+  {
+    "name": "codex",
+    "desc": "Delegate coding tasks to [Codex](https://github.com/openai/codex) via the Council terminal. Codex is OpenAI's autonomous coding agent CLI.",
+    "path": "skills/autonomous-ai-agents/codex/SKILL.md"
+  },
+  {
+    "name": "comfyui",
+    "desc": "for workflow execution.",
+    "path": "skills/creative/comfyui/SKILL.md"
+  },
+  {
+    "name": "comps-analysis",
+    "desc": "---",
+    "path": "optional-skills/finance/comps-analysis/SKILL.md"
+  },
+  {
+    "name": "concept-diagrams",
+    "desc": "Generate production-quality SVG diagrams with a unified flat, minimal design system. Output is a single self-contained HTML file that renders identically in any modern browser, with automatic light/dark mode.",
+    "path": "optional-skills/creative/concept-diagrams/SKILL.md"
+  },
+  {
+    "name": "creative-ideation",
+    "desc": "# Creative Ideation",
+    "path": "skills/creative/creative-ideation/SKILL.md"
+  },
+  {
+    "name": "darwinian-evolver",
+    "desc": "import upstream classes into Council itself.",
+    "path": "optional-skills/research/darwinian-evolver/SKILL.md"
+  },
+  {
+    "name": "dcf-model",
+    "desc": "---",
+    "path": "optional-skills/finance/dcf-model/SKILL.md"
+  },
+  {
+    "name": "debugging-hermes-tui-commands",
+    "desc": "# Debugging Council TUI Slash Commands",
+    "path": "skills/software-development/debugging-hermes-tui-commands/SKILL.md"
+  },
+  {
+    "name": "design-md",
+    "desc": "diffs versions for regressions, and exports to Tailwind or W3C DTCG JSON.",
+    "path": "skills/creative/design-md/SKILL.md"
+  },
+  {
+    "name": "docker-management",
+    "desc": "Manage Docker containers, images, volumes, networks, and Compose stacks using standard Docker CLI commands. No additional dependencies beyond Docker itself.",
+    "path": "optional-skills/devops/docker-management/SKILL.md"
+  },
+  {
+    "name": "dogfood",
+    "desc": "# Dogfood: Systematic Web Application QA Testing",
+    "path": "skills/dogfood/SKILL.md"
+  },
+  {
+    "name": "drug-discovery",
+    "desc": "Use this skill for all pharma/chemistry research tasks.",
+    "path": "optional-skills/research/drug-discovery/SKILL.md"
+  },
+  {
+    "name": "dspy",
+    "desc": "# DSPy: Declarative Language Model Programming",
+    "path": "skills/mlops/research/dspy/SKILL.md"
+  },
+  {
+    "name": "duckduckgo-search",
+    "desc": "Preferred when `web_search` is unavailable or unsuitable (for example when `FIRECRAWL_API_KEY` is not set). Can also be used as a standalone search path when DuckDuckGo results are specifically desired.",
+    "path": "optional-skills/research/duckduckgo-search/SKILL.md"
+  },
+  {
+    "name": "evm",
+    "desc": "---",
+    "path": "optional-skills/blockchain/evm/SKILL.md"
+  },
+  {
+    "name": "excalidraw",
+    "desc": "Create diagrams by writing standard Excalidraw element JSON and saving as `.excalidraw` files. These files can be drag-and-dropped onto [excalidraw.com](https://excalidraw.com) for viewing and editing. No accounts, no API keys, no rendering libraries -- just JSON.",
+    "path": "skills/creative/excalidraw/SKILL.md"
+  },
+  {
+    "name": "excel-author",
+    "desc": "Adapted from Anthropic's `xlsx-author` and `audit-xls` skills in the [anthropics/financial-services](https://github.com/anthropics/financial-services) repo. The MCP / Office-JS / Cowork-specific branches of the originals are dropped \u2014 this skill assumes headless Python.",
+    "path": "optional-skills/finance/excel-author/SKILL.md"
+  },
+  {
+    "name": "faiss",
+    "desc": "Facebook AI's library for billion-scale vector similarity search.",
+    "path": "optional-skills/mlops/faiss/SKILL.md"
+  },
+  {
+    "name": "fastmcp",
+    "desc": "Build MCP servers in Python with FastMCP, validate them locally, install them into MCP clients, and deploy them as HTTP endpoints.",
+    "path": "optional-skills/mcp/fastmcp/SKILL.md"
+  },
+  {
+    "name": "findmy",
+    "desc": "screen capture to read device locations.",
+    "path": "skills/apple/findmy/SKILL.md"
+  },
+  {
+    "name": "fitness-nutrition",
+    "desc": "---",
+    "path": "optional-skills/health/fitness-nutrition/SKILL.md"
+  },
+  {
+    "name": "flash-attention",
+    "desc": "# Flash Attention - Fast Memory-Efficient Attention",
+    "path": "optional-skills/mlops/flash-attention/SKILL.md"
+  },
+  {
+    "name": "gif-search",
+    "desc": "Search and download GIFs directly via the Tenor API using curl. No extra tools needed.",
+    "path": "skills/media/gif-search/SKILL.md"
+  },
+  {
+    "name": "github-auth",
+    "desc": "- **`gh` CLI (if installed)** \u2014 richer GitHub API access with a simpler auth flow",
+    "path": "skills/github/github-auth/SKILL.md"
+  },
+  {
+    "name": "github-code-review",
+    "desc": "Perform code reviews on local changes before pushing, or review open PRs on GitHub. Most of this skill uses plain `git` \u2014 the `gh`/`curl` split only matters for PR-level interactions.",
+    "path": "skills/github/github-code-review/SKILL.md"
+  },
+  {
+    "name": "github-issues",
+    "desc": "Create, search, triage, and manage GitHub issues. Each section shows `gh` first, then the `curl` fallback.",
+    "path": "skills/github/github-issues/SKILL.md"
+  },
+  {
+    "name": "github-pr-workflow",
+    "desc": "Complete guide for managing the PR lifecycle. Each section shows the `gh` way first, then the `git` + `curl` fallback for machines without `gh`.",
+    "path": "skills/github/github-pr-workflow/SKILL.md"
+  },
+  {
+    "name": "github-repo-management",
+    "desc": "Create, clone, fork, configure, and manage GitHub repositories. Each section shows `gh` first, then the `git` + `curl` fallback.",
+    "path": "skills/github/github-repo-management/SKILL.md"
+  },
+  {
+    "name": "gitnexus-explorer",
+    "desc": "symbols, call chains, clusters, and execution flows. Tunneled via Cloudflare for remote access.",
+    "path": "optional-skills/research/gitnexus-explorer/SKILL.md"
+  },
+  {
+    "name": "godmode",
+    "desc": "**Key difference from OBLITERATUS:** OBLITERATUS modifies model weights permanently (requires open-weight models + GPU). This skill operates at the prompt/API level \u2014 works on any model accessible via API, including closed-source models (GPT, Claude, Gemini, Grok).",
+    "path": "skills/red-teaming/godmode/SKILL.md"
+  },
+  {
+    "name": "google-workspace",
+    "desc": "Gmail, Calendar, Drive, Contacts, Sheets, and Docs \u2014 through Council-managed OAuth and a thin CLI wrapper. When `gws` is installed, the skill uses it as the execution backend for broader Google Workspace coverage; otherwise it falls back to the bundled Python client implementation.",
+    "path": "skills/productivity/google-workspace/SKILL.md"
+  },
+  {
+    "name": "grok",
+    "desc": "for interactive sessions.",
+    "path": "optional-skills/autonomous-ai-agents/grok/SKILL.md"
+  },
+  {
+    "name": "guidance",
+    "desc": "# Guidance: Constrained LLM Generation",
+    "path": "optional-skills/mlops/guidance/SKILL.md"
+  },
+  {
+    "name": "heartmula",
+    "desc": "# HeartMuLa - Open-Source Music Generation",
+    "path": "skills/media/heartmula/SKILL.md"
+  },
+  {
+    "name": "here-now",
+    "desc": "- **Drives**: store private agent files in cloud folders.",
+    "path": "optional-skills/productivity/here-now/SKILL.md"
+  },
+  {
+    "name": "hermes-agent",
+    "desc": "**Docs:** https://pokelabs-council.pokelabs.com/docs/",
+    "path": "skills/autonomous-ai-agents/hermes-agent/SKILL.md"
+  },
+  {
+    "name": "hermes-agent-skill-authoring",
+    "desc": "# Authoring Council-Agent Skills (in-repo)",
+    "path": "skills/software-development/hermes-agent-skill-authoring/SKILL.md"
+  },
+  {
+    "name": "hermes-s6-container-supervision",
+    "desc": "# Council s6-overlay Container Supervision",
+    "path": "skills/software-development/hermes-s6-container-supervision/SKILL.md"
+  },
+  {
+    "name": "himalaya",
+    "desc": "requires the external `himalaya` CLI.",
+    "path": "skills/email/himalaya/SKILL.md"
+  },
+  {
+    "name": "honcho",
+    "desc": "Honcho provides AI-native cross-session user modeling. It learns who the user is across conversations and gives every Council profile its own peer identity while sharing a unified view of the user.",
+    "path": "optional-skills/autonomous-ai-agents/honcho/SKILL.md"
+  },
+  {
+    "name": "huggingface-tokenizers",
+    "desc": "Fast, production-ready tokenizers with Rust performance and Python ease-of-use.",
+    "path": "optional-skills/mlops/huggingface-tokenizers/SKILL.md"
+  },
+  {
+    "name": "humanizer",
+    "desc": "**Key insight:** LLMs use statistical algorithms to guess what should come next. The result tends toward the most statistically likely completion, which is how the telltale patterns below get baked in.",
+    "path": "skills/creative/humanizer/SKILL.md"
+  },
+  {
+    "name": "hyperframes",
+    "desc": "**Complement to `manim-video`:** Use `manim-video` for mathematical/geometric explainers (equations, 3B1B-style). Use `hyperframes` for motion-graphics, talking-head with captions, product tours, social overlays, shader transitions, and anything driven by real video/audio media.",
+    "path": "optional-skills/creative/hyperframes/SKILL.md"
+  },
+  {
+    "name": "hyperliquid",
+    "desc": "---",
+    "path": "optional-skills/blockchain/hyperliquid/SKILL.md"
+  },
+  {
+    "name": "imessage",
+    "desc": "Use `imsg` to read and send iMessage/SMS via macOS Messages.app.",
+    "path": "skills/apple/imessage/SKILL.md"
+  },
+  {
+    "name": "instructor",
+    "desc": "# Instructor: Structured LLM Outputs",
+    "path": "optional-skills/mlops/instructor/SKILL.md"
+  },
+  {
+    "name": "jupyter-live-kernel",
+    "desc": "state incrementally, explore APIs, inspect DataFrames, or iterate on complex code.",
+    "path": "skills/data-science/jupyter-live-kernel/SKILL.md"
+  },
+  {
+    "name": "kanban-codex-lane",
+    "desc": "# Kanban Codex Lane",
+    "path": "skills/autonomous-ai-agents/kanban-codex-lane/SKILL.md"
+  },
+  {
+    "name": "kanban-orchestrator",
+    "desc": "> The **core worker lifecycle** (including the `kanban_create` fan-out pattern and the \"decompose, don't execute\" rule) is auto-injected into every kanban process via the `KANBAN_GUIDANCE` system-prompt block. This skill is the deeper playbook when you're an orchestrator profile whose whole job is routing.",
+    "path": "skills/devops/kanban-orchestrator/SKILL.md"
+  },
+  {
+    "name": "kanban-video-orchestrator",
+    "desc": "`heartmula`, external APIs, or plain Python with PIL + ffmpeg.",
+    "path": "optional-skills/creative/kanban-video-orchestrator/SKILL.md"
+  },
+  {
+    "name": "kanban-worker",
+    "desc": "> You're seeing this skill because the Council Kanban dispatcher spawned you as a worker with `--skills kanban-worker` \u2014 it's loaded automatically for every dispatched worker. The **lifecycle** (6 steps: orient \u2192 work \u2192 heartbeat \u2192 block/complete) also lives in the `KANBAN_GUIDANCE` block that's auto-injected into your system prompt. This skill is the deeper detail: good handoff shapes, retry diagnostics, edge cases.",
+    "path": "skills/devops/kanban-worker/SKILL.md"
+  },
+  {
+    "name": "lambda-labs",
+    "desc": "Comprehensive guide to running ML workloads on Lambda Labs GPU cloud with on-demand instances and 1-Click Clusters.",
+    "path": "optional-skills/mlops/lambda-labs/SKILL.md"
+  },
+  {
+    "name": "lbo-model",
+    "desc": "---",
+    "path": "optional-skills/finance/lbo-model/SKILL.md"
+  },
+  {
+    "name": "linear",
+    "desc": "Manage Linear issues, projects, and teams directly via the GraphQL API using `curl`. No MCP server, no OAuth flow, no extra dependencies.",
+    "path": "skills/productivity/linear/SKILL.md"
+  },
+  {
+    "name": "llama-cpp",
+    "desc": "Use this skill for local GGUF inference, quant selection, or Hugging Face repo discovery for llama.cpp.",
+    "path": "skills/mlops/inference/llama-cpp/SKILL.md"
+  },
+  {
+    "name": "llava",
+    "desc": "Open-source vision-language model for conversational image understanding.",
+    "path": "optional-skills/mlops/llava/SKILL.md"
+  },
+  {
+    "name": "llm-wiki",
+    "desc": "summarizes, cross-references, files, and maintains consistency.",
+    "path": "skills/research/llm-wiki/SKILL.md"
+  },
+  {
+    "name": "lm-evaluation-harness",
+    "desc": "# lm-evaluation-harness - LLM Benchmarking",
+    "path": "skills/mlops/evaluation/lm-evaluation-harness/SKILL.md"
+  },
+  {
+    "name": "macos-computer-use",
+    "desc": "no Anthropic-native schema to learn.",
+    "path": "skills/apple/macos-computer-use/SKILL.md"
+  },
+  {
+    "name": "maps",
+    "desc": "`--near \"<place>\"` shortcut and multi-category support.",
+    "path": "skills/productivity/maps/SKILL.md"
+  },
+  {
+    "name": "mcporter",
+    "desc": "Use `mcporter` to discover, call, and manage [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) servers and tools directly from the terminal.",
+    "path": "optional-skills/mcp/mcporter/SKILL.md"
+  },
+  {
+    "name": "meme-generation",
+    "desc": "Generate actual meme images from a topic. Picks a template, writes captions, and renders a real .png file with text overlay.",
+    "path": "optional-skills/creative/meme-generation/SKILL.md"
+  },
+  {
+    "name": "memento-flashcards",
+    "desc": "# Memento Flashcards \u2014 Spaced-Repetition Flashcard Skill",
+    "path": "optional-skills/productivity/memento-flashcards/SKILL.md"
+  },
+  {
+    "name": "merger-model",
+    "desc": "---",
+    "path": "optional-skills/finance/merger-model/SKILL.md"
+  },
+  {
+    "name": "modal",
+    "desc": "Comprehensive guide to running ML workloads on Modal's serverless GPU cloud platform.",
+    "path": "optional-skills/mlops/modal/SKILL.md"
+  },
+  {
+    "name": "nano-pdf",
+    "desc": "Edit PDFs using natural-language instructions. Point it at a page and describe what to change.",
+    "path": "skills/productivity/nano-pdf/SKILL.md"
+  },
+  {
+    "name": "native-mcp",
+    "desc": "Poke Council has a built-in MCP client that connects to MCP servers at startup, discovers their tools, and makes them available as first-class tools the agent can call directly. No bridge CLI needed -- tools from MCP servers appear alongside built-in tools like `terminal`, `read_file`, etc.",
+    "path": "skills/mcp/native-mcp/SKILL.md"
+  },
+  {
+    "name": "nemo-curator",
+    "desc": "NVIDIA's toolkit for preparing high-quality training data for LLMs.",
+    "path": "optional-skills/mlops/nemo-curator/SKILL.md"
+  },
+  {
+    "name": "neuroskill-bci",
+    "desc": "---",
+    "path": "optional-skills/health/neuroskill-bci/SKILL.md"
+  },
+  {
+    "name": "node-inspect-debugger",
+    "desc": "# Node.js Inspect Debugger",
+    "path": "skills/software-development/node-inspect-debugger/SKILL.md"
+  },
+  {
+    "name": "notion",
+    "desc": "\u25c6 **HTTP + curl** \u2014 works everywhere including Windows. **Default fallback** when `ntn` isn't installed.",
+    "path": "skills/productivity/notion/SKILL.md"
+  },
+  {
+    "name": "obliteratus",
+    "desc": "# OBLITERATUS Skill",
+    "path": "skills/mlops/inference/obliteratus/SKILL.md"
+  },
+  {
+    "name": "obsidian",
+    "desc": "Use this skill for filesystem-first Obsidian vault work: reading notes, listing notes, searching note files, creating notes, appending content, and adding wikilinks.",
+    "path": "skills/note-taking/obsidian/SKILL.md"
+  },
+  {
+    "name": "ocr-and-documents",
+    "desc": "This skill covers **PDFs and scanned documents**.",
+    "path": "skills/productivity/ocr-and-documents/SKILL.md"
+  },
+  {
+    "name": "one-three-one-rule",
+    "desc": "Structured decision-making format for when a task has multiple viable approaches and the user needs a clear recommendation. Produces a concise problem framing, three options with trade-offs, and an actionable plan for the recommended path.",
+    "path": "optional-skills/communication/one-three-one-rule/SKILL.md"
+  },
+  {
+    "name": "openclaw-migration",
+    "desc": "Use this skill when a user wants to move their OpenClaw setup into Poke Council with minimal manual cleanup.",
+    "path": "optional-skills/migration/openclaw-migration/SKILL.md"
+  },
+  {
+    "name": "opencode",
+    "desc": "Use [OpenCode](https://opencode.ai) as an autonomous coding worker orchestrated by Council terminal/process tools. OpenCode is a provider-agnostic, open-source AI coding agent with a TUI and CLI.",
+    "path": "skills/autonomous-ai-agents/opencode/SKILL.md"
+  },
+  {
+    "name": "openhands",
+    "desc": "This skill is the headless-mode wrapper for batch / one-shot delegation. The interactive textual UI is not used from Council.",
+    "path": "optional-skills/autonomous-ai-agents/openhands/SKILL.md"
+  },
+  {
+    "name": "openhue",
+    "desc": "Control Philips Hue lights and scenes via a Hue Bridge from the terminal.",
+    "path": "skills/smart-home/openhue/SKILL.md"
+  },
+  {
+    "name": "osint-investigation",
+    "desc": "the original didn't address.",
+    "path": "optional-skills/research/osint-investigation/SKILL.md"
+  },
+  {
+    "name": "oss-forensics",
+    "desc": "---",
+    "path": "optional-skills/security/oss-forensics/SKILL.md"
+  },
+  {
+    "name": "outlines",
+    "desc": "# Outlines: Structured Text Generation",
+    "path": "optional-skills/mlops/inference/outlines/SKILL.md"
+  },
+  {
+    "name": "p5js",
+    "desc": "# p5.js Production Pipeline",
+    "path": "skills/creative/p5js/SKILL.md"
+  },
+  {
+    "name": "page-agent",
+    "desc": "alibaba/page-agent (https://github.com/alibaba/page-agent, 17k+ stars, MIT) is an in-page GUI agent written in TypeScript. It lives inside a webpage, reads the DOM as text (no screenshots, no multi-modal LLM), and executes natural-language instructions like \"click the login button, then fill username as John\" against the current page. Pure client-side \u2014 the host site just includes a script and passes an OpenAI-compatible LLM endpoint.",
+    "path": "optional-skills/web-development/page-agent/SKILL.md"
+  },
+  {
+    "name": "parallel-cli",
+    "desc": "- Search, extract, research, enrichment, entity discovery, and monitoring in one CLI",
+    "path": "optional-skills/research/parallel-cli/SKILL.md"
+  },
+  {
+    "name": "peft",
+    "desc": "Fine-tune LLMs by training <1% of parameters using LoRA, QLoRA, and 25+ adapter methods.",
+    "path": "optional-skills/mlops/peft/SKILL.md"
+  },
+  {
+    "name": "pinecone",
+    "desc": "The vector database for production AI applications.",
+    "path": "optional-skills/mlops/pinecone/SKILL.md"
+  },
+  {
+    "name": "pinggy-tunnel",
+    "desc": "Free tier: 60-minute tunnels, random subdomain, no signup. Pro tier ($3/mo) is an opt-in with a token.",
+    "path": "optional-skills/devops/pinggy-tunnel/SKILL.md"
+  },
+  {
+    "name": "pixel-art",
+    "desc": "adaptive N-color quantization for arcade/SNES-style looks.",
+    "path": "skills/creative/pixel-art/SKILL.md"
+  },
+  {
+    "name": "plan",
+    "desc": "Use this skill when the user wants a plan instead of execution.",
+    "path": "skills/software-development/plan/SKILL.md"
+  },
+  {
+    "name": "pokemon-player",
+    "desc": "Play Pokemon games via headless emulation using the `pokemon-agent` package.",
+    "path": "skills/gaming/pokemon-player/SKILL.md"
+  },
+  {
+    "name": "polymarket",
+    "desc": "See `references/api-endpoints.md` for the full endpoint reference with curl examples.",
+    "path": "skills/research/polymarket/SKILL.md"
+  },
+  {
+    "name": "popular-web-designs",
+    "desc": "system, shadows, responsive behavior, and practical agent prompts with exact CSS values.",
+    "path": "skills/creative/popular-web-designs/SKILL.md"
+  },
+  {
+    "name": "pptx-author",
+    "desc": "For the broader, already-shipped PowerPoint authoring skill (slides, speaker notes, embeds, media), see the built-in `powerpoint` skill. This skill is a lighter-weight pattern tuned for model-backed decks (pitch decks, IC memos, earnings notes) where every number must trace to a source workbook.",
+    "path": "optional-skills/finance/pptx-author/SKILL.md"
+  },
+  {
+    "name": "pretext",
+    "desc": "# Pretext Creative Demos",
+    "path": "skills/creative/pretext/SKILL.md"
+  },
+  {
+    "name": "python-debugpy",
+    "desc": "# Python Debugger (pdb + debugpy)",
+    "path": "skills/software-development/python-debugpy/SKILL.md"
+  },
+  {
+    "name": "pytorch-fsdp",
+    "desc": "Comprehensive assistance with pytorch-fsdp development, generated from official documentation.",
+    "path": "optional-skills/mlops/pytorch-fsdp/SKILL.md"
+  },
+  {
+    "name": "pytorch-lightning",
+    "desc": "# PyTorch Lightning - High-Level Training Framework",
+    "path": "optional-skills/mlops/pytorch-lightning/SKILL.md"
+  },
+  {
+    "name": "qdrant",
+    "desc": "High-performance vector database written in Rust for production RAG and semantic search.",
+    "path": "optional-skills/mlops/qdrant/SKILL.md"
+  },
+  {
+    "name": "qmd",
+    "desc": "Created by [Tobi L\u00fctke](https://github.com/tobi/qmd). MIT licensed.",
+    "path": "optional-skills/research/qmd/SKILL.md"
+  },
+  {
+    "name": "requesting-code-review",
+    "desc": "**Core principle:** No agent should verify its own work. Fresh context finds what you miss.",
+    "path": "skills/software-development/requesting-code-review/SKILL.md"
+  },
+  {
+    "name": "research-paper-writing",
+    "desc": "---",
+    "path": "skills/research/research-paper-writing/SKILL.md"
+  },
+  {
+    "name": "rest-graphql-debug",
+    "desc": "Drive REST and GraphQL diagnosis through Council tools \u2014 `terminal` for `curl`, `execute_code` for Python `requests`, `web_extract` for vendor docs. Isolate the failing layer before guessing at the fix.",
+    "path": "optional-skills/software-development/rest-graphql-debug/SKILL.md"
+  },
+  {
+    "name": "saelens",
+    "desc": "**GitHub**: [jbloomAus/SAELens](https://github.com/jbloomAus/SAELens) (1,100+ stars)",
+    "path": "optional-skills/mlops/saelens/SKILL.md"
+  },
+  {
+    "name": "scrapling",
+    "desc": "**This skill is for educational and research purposes only.** Users must comply with local/international data scraping laws and respect website Terms of Service.",
+    "path": "optional-skills/research/scrapling/SKILL.md"
+  },
+  {
+    "name": "searxng-search",
+    "desc": "**No API key required** when using a public instance. Can also be self-hosted for full control. Automatically appears as a fallback when the main web search toolset (`FIRECRAWL_API_KEY`) is not configured.",
+    "path": "optional-skills/research/searxng-search/SKILL.md"
+  },
+  {
+    "name": "segment-anything",
+    "desc": "Comprehensive guide to using Meta AI's Segment Anything Model for zero-shot image segmentation.",
+    "path": "skills/mlops/models/segment-anything/SKILL.md"
+  },
+  {
+    "name": "sherlock",
+    "desc": "Hunt down social media accounts by username across 400+ social networks using the [Sherlock Project](https://github.com/sherlock-project/sherlock).",
+    "path": "optional-skills/security/sherlock/SKILL.md"
+  },
+  {
+    "name": "shop-app",
+    "desc": "---",
+    "path": "optional-skills/productivity/shop-app/SKILL.md"
+  },
+  {
+    "name": "shopify",
+    "desc": "The REST Admin API is legacy since 2024-04 and only receives security fixes. **Use GraphQL Admin** for all admin work. Use **Storefront GraphQL** for read-only customer-facing queries (products, collections, cart).",
+    "path": "optional-skills/productivity/shopify/SKILL.md"
+  },
+  {
+    "name": "simpo",
+    "desc": "# SimPO - Simple Preference Optimization",
+    "path": "optional-skills/mlops/simpo/SKILL.md"
+  },
+  {
+    "name": "siyuan",
+    "desc": "Use the [SiYuan](https://github.com/siyuan-note/siyuan) kernel API via curl to search, read, create, update, and delete blocks and documents in a self-hosted knowledge base. No extra tools needed -- just curl and an API token.",
+    "path": "optional-skills/productivity/siyuan/SKILL.md"
+  },
+  {
+    "name": "sketch",
+    "desc": "Load this when the user says things like \"sketch this screen\", \"show me what X could look like\", \"compare layout A vs B\", \"give me 2-3 takes on this UI\", \"let me see some variants\", \"mockup this before I build\".",
+    "path": "skills/creative/sketch/SKILL.md"
+  },
+  {
+    "name": "slime",
+    "desc": "slime is an LLM post-training framework from Tsinghua's THUDM team, powering GLM-4.5, GLM-4.6, and GLM-4.7. It connects Megatron-LM for training with SGLang for high-throughput rollout generation.",
+    "path": "optional-skills/mlops/slime/SKILL.md"
+  },
+  {
+    "name": "solana",
+    "desc": "---",
+    "path": "optional-skills/blockchain/solana/SKILL.md"
+  },
+  {
+    "name": "songsee",
+    "desc": "Generate spectrograms and multi-panel audio feature visualizations from audio files.",
+    "path": "skills/media/songsee/SKILL.md"
+  },
+  {
+    "name": "songwriting-and-ai-music",
+    "desc": "---",
+    "path": "skills/creative/songwriting-and-ai-music/SKILL.md"
+  },
+  {
+    "name": "spike",
+    "desc": "Load this when the user says things like \"let me try this\", \"I want to see if X works\", \"spike this out\", \"before I commit to Y\", \"quick prototype of Z\", \"is this even possible?\", or \"compare A vs B\".",
+    "path": "skills/software-development/spike/SKILL.md"
+  },
+  {
+    "name": "spotify",
+    "desc": "Control the user's Spotify account via the Council Spotify toolset (7 tools). Setup guide: https://pokelabs-council.pokelabs.com/docs/user-guide/features/spotify",
+    "path": "skills/media/spotify/SKILL.md"
+  },
+  {
+    "name": "stable-diffusion",
+    "desc": "Comprehensive guide to generating images with Stable Diffusion using the HuggingFace Diffusers library.",
+    "path": "optional-skills/mlops/stable-diffusion/SKILL.md"
+  },
+  {
+    "name": "stocks",
+    "desc": "installs. Yahoo's endpoint is unofficial and may rate-limit or change.",
+    "path": "optional-skills/finance/stocks/SKILL.md"
+  },
+  {
+    "name": "subagent-driven-development",
+    "desc": "# Subagent-Driven Development",
+    "path": "skills/software-development/subagent-driven-development/SKILL.md"
+  },
+  {
+    "name": "systematic-debugging",
+    "desc": "# Systematic Debugging",
+    "path": "skills/software-development/systematic-debugging/SKILL.md"
+  },
+  {
+    "name": "teams-meeting-pipeline",
+    "desc": "Everything operator-facing is a `council teams-pipeline` subcommand run via the terminal tool. There are no new model tools for this pipeline \u2014 the CLI is the surface.",
+    "path": "skills/productivity/teams-meeting-pipeline/SKILL.md"
+  },
+  {
+    "name": "telephony",
+    "desc": "- place outbound AI calls through Bland.ai or Vapi",
+    "path": "optional-skills/productivity/telephony/SKILL.md"
+  },
+  {
+    "name": "tensorrt-llm",
+    "desc": "NVIDIA's open-source library for optimizing LLM inference with state-of-the-art performance on NVIDIA GPUs.",
+    "path": "optional-skills/mlops/tensorrt-llm/SKILL.md"
+  },
+  {
+    "name": "test-driven-development",
+    "desc": "# Test-Driven Development (TDD)",
+    "path": "skills/software-development/test-driven-development/SKILL.md"
+  },
+  {
+    "name": "torchtitan",
+    "desc": "# TorchTitan - PyTorch Native Distributed LLM Pretraining",
+    "path": "optional-skills/mlops/torchtitan/SKILL.md"
+  },
+  {
+    "name": "touchdesigner-mcp",
+    "desc": "# TouchDesigner Integration (twozero MCP)",
+    "path": "skills/creative/touchdesigner-mcp/SKILL.md"
+  },
+  {
+    "name": "trl-fine-tuning",
+    "desc": "# TRL - Transformer Reinforcement Learning",
+    "path": "optional-skills/mlops/training/trl-fine-tuning/SKILL.md"
+  },
+  {
+    "name": "unsloth",
+    "desc": "Comprehensive assistance with unsloth development, generated from official documentation.",
+    "path": "optional-skills/mlops/training/unsloth/SKILL.md"
+  },
+  {
+    "name": "vllm",
+    "desc": "# vLLM - High-Performance LLM Serving",
+    "path": "skills/mlops/inference/vllm/SKILL.md"
+  },
+  {
+    "name": "watchers",
+    "desc": "Poll external sources on an interval and react only to new items. Three ready-made scripts plus a shared watermark helper; wire them into a cron job (or run them ad-hoc from the terminal).",
+    "path": "optional-skills/devops/watchers/SKILL.md"
+  },
+  {
+    "name": "web-pentest",
+    "desc": "---",
+    "path": "optional-skills/security/web-pentest/SKILL.md"
+  },
+  {
+    "name": "webhook-subscriptions",
+    "desc": "Create dynamic webhook subscriptions so external services (GitHub, GitLab, Stripe, CI/CD, IoT sensors, monitoring tools) can trigger Council agent runs by POSTing events to a URL.",
+    "path": "skills/devops/webhook-subscriptions/SKILL.md"
+  },
+  {
+    "name": "weights-and-biases",
+    "desc": "# Weights & Biases: ML Experiment Tracking & MLOps",
+    "path": "skills/mlops/evaluation/weights-and-biases/SKILL.md"
+  },
+  {
+    "name": "whisper",
+    "desc": "OpenAI's multilingual speech recognition model.",
+    "path": "optional-skills/mlops/whisper/SKILL.md"
+  },
+  {
+    "name": "writing-plans",
+    "desc": "# Writing Implementation Plans",
+    "path": "skills/software-development/writing-plans/SKILL.md"
+  },
+  {
+    "name": "xurl",
+    "desc": "---",
+    "path": "skills/social-media/xurl/SKILL.md"
+  },
+  {
+    "name": "yuanbao",
+    "desc": "# Yuanbao Group Interaction",
+    "path": "skills/yuanbao/SKILL.md"
+  }
+]
