@@ -1,0 +1,112 @@
+name: Skills Directory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'optional-skills/**'
+      - '.github/workflows/skills-directory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate skills directory
+        run: |
+          python3 << 'PYEOF'
+          import os, json, html
+
+          def extract_skill_info(path):
+              """Extract name, description, and triggers from a SKILL.md file."""
+              name = os.path.basename(os.path.dirname(path))
+              desc = ""
+              triggers = []
+              try:
+                  with open(path) as f:
+                      content = f.read()
+                  # First non-empty line after # is usually the title
+                  lines = [l.strip() for l in content.split('\n') if l.strip()]
+                  for line in lines[:5]:
+                      if line.startswith('#'):
+                          name = line.lstrip('#').strip()
+                          break
+                  # Find description
+                  for i, line in enumerate(lines):
+                      if line.startswith('##') and i > 0:
+                          desc = lines[i-1] if i > 0 else ""
+                          break
+                  if not desc and len(lines) > 1:
+                      desc = lines[1][:120]
+              except:
+                  pass
+              return {"name": name, "desc": desc, "path": path}
+
+          skills = []
+          for root, dirs, files in os.walk('skills'):
+              for f in files:
+                  if f == 'SKILL.md':
+                      skills.append(extract_skill_info(os.path.join(root, f)))
+          for root, dirs, files in os.walk('optional-skills'):
+              for f in files:
+                  if f == 'SKILL.md':
+                      skills.append(extract_skill_info(os.path.join(root, f)))
+
+          skills.sort(key=lambda s: s['name'])
+
+          # Generate HTML
+          rows = ""
+          for s in skills:
+              relpath = s['path'].replace('/SKILL.md', '')
+              rows += f'''<tr>
+              <td><strong>{html.escape(s["name"])}</strong></td>
+              <td>{html.escape(s["desc"])}</td>
+              <td><code>{html.escape(relpath)}</code></td>
+              <td><a href="https://github.com/pokelabshq/council/tree/main/{relpath}">View</a></td>
+          </tr>'''
+
+          page = f'''<!DOCTYPE html>
+          <html><head><meta charset="UTF-8"><title>Poke Labs — Skills Directory</title>
+          <style>
+          body {{ font-family: -apple-system, sans-serif; background: #0a0a1a; color: #e0e0e0; padding: 2rem; max-width: 900px; margin: 0 auto; }}
+          h1 {{ color: #a78bfa; }}
+          table {{ width: 100%; border-collapse: collapse; margin: 1rem 0; }}
+          th, td {{ text-align: left; padding: .75rem; border-bottom: 1px solid #222; }}
+          th {{ color: #666; text-transform: uppercase; font-size: .75rem; }}
+          a {{ color: #a78bfa; }}
+          .meta {{ color: #666; font-size: .85rem; margin-bottom: 1rem; }}
+          </style></head><body>
+          <h1>🧩 Skills Directory</h1>
+          <p class="meta">{len(skills)} skills available. Generated from <a href="https://github.com/pokelabshq/council">pokelabshq/council</a>.</p>
+          <table>
+          <tr><th>Name</th><th>Description</th><th>Path</th><th>Link</th></tr>
+          {rows}
+          </table>
+          <p style="color:#444;font-size:.8rem;margin-top:2rem">🐾 Poke Labs — MIT License</p>
+          </body></html>'''
+
+          os.makedirs('skills-site', exist_ok=True)
+          with open('skills-site/index.html', 'w') as f:
+              f.write(page)
+
+          # Also output JSON for API consumption
+          with open('skills-site/skills.json', 'w') as f:
+              json.dump(skills, f, indent=2)
+
+          print(f"Generated directory with {len(skills)} skills")
+          PYEOF
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./skills-site
+          destination_dir: skills
