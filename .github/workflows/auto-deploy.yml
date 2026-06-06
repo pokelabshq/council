@@ -1,0 +1,41 @@
+name: Auto-deploy on skills-index change
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'skills-index.json'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate skills-index.json
+        run: |
+          python3 -c "
+          import json
+          with open('skills-index.json') as f:
+              data = json.load(f)
+          print(f'✅ skills-index.json valid: {len(data.get(\"skills\", []))} skills')
+          "
+
+      - name: Deploy site
+        run: |
+          echo "🚀 Deploying Poke Labs site..."
+          # Copy latest skills index to public
+          cp skills-index.json public/ 2>/dev/null || true
+          echo "✅ Skills index deployed"
+
+      - name: Commit deployed index
+        run: |
+          git config user.name "poke-bot"
+          git config user.email "poke@pokelabs.org"
+          git add public/skills-index.json 2>/dev/null || true
+          git diff --cached --quiet || git commit -m "chore: auto-deploy skills-index.json [skip ci]"
+          git push || true
