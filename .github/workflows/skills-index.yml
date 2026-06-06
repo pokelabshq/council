@@ -8,13 +8,10 @@ on:
     branches: [main]
     paths:
       - 'scripts/build_skills_index.py'
-      - 'skills/**'
-      - 'optional-skills/**'
-      - 'tools/skills_hub.py'
       - '.github/workflows/skills-index.yml'
 
 permissions:
-  contents: read
+  contents: write
   actions: write
 
 jobs:
@@ -36,28 +33,29 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/build_skills_index.py
 
-      - name: Upload index artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a  # v7.0.1
-        with:
-          name: skills-index
-          path: website/static/api/skills-index.json
-          retention-days: 7
-
-      - name: Commit index to repo
+      - name: Commit skills index to repo
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add website/static/api/skills-index.json
-          git diff --cached --quiet || git commit -m "chore: update skills-index.json [skip ci]"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "chore: update skills-index.json [skip ci]"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
   trigger-deploy:
     needs: build-index
-    # Trigger deploy on schedule, push (skill changes), AND manual dispatch
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    if: always() && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Deploy Site workflow
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run deploy-site.yml --repo ${{ github.repository }}
+        run: |
+          echo "Triggering deploy-site.yml to publish updated skills index..."
+          gh workflow run deploy-site.yml --repo ${{ github.repository }}

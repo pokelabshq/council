@@ -9,6 +9,7 @@ on:
       - 'website/**'
       - 'skills/**'
       - 'optional-skills/**'
+      - 'website/static/api/skills-index.json'
       - '.github/workflows/deploy-site.yml'
   workflow_dispatch:
 
@@ -22,11 +23,6 @@ concurrency:
 
 jobs:
   deploy-vercel:
-    # Triggered automatically on release publish (production cuts) and
-    # manually via `gh workflow run deploy-site.yml` when an out-of-band
-    # main commit needs to ship live before the next release tag — e.g.
-    # a skills-index PR that doesn't touch website/** paths and so
-    # doesn't auto-deploy via the deploy-docs path.
     if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
@@ -59,11 +55,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Always rebuild — the file isn't committed (gitignored), so a
-          # fresh checkout starts without it and we want the freshest crawl
-          # in every deploy. Failure is non-fatal: extract-skills.py will
-          # fall back to the legacy snapshot cache and the Skills Hub page
-          # still renders, just without the latest community catalog.
           python3 scripts/build_skills_index.py || echo "Skills index build failed (non-fatal)"
 
       - name: Extract skill metadata for dashboard
@@ -84,10 +75,6 @@ jobs:
         run: |
           mkdir -p _site/docs
           cp -r website/build/* _site/docs/
-          # llms.txt / llms-full.txt are also published at the site root
-          # (https://pokelabs-council.pokelabs.com/llms.txt) because some
-          # agents and IDE plugins probe the classic root-level path rather
-          # than /docs/llms.txt. Same file, two URLs, one source of truth.
           if [ -f website/build/llms.txt ]; then
             cp website/build/llms.txt _site/llms.txt
           fi
@@ -96,10 +83,10 @@ jobs:
           fi
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        uses: actions/upload-pages-artifact@fc324d354d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deploy
-        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4
