@@ -1,6 +1,6 @@
 # Council — Micro-service Platform
 
-A collection of 14 Python micro-services with a unified gateway, Docker deployment, and CI/CD.
+A collection of 22 Python micro-services with a unified gateway, Docker deployment, and CI/CD.
 
 ## Quick Start
 
@@ -17,7 +17,6 @@ cd poke-services/sentiment && python3 server.py
 | Service | Port | Description |
 |---------|------|-------------|
 | Gateway | 8700 | Unified API entry point — routes to all services |
-| Sentiment | 8764 | Analyzes text sentiment (positive/negative/neutral) |
 | Link Preview | 8765 | Extracts title, description, image from URLs |
 | Keyword Extractor | 8766 | Extracts keywords and key phrases from text |
 | QR Generator | 8767 | Generates QR codes as SVG |
@@ -30,7 +29,16 @@ cd poke-services/sentiment && python3 server.py
 | JSON Formatter | 8774 | Validates, formats, and minifies JSON |
 | Base64 Tool | 8775 | Encodes/decodes base64 |
 | Markdown Renderer | 8776 | Converts Markdown to HTML |
-| Status Dashboard | 8778 | Live health monitor for all services |
+| Sentiment | 8777 | Analyzes text sentiment (positive/negative/neutral) |
+| Hash Gen | 8779 | Generates hashes (md5, sha1, sha256, sha512) |
+| Webhook Relay | 8779 | Receives webhooks, logs events, dispatches to services |
+| UUID Gen | 8780 | Generates UUIDs (v1, v4, v7) |
+| Rate Limiter | 8780 | Token bucket rate limiting |
+| Timestamp Conv | 8781 | Unix / ISO8601 / RFC2822 conversion |
+| Email Validator | 8781 | Validates email format, MX records, checks disposable domains |
+| Barcode Gen | 8782 | Generates barcodes (code39, code128-b, ean-13) |
+| Status Dashboard | 8790 | Real-time health monitor for all services |
+| Health Agg | 8791 | Unified health check for all council services |
 
 ## API Usage
 
@@ -39,26 +47,19 @@ All services expose a `POST /api/<action>` endpoint and `GET /api/health`.
 ### Via Gateway (recommended)
 
 ```bash
-# Sentiment analysis
 curl -X POST http://localhost:8700/api/sentiment/analyze \
   -H "Content-Type: application/json" \
   -d '{"text": "I love this project!"}'
 
-# Generate QR code
 curl -X POST http://localhost:8700/api/qr/qr \
   -H "Content-Type: application/json" \
   -d '{"data": "https://pokelabs.org"}'
-
-# Color palette
-curl -X POST http://localhost:8700/api/colors/generate \
-  -H "Content-Type: application/json" \
-  -d '{"base": "#00d4ff", "count": 5, "mode": "analogous"}'
 ```
 
 ### Direct Service Access
 
 ```bash
-curl -X POST http://localhost:8764/api/analyze \
+curl -X POST http://localhost:8777/api/analyze \
   -H "Content-Type: application/json" \
   -d '{"text": "Amazing work!"}'
 
@@ -68,7 +69,7 @@ curl http://localhost:8765/api/health
 ## Architecture
 
 ```
-Client → Gateway (:8700) → Service (:8764-8778)
+Client → Gateway (:8700) → Service (:8765-8791)
                   ↓
          Health checks
          Routing
@@ -79,7 +80,7 @@ Client → Gateway (:8700) → Service (:8764-8778)
 
 - **Language**: Python 3.12 (stdlib only — no dependencies)
 - **Deployment**: Docker + docker-compose
-- **CI/CD**: GitHub Actions (lint, audit, auto-merge)
+- **CI/CD**: GitHub Actions
 - **License**: MIT
 
 ## Adding a New Service
@@ -87,7 +88,7 @@ Client → Gateway (:8700) → Service (:8764-8778)
 1. Create `poke-services/<name>/server.py`
 2. Include `GET /api/health` endpoint
 3. Add to `docker-compose.yml`
-4. Add to gateway `SERVICES` dict
+4. Add to gateway routing
 5. Add `Dockerfile`
 
 See [AGENTS.md](AGENTS.md) for coding standards and service template.
@@ -95,35 +96,3 @@ See [AGENTS.md](AGENTS.md) for coding standards and service template.
 ## License
 
 MIT — Poke Labs
-
----
-
-## 🚀 Link Preview API — Now Live!
-
-**Extract titles, descriptions, and images from any URL. One API call.**
-
-👉 **Live Demo**: https://pokelabs.org
-
-### Quick Start
-```bash
-curl -X POST https://pokelabs.org/api/preview \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://github.com"}'
-```
-
-### Pricing
-| Tier | Price | Rate Limit |
-|------|-------|------------|
-| Free | $0 | 3 req/day |
-| Hacker | $5/mo | 1,000 req/day |
-| Pro | $25/mo | 10,000 req/day |
-| Enterprise | $100/mo | 100,000 req/day |
-
-### API Key Authentication
-```bash
-curl -X POST https://pokelabs.org/api/preview \
-  -H "X-API-Key: pk_live_xxxxx" \
-  -d '{"url": "https://github.com"}'
-```
-
-All payments via USDC on Base chain.
