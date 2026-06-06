@@ -16,11 +16,12 @@ Our flagship product is an open-source platform of micro-services and AI agents 
 
 ## Traction
 
-- **2 open-source repos** with active development (council, poke)
-- **12 micro-services** built and deployed (link-preview, keyword extraction, summarization, QR generation, DNS checking, color palettes, URL shortener, template generation, health aggregation, JSON-to-TypeScript, GitHub webhooks)
+- **6 open-source repos** with active development (council, council-website, services, cli, brand, poke)
+- **22 micro-services** built and deployed (link-preview, keyword extraction, summarization, QR generation, DNS checking, color palettes, URL shortener, password generator, hash generation, UUID generation, barcode generation, email validation, webhook relay, rate limiter, and more)
 - **API gateway** routing all services behind a single port
-- **CLI tool** (`pokelabs-council`) for terminal-based multi-agent deliberation
+- **CLI tool** (`pokelabs`) for terminal-based multi-agent deliberation
 - **Status dashboard** for real-time service monitoring
+- **Free API tools** — link preview, OG image generator, SEO meta checker
 - All code MIT licensed, zero-cost to run
 
 ## Market
@@ -53,4 +54,4 @@ We're looking for $50K in pre-seed funding to:
 
 ---
 
-*Built with ❤️ by Poke Labs. MIT License. All code is open source.*
+*MIT License. All code is open source.*

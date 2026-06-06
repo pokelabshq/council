@@ -1,7 +1,7 @@
 """
 Stub module for poke_account.
 
-This module was referenced during the rebrand from Hermes to Council but
+This module was referenced during development but
 the original implementation was not included in the fork. These are no-op
 stubs so imports don't fail.
 """
