@@ -95,3 +95,35 @@ See [AGENTS.md](AGENTS.md) for coding standards and service template.
 ## License
 
 MIT — Poke Labs
+
+---
+
+## 🚀 Link Preview API — Now Live!
+
+**Extract titles, descriptions, and images from any URL. One API call.**
+
+👉 **Live Demo**: https://pokelabs.org
+
+### Quick Start
+```bash
+curl -X POST https://pokelabs.org/api/preview \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://github.com"}'
+```
+
+### Pricing
+| Tier | Price | Rate Limit |
+|------|-------|------------|
+| Free | $0 | 3 req/day |
+| Hacker | $5/mo | 1,000 req/day |
+| Pro | $25/mo | 10,000 req/day |
+| Enterprise | $100/mo | 100,000 req/day |
+
+### API Key Authentication
+```bash
+curl -X POST https://pokelabs.org/api/preview \
+  -H "X-API-Key: pk_live_xxxxx" \
+  -d '{"url": "https://github.com"}'
+```
+
+All payments via USDC on Base chain.
