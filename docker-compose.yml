@@ -1,128 +1,47 @@
-version: "3.9"
+version: '3.8'
 
 services:
-  gateway:
-    build: ./gateway
+  poke-dashboard:
+    build: .
     ports:
-      - "8700:8700"
-    depends_on:
-      - sentiment
-      - link-preview
-      - keyword-extractor
-      - qr-generator
-      - dns-lookup
-      - color-palette
-      - text-summary
-      - url-shortener
-      - password-generator
-      - timestamp-converter
-      - json-formatter
-      - base64-tool
-      - markdown-render
-      - status-dashboard
-      - hash-gen
-      - uuid-gen
-      - timestamp-conv
-    restart: unless-stopped
-
-  sentiment:
-    build: ./poke-services/sentiment
-    ports:
-      - "8764:8764"
+      - "8799:8799"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8799/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     restart: unless-stopped
 
   link-preview:
-    build: ./poke-services/link-preview
+    build: .
     ports:
       - "8765:8765"
+    environment:
+      - PORT=8765
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8765/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     restart: unless-stopped
 
-  keyword-extractor:
-    build: ./poke-services/keyword-extractor
-    ports:
-      - "8766:8766"
-    restart: unless-stopped
-
-  qr-generator:
-    build: ./poke-services/qr-generator
-    ports:
-      - "8767:8767"
-    restart: unless-stopped
-
-  dns-lookup:
-    build: ./poke-services/dns-lookup
-    ports:
-      - "8768:8768"
-    restart: unless-stopped
-
-  color-palette:
-    build: ./poke-services/color-palette
-    ports:
-      - "8769:8769"
-    restart: unless-stopped
-
-  text-summary:
-    build: ./poke-services/text-summary
+  poke-bot:
+    build: .
     ports:
       - "8770:8770"
+    environment:
+      - PORT=8770
+      - GITHUB_SECRET=${GITHUB_SECRET}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
     restart: unless-stopped
 
-  url-shortener:
-    build: ./poke-services/url-shortener
-    ports:
-      - "8771:8771"
-    restart: unless-stopped
-
-  password-generator:
-    build: ./poke-services/password-generator
-    ports:
-      - "8772:8772"
-    restart: unless-stopped
-
-  timestamp-converter:
-    build: ./poke-services/timestamp-converter
-    ports:
-      - "8773:8773"
-    restart: unless-stopped
-
-  json-formatter:
-    build: ./poke-services/json-formatter
-    ports:
-      - "8774:8774"
-    restart: unless-stopped
-
-  base64-tool:
-    build: ./poke-services/base64-tool
+  webhook-relay:
+    build: .
     ports:
       - "8775:8775"
-    restart: unless-stopped
-
-  markdown-render:
-    build: ./poke-services/markdown-render
-    ports:
-      - "8776:8776"
-    restart: unless-stopped
-
-  status-dashboard:
-    build: ./poke-services/status-dashboard
-    ports:
-      - "8778:8778"
-    restart: unless-stopped
-
-  hash-gen:
-    build: ./poke-services/hash-gen
-    ports:
-      - "8779:8779"
-    restart: unless-stopped
-
-  uuid-gen:
-    build: ./poke-services/uuid-gen
-    ports:
-      - "8780:8780"
-    restart: unless-stopped
-
-  timestamp-conv:
-    build: ./poke-services/timestamp-conv
-    ports:
-      - "8781:8781"
+    environment:
+      - PORT=8775
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
     restart: unless-stopped
