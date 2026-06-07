@@ -11,6 +11,10 @@ on:
       - 'optional-skills/**'
       - 'website/static/api/skills-index.json'
       - '.github/workflows/deploy-site.yml'
+  workflow_run:
+    workflows: ["Build Skills Index"]
+    types:
+      - completed
   workflow_dispatch:
     inputs:
       deploy_target:
@@ -33,14 +37,14 @@ concurrency:
 
 jobs:
   deploy-vercel:
-    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'release' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Deploy
         run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"
 
   deploy-docs:
-    if: github.repository == 'pokelabshq/council' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'release')
+    if: github.repository == 'pokelabshq/council' && (github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'release' || github.event_name == 'workflow_run')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
