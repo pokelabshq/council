@@ -6305,6 +6305,13 @@ def cmd_doctor(args):
     run_doctor(args)
 
 
+def cmd_review(args):
+    """Run ai-powered code review on git diffs, files, or PRs."""
+    from council_cli.review import cmd_review as _cmd_review
+
+    _cmd_review(args)
+
+
 def cmd_security(args):
     """Dispatch `council security <subcmd>`."""
     sub = getattr(args, "security_command", None)
@@ -11157,7 +11164,7 @@ _BUILTIN_SUBCOMMANDS = frozenset(
     {
         "acp", "auth", "backup", "bundles", "checkpoints", "claw", "completion",
         "computer-use",
-        "config", "cron", "curator", "dashboard", "debug", "doctor",
+        "config", "cron", "curator", "dashboard", "debug", "doctor", "review",
         "dump", "fallback", "gateway", "hooks", "import", "insights",
         "kanban", "login", "logout", "logs", "lsp", "mcp", "memory", "migrate",
         "model", "pairing", "plugins", "portal", "postinstall", "profile", "proxy",
@@ -12548,6 +12555,50 @@ def main():
         ),
     )
     doctor_parser.set_defaults(func=cmd_doctor)
+
+    # =========================================================================
+    # review command — local ai-powered code review
+    # =========================================================================
+    review_parser = subparsers.add_parser(
+        "review",
+        help="ai-powered code review for git diffs, files, or PRs",
+        description=(
+            "review code changes using the configured council model. "
+            "supports staged changes, branch diffs, github PRs, and individual files. "
+            "all review is run locally — no external api beyond what council already uses."
+        ),
+    )
+    review_parser.add_argument(
+        "--branch", "-b",
+        metavar="BRANCH",
+        help="review all changes between the given branch and HEAD",
+    )
+    review_parser.add_argument(
+        "--pr", "-p",
+        metavar="NUMBER",
+        help="review a github PR by number (requires gh cli)",
+    )
+    review_parser.add_argument(
+        "--file", "-f",
+        metavar="PATH",
+        help="review a single file (unstaged changes)",
+    )
+    review_parser.add_argument(
+        "--diff", "-d",
+        metavar="TEXT",
+        help="review raw diff text passed as argument",
+    )
+    review_parser.add_argument(
+        "--fix",
+        action="store_true",
+        help="auto-fix issues found (staged changes only)",
+    )
+    review_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="output machine-readable json instead of formatted text",
+    )
+    review_parser.set_defaults(func=cmd_review)
 
     # =========================================================================
     # security command — on-demand supply-chain audit
