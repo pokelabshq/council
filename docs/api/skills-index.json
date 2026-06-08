@@ -1,161 +1,539 @@
 {
-  "version": "1.0",
-  "generated": "2026-06-05T00:35:00Z",
+  "version": "2.0",
+  "generated": "2026-06-08T00:00:00Z",
+  "source": "pokelabshq/council",
+  "total_skills": 50,
   "skills": [
     {
-      "name": "apple",
-      "path": "skills/apple/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "autonomous-ai-agents",
-      "path": "skills/autonomous-ai-agents/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "creative",
-      "path": "skills/creative/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "data-science",
-      "path": "skills/data-science/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "devops",
-      "path": "skills/devops/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "dogfood",
-      "path": "skills/dogfood/",
-      "has_readme": false,
-      "has_skill_md": true,
-      "files": [
-        "SKILL.md"
-      ],
-      "description": "---"
-    },
-    {
-      "name": "email",
-      "path": "skills/email/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "gaming",
-      "path": "skills/gaming/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "github",
-      "path": "skills/github/",
-      "has_readme": false,
-      "has_skill_md": false,
-      "files": []
-    },
-    {
-      "name": "index-cache",
-      "path": "skills/index-cache/",
+      "name": ".git",
+      "path": "skills/.git/",
+      "description": "Poke Labs skill: .git",
       "has_readme": false,
       "has_skill_md": false,
       "files": [
-        "lobehub_index.json"
+        "HEAD",
+        "description",
+        "COMMIT_EDITMSG",
+        "index",
+        "config"
       ]
     },
     {
-      "name": "mcp",
-      "path": "skills/mcp/",
+      "name": "a2a-marketplace",
+      "path": "skills/a2a-marketplace/",
+      "description": "Poke Labs skill: a2a-marketplace",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "server.py"
+      ]
     },
     {
-      "name": "media",
-      "path": "skills/media/",
+      "name": "analytics",
+      "path": "skills/analytics/",
+      "description": "Poke Labs skill: analytics",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "server.py"
+      ]
     },
     {
-      "name": "mlops",
-      "path": "skills/mlops/",
+      "name": "api-gateway",
+      "path": "skills/api-gateway/",
+      "description": "Poke Labs skill: api-gateway",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "gateway.py"
+      ]
     },
     {
-      "name": "note-taking",
-      "path": "skills/note-taking/",
+      "name": "auto-merge",
+      "path": "skills/auto-merge/",
+      "description": "Poke Labs skill: auto-merge",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "repo-scorecard.py",
+        "auto-merge.yml"
+      ]
     },
     {
-      "name": "productivity",
-      "path": "skills/productivity/",
+      "name": "changelog-gen",
+      "path": "skills/changelog-gen/",
+      "description": "Poke Labs skill: changelog-gen",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "gen.py"
+      ]
     },
     {
-      "name": "red-teaming",
-      "path": "skills/red-teaming/",
+      "name": "cli",
+      "path": "skills/cli/",
+      "description": "Poke Labs skill: cli",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "poke.js"
+      ]
     },
     {
-      "name": "research",
-      "path": "skills/research/",
+      "name": "color-api",
+      "path": "skills/color-api/",
+      "description": "Poke Labs skill: color-api",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "server.py"
+      ]
     },
     {
-      "name": "smart-home",
-      "path": "skills/smart-home/",
+      "name": "daily-briefing",
+      "path": "skills/daily-briefing/",
+      "description": "Poke Labs skill: daily-briefing",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "briefing.py"
+      ]
     },
     {
-      "name": "social-media",
-      "path": "skills/social-media/",
+      "name": "dashboard",
+      "path": "skills/dashboard/",
+      "description": "Poke Labs skill: dashboard",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "server.py",
+        "app.py"
+      ]
     },
     {
-      "name": "software-development",
-      "path": "skills/software-development/",
+      "name": "dns-checker",
+      "path": "skills/dns-checker/",
+      "description": "Poke Labs skill: dns-checker",
       "has_readme": false,
       "has_skill_md": false,
-      "files": []
+      "files": [
+        "server.py"
+      ]
     },
     {
-      "name": "yuanbao",
-      "path": "skills/yuanbao/",
+      "name": "gateway",
+      "path": "skills/gateway/",
+      "description": "Poke Labs skill: gateway",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "github-webhook",
+      "path": "skills/github-webhook/",
+      "description": "Poke Labs skill: github-webhook",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "hash-gen",
+      "path": "skills/hash-gen/",
+      "description": "Poke Labs skill: hash-gen",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "health-agg",
+      "path": "skills/health-agg/",
+      "description": "Poke Labs skill: health-agg",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "agg.py",
+        "server.py"
+      ]
+    },
+    {
+      "name": "health-dashboard",
+      "path": "skills/health-dashboard/",
+      "description": "Poke Labs skill: health-dashboard",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "json2ts",
+      "path": "skills/json2ts/",
+      "description": "Poke Labs skill: json2ts",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "keyword-api",
+      "path": "skills/keyword-api/",
+      "description": "Extract keywords, entities, and text statistics from any text.",
+      "has_readme": true,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "README.md"
+      ]
+    },
+    {
+      "name": "landing",
+      "path": "skills/landing/",
+      "description": "Poke Labs skill: landing",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "link-preview",
+      "path": "skills/link-preview/",
+      "description": "Poke Labs skill: link-preview",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "usage.json",
+        "server_v6.py",
+        "Dockerfile"
+      ]
+    },
+    {
+      "name": "milestone-tracker",
+      "path": "skills/milestone-tracker/",
+      "description": "Poke Labs skill: milestone-tracker",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "tracker.py"
+      ]
+    },
+    {
+      "name": "notify-hub",
+      "path": "skills/notify-hub/",
+      "description": "Unified notification service \u2014 send alerts to multiple channels from one API.",
       "has_readme": false,
       "has_skill_md": true,
       "files": [
-        "SKILL.md"
-      ],
-      "description": "---"
+        "SKILL.md",
+        "hub.py"
+      ]
+    },
+    {
+      "name": "paywall-proxy",
+      "path": "skills/paywall-proxy/",
+      "description": "Poke Labs skill: paywall-proxy",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "proxy.py",
+        "server.py"
+      ]
+    },
+    {
+      "name": "poke-cli",
+      "path": "skills/poke-cli/",
+      "description": "Poke Labs skill: poke-cli",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "poke",
+        "poke.py"
+      ]
+    },
+    {
+      "name": "poke-feed",
+      "path": "skills/poke-feed/",
+      "description": "Poke Labs skill: poke-feed",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "feed.py"
+      ]
+    },
+    {
+      "name": "poke-hub",
+      "path": "skills/poke-hub/",
+      "description": "Poke Labs skill: poke-hub",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "bot.py"
+      ]
+    },
+    {
+      "name": "poke-tweets",
+      "path": "skills/poke-tweets/",
+      "description": "Poke Labs skill: poke-tweets",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "pokelabs-site",
+      "path": "skills/pokelabs-site/",
+      "description": "Poke Labs skill: pokelabs-site",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "seo-checker.html",
+        "og-generator.html",
+        "dashboard.html",
+        "server.py",
+        "index.html",
+        "Dockerfile",
+        "skills.html"
+      ]
+    },
+    {
+      "name": "portal",
+      "path": "skills/portal/",
+      "description": "Poke Labs skill: portal",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "index.html"
+      ]
+    },
+    {
+      "name": "pricing-api",
+      "path": "skills/pricing-api/",
+      "description": "Poke Labs skill: pricing-api",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "Dockerfile"
+      ]
+    },
+    {
+      "name": "qr-api",
+      "path": "skills/qr-api/",
+      "description": "Poke Labs skill: qr-api",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "qr-scanner",
+      "path": "skills/qr-scanner/",
+      "description": "Poke Labs skill: qr-scanner",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "registry",
+      "path": "skills/registry/",
+      "description": "Poke Labs skill: registry",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "release-tracker",
+      "path": "skills/release-tracker/",
+      "description": "Poke Labs skill: release-tracker",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "tracker.py"
+      ]
+    },
+    {
+      "name": "repo-monitor",
+      "path": "skills/repo-monitor/",
+      "description": "Poke Labs skill: repo-monitor",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "monitor.py"
+      ]
+    },
+    {
+      "name": "sentiment",
+      "path": "skills/sentiment/",
+      "description": "Poke Labs skill: sentiment",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "shortener",
+      "path": "skills/shortener/",
+      "description": "Poke Labs skill: shortener",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "urls.json"
+      ]
+    },
+    {
+      "name": "skills-marketplace",
+      "path": "skills/skills-marketplace/",
+      "description": "Poke Labs skill: skills-marketplace",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "skills-marketplace-v2",
+      "path": "skills/skills-marketplace-v2/",
+      "description": "Poke Labs skill: skills-marketplace-v2",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "status-page",
+      "path": "skills/status-page/",
+      "description": "Poke Labs skill: status-page",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "statuspage",
+      "path": "skills/statuspage/",
+      "description": "Poke Labs skill: statuspage",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "index.html"
+      ]
+    },
+    {
+      "name": "summarize",
+      "path": "skills/summarize/",
+      "description": "Poke Labs skill: summarize",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "usage.json"
+      ]
+    },
+    {
+      "name": "telegram-bot",
+      "path": "skills/telegram-bot/",
+      "description": "Poke Labs skill: telegram-bot",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "bot.py",
+        "Dockerfile"
+      ]
+    },
+    {
+      "name": "template-gen",
+      "path": "skills/template-gen/",
+      "description": "Poke Labs skill: template-gen",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "timestamp-conv",
+      "path": "skills/timestamp-conv/",
+      "description": "Poke Labs skill: timestamp-conv",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "uptime-checker",
+      "path": "skills/uptime-checker/",
+      "description": "Poke Labs skill: uptime-checker",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "check.py"
+      ]
+    },
+    {
+      "name": "uptime-monitor",
+      "path": "skills/uptime-monitor/",
+      "description": "Poke Labs skill: uptime-monitor",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "monitor.py",
+        "server.py",
+        "checker.py"
+      ]
+    },
+    {
+      "name": "url-shortener",
+      "path": "skills/url-shortener/",
+      "description": "Poke Labs skill: url-shortener",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "uuid-gen",
+      "path": "skills/uuid-gen/",
+      "description": "Poke Labs skill: uuid-gen",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py"
+      ]
+    },
+    {
+      "name": "webhook-relay",
+      "path": "skills/webhook-relay/",
+      "description": "Poke Labs skill: webhook-relay",
+      "has_readme": false,
+      "has_skill_md": false,
+      "files": [
+        "server.py",
+        "relay.py"
+      ]
     }
   ]
 }
