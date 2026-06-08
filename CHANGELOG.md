@@ -1,67 +1,54 @@
-# Changelog
+# changelog
 
-## [2026-06-06] — Unreleased
+all notable changes to this project.
 
-### ✨ Added
+format based on [keep a changelog](https://keepachangelog.com/en/1.1.0/).
+project adheres to [semantic versioning](https://semver.org/).
 
-- Add skills directory CI — auto-generates HTML index from SKILL.md files, publishes to GitHub Pages (f5de8477) — Poke Labs
-- Add Skills Marketplace v1 — searchable catalog, install API, web UI (9ea5c70b) — Poke Labs
-- Add daily briefing generator — GitHub health, service status, credits (819c71c1) — Poke Labs
-- Add barcode generator on port 8782 (50195443) — Poke Labs
-- Register 4 new services in gateway  (8a7bd269) — Poke Labs
-- Add webhook relay service + SKILLS.md documentation index (619d5105) — Poke Labs
-- Add gateway, docker-compose, and Dockerfiles for all 14 services (b4bbcc23) — Poke Labs
-- Add 5 more micro-services — 14 total (754bba4c) — Poke Labs
-- Add 5 micro-services  (91bb37f0) — Poke Labs
-- Add status dashboard service — live health monitor for all 13 services (e2b8c892) — Poke Labs
-- Add docker-compose.yml for one-command deployment of all 13 services + gateway (f458061f) — Poke Labs
+## [unreleased]
 
-### 🔄 Changed
+### added
+- add all poke labs services (5e64973) — 2026-06-06
+- add all poke services — dashboard, analytics, uptime monitor, skills marketplace, changelog gen, docs site, poke cli (9ba39fa) — 2026-06-06
+- add skills directory ci — auto-generates html index from skill.md files, publishes to github pages (f5de847) — 2026-06-05
+- add skills marketplace v1 — searchable catalog, install api, web ui (9ea5c70) — 2026-06-05
+- add daily briefing generator — github health, service status, credits (819c71c) — 2026-06-05
+- add barcode generator on port 8782 (5019544) — 2026-06-04
+- register 4 new services in gateway (8a7bd26) — 2026-06-04
+- add webhook relay service + skills.md documentation index (619d510) — 2026-06-04
+- add gateway, docker-compose, and dockerfiles for all 14 services (b4bbcc2) — 2026-06-04
+- add 5 more micro-services — 14 total (754bba4) — 2026-06-04
+- add 5 micro-services (91bb37f) — 2026-06-04
+- add status dashboard service — live health monitor for all 13 services (e2b8c89) — 2026-06-04
+- add docker-compose.yml for one-command deployment of all 13 services + gateway (f458061) — 2026-06-04
+- add rate limiter, email validator, service generator script, health monitor (844ea90) — 2026-06-04
+- add 4 new micro-services: sentiment, hash-gen, uuid-gen, timestamp-conv (9e8cf38) — 2026-06-04
+- add landing page for pokelabs.org (04fef87) — 2026-06-04
+- add health aggregator service on port 8791 (e387ce7) — 2026-06-04
 
-- Merge remote-tracking branch 'origin/dependabot/github_actions/docker/setup-buildx-action-4.1.0' (152e7cfc) — Poke Labs
-- Merge remote-tracking branch 'origin/dependabot/github_actions/actions/upload-artifact-7.0.1' (eae9d62a) — Poke Labs
-- Merge remote-tracking branch 'origin/dependabot/github_actions/actions/deploy-pages-5.0.0' (d6a365c4) — Poke Labs
-- Merge remote-tracking branch 'origin/dependabot/github_actions/actions-minor-patch-5bd7f00c1f' (8be334ae) — Poke Labs
-- Initial commit (91a6c87c) — Alexander Wondwossen
+### fixed
+- auto-deploy site when skills-index.json changes (22e30f1) — 2026-06-06
+- generate skills-index.json to resolve watchdog issue (c44f588) — 2026-06-05
+- repair markdown-render server (0f3106a) — 2026-06-04
+- trigger deploy on skill changes + commit index to repo (bc045a6) — 2026-06-04
+- make auto-merge resilient to missing metadata (41fe287) — 2026-06-04
+- add retry logic to skills index crawler (890288c) — 2026-06-04
+- recover skills index from cache when sources fail (5d14914) — 2026-06-04
+- add retry with exponential backoff to _guarded_http_get (75a5a25) — 2026-06-04
 
-### 🐛 Fixed
+### docs
+- add og image generator and seo checker guides (0ec6a77) — 2026-06-06
+- add link preview api section with pricing and quick start (254f97f) — 2026-06-06
+- announce link preview api with pricing tiers and usage examples (ee8c82c) — 2026-06-06
+- add contributing.md with known ci issues and dev setup (b06c5bc) — 2026-06-05
+- add agents.md contribution guide — coding standards, service template, git workflow (9941824) — 2026-06-04
+- add comprehensive work log — services, infrastructure, roadmap (871277c) — 2026-06-04
 
-- Generate skills-index.json to resolve watchdog issue (c44f588d) — Poke Labs
-- Repair markdown-render server  (0f3106a5) — Alexander Wondwossen
+### ci
+- add github actions ci workflow for automated testing (a6fb3d4) — 2026-06-05
+- add auto-merge workflow for dependabot patch prs (d73d55e) — 2026-06-05
+- add weekly service audit workflow (fb30a58) — 2026-06-04
+- add auto-merge workflow for dependabot prs (97515bd) — 2026-06-04
 
-### 📝 Documentation
-
-- Add OG image generator and SEO checker guides (0ec6a77c) — Poke Labs
-- Add Link Preview API section with pricing and quick start (254f97fe) — Poke Labs
-- Announce Link Preview API with pricing tiers and usage examples (ee8c82c2) — Poke Labs
-- Add CONTRIBUTING.md with known CI issues and dev setup (b06c5bc2) — Poke Labs
-- Add AGENTS.md contribution guide — coding standards, service template, git workflow (99418248) — Poke Labs
-- Add comprehensive work log — services, infrastructure, roadmap (871277c7) — Poke Labs
-- Comprehensive README with service catalog, architecture, and contributing guide (215ce4cb) — Poke Labs
-- Add comprehensive work log (26abae49) — Poke Labs
-- Add investor pitch deck (aa581c43) — Poke Labs
-
-### 🔧 Chores
-
-- Add GitHub Actions CI workflow for automated testing (a6fb3d4a) — Poke Labs
-- Add auto-merge workflow for Dependabot patch PRs (d73d55e6) — Poke Labs
-- Add weekly service audit workflow  (fb30a58c) — Poke Labs
-- Add auto-merge workflow for Dependabot PRs  (4e0078ad) — Poke Labs
-- Add GitHub Actions workflow for service health checks and linting (7d1e1162) — Poke Labs
-
----
-
-## Previous Versions
-
-### 
-
-- Add OG image generator and SEO checker guides (0ec6a77c)
-- Add Link Preview API section with pricing and quick start (254f97fe)
-- Announce Link Preview API with pricing tiers and usage examples (ee8c82c2)
-- Add skills directory CI — auto-generates HTML index from SKILL.md files, publishes to GitHub Pages (f5de8477)
-- Add Skills Marketplace v1 — searchable catalog, install API, web UI (9ea5c70b)
-- Add daily briefing generator — GitHub health, service status, credits (819c71c1)
-- Generate skills-index.json to resolve watchdog issue (c44f588d)
-- Add CONTRIBUTING.md with known CI issues and dev setup (b06c5bc2)
-- Add GitHub Actions CI workflow for automated testing (a6fb3d4a)
-- Add auto-merge workflow for Dependabot patch PRs (d73d55e6)
+### changed
+- rebrand: pokelabs council — full rebrand from hermes agent (a2e7c96) — 2026-06-04
