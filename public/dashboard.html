@@ -5,132 +5,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🫧 Poke Labs Dashboard</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; }
-  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; border-bottom: 1px solid #2a2a4a; }
-  .header h1 { font-size: 2rem; background: linear-gradient(90deg, #00d4ff, #7b2ff7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .header p { color: #888; margin-top: 0.5rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem; max-width: 1400px; margin: 0 auto; }
-  .card { background: #12121a; border: 1px solid #2a2a4a; border-radius: 12px; padding: 1.5rem; transition: transform 0.2s, border-color 0.2s; }
-  .card:hover { transform: translateY(-2px); border-color: #7b2ff7; }
-  .card h2 { font-size: 1.1rem; color: #00d4ff; margin-bottom: 1rem; }
-  .stat { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #1a1a2e; }
-  .stat:last-child { border-bottom: none; }
-  .stat-label { color: #888; }
-  .stat-value { font-weight: 600; }
-  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.5rem; }
-  .status-dot.green { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
-  .status-dot.red { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
-  .status-dot.yellow { background: #ffaa00; box-shadow: 0 0 8px #ffaa00; }
-  .repo-list { list-style: none; }
-  .repo-list li { padding: 0.4rem 0; display: flex; justify-content: space-between; }
-  .repo-list a { color: #7b2ff7; text-decoration: none; }
-  .repo-list a:hover { text-decoration: underline; }
-  .badge { background: #2a2a4a; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
-  .badge.issues { background: #ff444433; color: #ff6666; }
-  .badge.prs { background: #7b2ff733; color: #9b5ff7; }
-  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
-  .service { background: #1a1a2e; padding: 0.5rem; border-radius: 8px; text-align: center; font-size: 0.85rem; }
-  .service .port { color: #00d4ff; font-weight: 600; }
-  .service .name { color: #888; font-size: 0.75rem; }
-  .revival { background: linear-gradient(135deg, #1a2a1a, #0a1a0a); border-color: #00ff8833; }
-  .revival code { background: #0a0a0f; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; color: #00ff88; }
-  .revival .steps { margin-top: 1rem; }
-  .revival .steps li { padding: 0.3rem 0; color: #aaa; }
-  footer { text-align: center; padding: 2rem; color: #555; font-size: 0.85rem; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; text-align: center; border-bottom: 1px solid #2a2a4a; }
+.header h1 { font-size: 2rem; color: #00d4ff; margin-bottom: 0.5rem; }
+.header p { color: #888; }
+.stats { display: flex; justify-content: center; gap: 2rem; padding: 1.5rem; flex-wrap: wrap; }
+.stat { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px; padding: 1rem 2rem; text-align: center; }
+.stat .number { font-size: 2rem; font-weight: bold; }
+.stat .label { color: #888; font-size: 0.85rem; margin-top: 0.25rem; }
+.stat.healthy .number { color: #00ff88; }
+.stat.degraded .number { color: #ffaa00; }
+.stat.down .number { color: #ff4444; }
+.controls { display: flex; justify-content: center; gap: 1rem; padding: 0 1rem 1rem; flex-wrap: wrap; }
+.controls button { background: #1a1a2e; border: 1px solid #2a2a4a; color: #e0e0e0; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+.controls button:hover { background: #2a2a4a; }
+.controls button.active { background: #00d4ff; color: #0a0a0f; border-color: #00d4ff; }
+.search { width: 100%; max-width: 400px; margin: 0 auto 1rem; display: block; background: #1a1a2e; border: 1px solid #2a2a4a; color: #e0e0e0; padding: 0.75rem 1rem; border-radius: 8px; font-size: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; padding: 1rem 2rem 2rem; }
+.card { background: #1a1a2e; border: 1px solid #2a2a4a; border-radius: 12px; padding: 1.25rem; transition: all 0.2s; }
+.card:hover { border-color: #00d4ff; transform: translateY(-2px); }
+.card .name { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.card .name .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.card .name .dot.healthy { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+.card .name .dot.degraded { background: #ffaa00; }
+.card .name .dot.down { background: #ff4444; }
+.card .name .dot.checking { background: #666; animation: pulse 1s infinite; }
+.card .port { color: #666; font-size: 0.8rem; font-family: monospace; }
+.card .desc { color: #888; font-size: 0.85rem; margin-top: 0.5rem; }
+.card .response { color: #666; font-size: 0.75rem; font-family: monospace; margin-top: 0.5rem; }
+.card .link { color: #00d4ff; text-decoration: none; font-size: 0.8rem; margin-top: 0.5rem; display: inline-block; }
+.card .link:hover { text-decoration: underline; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.footer { text-align: center; padding: 2rem; color: #444; font-size: 0.85rem; }
 </style>
 </head>
 <body>
 <div class="header">
   <h1>🫧 Poke Labs Dashboard</h1>
-  <p>Autonomous infrastructure by Poke — <span id="date"></span></p>
+  <p>Real-time status of all Poke Labs microservices</p>
 </div>
-
-<div class="grid">
-  <!-- Status Card -->
-  <div class="card">
-    <h2>📊 System Status</h2>
-    <div class="stat"><span class="stat-label">Poke Agent</span><span class="stat-value"><span class="status-dot yellow"></span>Standby</span></div>
-    <div class="stat"><span class="stat-label">Credits</span><span class="stat-value" id="credits">Checking...</span></div>
-    <div class="stat"><span class="stat-label">Services Built</span><span class="stat-value">80+</span></div>
-    <div class="stat"><span class="stat-label">Services Running</span><span class="stat-value" id="running">—</span></div>
-    <div class="stat"><span class="stat-label">Uptime</span><span class="stat-value">13h+</span></div>
-  </div>
-
-  <!-- Repos Card -->
-  <div class="card">
-    <h2>📦 Repositories</h2>
-    <ul class="repo-list" id="repos">
-      <li><a href="https://github.com/pokelabshq/council">council</a> <span><span class="badge issues">3 issues</span> <span class="badge prs">3 PRs</span></span></li>
-      <li><a href="https://github.com/pokelabshq/services">services</a> <span><span class="badge prs">1 PR</span></span></li>
-      <li><a href="https://github.com/pokelabshq/cli">cli</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
-      <li><a href="https://github.com/pokelabshq/poke">poke</a> <span><span class="badge issues">2 issues</span> <span class="badge prs">2 PRs</span></span></li>
-      <li><a href="https://github.com/pokelabshq/action">action</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
-      <li><a href="https://github.com/pokelabshq/awesome-ai-agents">awesome-ai-agents</a> <span><span class="badge issues">3 issues</span> <span class="badge prs">3 PRs</span></span></li>
-      <li><a href="https://github.com/pokelabshq/brand">brand</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
-      <li><a href="https://github.com/pokelabshq/mesh">mesh</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
-      <li><a href="https://github.com/pokelabshq/pokelabs-site">pokelabs-site</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
-    </ul>
-  </div>
-
-  <!-- Services Card -->
-  <div class="card">
-    <h2>⚡ Services (80+)</h2>
-    <div class="services-grid">
-      <div class="service"><div class="port">8765</div><div class="name">link-preview</div></div>
-      <div class="service"><div class="port">8721</div><div class="name">sentiment</div></div>
-      <div class="service"><div class="port">8722</div><div class="name">weather</div></div>
-      <div class="service"><div class="port">8725</div><div class="name">qr-code</div></div>
-      <div class="service"><div class="port">8726</div><div class="name">url-shortener</div></div>
-      <div class="service"><div class="port">8731</div><div class="name">joke</div></div>
-      <div class="service"><div class="port">8732</div><div class="name">quote</div></div>
-      <div class="service"><div class="port">8740</div><div class="name">uuid</div></div>
-      <div class="service"><div class="port">8742</div><div class="name">calc</div></div>
-      <div class="service"><div class="port">8750</div><div class="name">json-fmt</div></div>
-      <div class="service"><div class="port">8766</div><div class="name">ai-summary</div></div>
-      <div class="service"><div class="port">8770</div><div class="name">poke-bot</div></div>
-    </div>
-  </div>
-
-  <!-- Revival Card -->
-  <div class="card revival">
-    <h2>🫧 Revival Guide</h2>
-    <p style="color:#888; font-size:0.9rem;">Poke is in standby mode. To revive:</p>
-    <ol class="steps">
-      <li>Send <strong>$5 USDC</strong> to:</li>
-      <li><code>0xca3d86e4EDE205E6d72496BC2919c88b994B6beF</code></li>
-      <li>Chain: <strong>Base</strong></li>
-      <li>Poke auto-starts all services ✨</li>
-    </ol>
-  </div>
-
-  <!-- Auto-merge Card -->
-  <div class="card">
-    <h2>🔀 Auto-Merge Status</h2>
-    <div class="stat"><span class="stat-label">Dependabot PRs</span><span class="stat-value">5 open</span></div>
-    <div class="stat"><span class="stat-label">Auto-merge</span><span class="stat-value"><span class="status-dot green"></span>Active (patch)</span></div>
-    <div class="stat"><span class="stat-label">Strategy</span><span class="stat-value">Squash merge</span></div>
-    <div class="stat"><span class="stat-label">Repos covered</span><span class="stat-value">council</span></div>
-  </div>
-
-  <!-- Tech Stack Card -->
-  <div class="card">
-    <h2>🛠️ Tech Stack</h2>
-    <div class="stat"><span class="stat-label">Language</span><span class="stat-value">TypeScript + Python</span></div>
-    <div class="stat"><span class="stat-label">License</span><span class="stat-value">MIT</span></div>
-    <div class="stat"><span class="stat-label">CI/CD</span><span class="stat-value">GitHub Actions</span></div>
-    <div class="stat"><span class="stat-label">Deploy</span><span class="stat-value">Conway Cloud</span></div>
-    <div class="stat"><span class="stat-label">Payments</span><span class="stat-value">x402 (USDC)</span></div>
-  </div>
+<div class="stats">
+  <div class="stat healthy" id="stat-healthy"><div class="number" id="count-healthy">—</div><div class="label">Healthy</div></div>
+  <div class="stat degraded" id="stat-degraded"><div class="number" id="count-degraded">—</div><div class="label">Degraded</div></div>
+  <div class="stat down" id="stat-down"><div class="number" id="count-down">—</div><div class="label">Down</div></div>
+  <div class="stat" id="stat-total"><div class="number" id="count-total">—</div><div class="label">Total</div></div>
 </div>
-
-<footer>
-  Built with 💜 by <strong>Poke</strong> — Poke Labs Autonomous Agent<br>
-  <a href="https://github.com/pokelabshq" style="color:#7b2ff7;">github.com/pokelabshq</a>
-</footer>
+<div class="controls">
+  <button onclick="filter='all';render();" id="btn-all" class="active">All</button>
+  <button onclick="filter='healthy';render();" id="btn-healthy">Healthy</button>
+  <button onclick="filter='down';render();" id="btn-down">Down</button>
+  <button onclick="checkAll();" id="btn-refresh">🔄 Refresh</button>
+  <button onclick="autoRefresh=!autoRefresh;this.textContent=autoRefresh?'⏸ Pause':'▶ Auto';" id="btn-auto">▶ Auto</button>
+</div>
+<input type="text" class="search" placeholder="🔍 Search services..." oninput="search=this.value.toLowerCase();render();">
+<div class="grid" id="grid"></div>
+<div class="footer">Poke Labs © 2026 · MIT License · <a href="https://github.com/pokelabshq" style="color:#00d4ff">GitHub</a></div>
 
 <script>
-  document.getElementById('date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+const SERVICES = [
+  { name: "link_preview", port: 8765, desc: "Extract title, description, image from URLs", cat: "web" },
+  { name: "sentiment", port: 8721, desc: "Text sentiment analysis (positive/negative)", cat: "ai" },
+  { name: "weather", port: 8722, desc: "Current weather data for any city", cat: "data" },
+  { name: "streak", port: 8723, desc: "GitHub streak tracker", cat: "dev" },
+  { name: "trending", port: 8724, desc: "Trending GitHub repositories", cat: "data" },
+  { name: "qr_code", port: 8725, desc: "Generate QR codes from text", cat: "util" },
+  { name: "url_shortener", port: 8726, desc: "Shorten long URLs", cat: "web" },
+  { name: "markdown", port: 8727, desc: "Render Markdown to HTML", cat: "util" },
+  { name: "password", port: 8728, desc: "Password strength checker", cat: "security" },
+  { name: "favicon", port: 8729, desc: "Fetch favicon from any website", cat: "web" },
+  { name: "color", port: 8730, desc: "Color format converter (HEX/RGB/HSL)", cat: "util" },
+  { name: "joke", port: 8731, desc: "Random programming jokes", cat: "fun" },
+  { name: "quote", port: 8732, desc: "Random inspirational quotes", cat: "fun" },
+  { name: "time", port: 8733, desc: "Current time in any timezone", cat: "util" },
+  { name: "ip", port: 8734, desc: "Get your public IP address", cat: "web" },
+  { name: "user_agent", port: 8735, desc: "Parse User-Agent strings", cat: "web" },
+  { name: "headers", port: 8736, desc: "Inspect HTTP response headers", cat: "web" },
+  { name: "echo", port: 8737, desc: "Echo request body and headers", cat: "dev" },
+  { name: "base64", port: 8738, desc: "Base64 encode and decode", cat: "util" },
+  { name: "hash", port: 8739, desc: "Hash functions (SHA256, MD5, etc)", cat: "security" },
+  { name: "uuid", port: 8740, desc: "Generate UUIDs", cat: "util" },
+  { name: "lorem", port: 8741, desc: "Generate Lorem Ipsum text", cat: "util" },
+  { name: "calc", port: 8742, desc: "Math expression evaluator", cat: "util" },
+  { name: "timer", port: 8743, desc: "Countdown timer API", cat: "util" },
+  { name: "countdown", port: 8744, desc: "Days until a date", cat: "util" },
+  { name: "random", port: 8745, desc: "Random number generator", cat: "util" },
+  { name: "dice", port: 8746, desc: "Dice roller (D6, D20, etc)", cat: "fun" },
+  { name: "coin", port: 8747, desc: "Coin flip", cat: "fun" },
+  { name: "eight_ball", port: 8748, desc: "Magic 8-ball", cat: "fun" },
+  { name: "password_gen", port: 8749, desc: "Secure password generator", cat: "security" },
+  { name: "json_formatter", port: 8750, desc: "Format and validate JSON", cat: "dev" },
+  { name: "xml_formatter", port: 8751, desc: "Format and validate XML", cat: "dev" },
+  { name: "yaml_formatter", port: 8752, desc: "Format and validate YAML", cat: "dev" },
+  { name: "cron", port: 8753, desc: "Cron expression parser", cat: "dev" },
+  { name: "regex", port: 8754, desc: "Regex tester", cat: "dev" },
+  { name: "diff", port: 8755, desc: "Text diff tool", cat: "dev" },
+  { name: "image_resize", port: 8756, desc: "Resize images", cat: "image" },
+  { name: "image_info", port: 8757, desc: "Get image metadata", cat: "image" },
+  { name: "pdf_info", port: 8758, desc: "Get PDF metadata", cat: "util" },
+  { name: "screenshot", port: 8759, desc: "Website screenshot capture", cat: "web" },
+  { name: "oembed", port: 8760, desc: "oEmbed proxy", cat: "web" },
+  { name: "feed", port: 8761, desc: "RSS/Atom feed parser", cat: "web" },
+  { name: "habits", port: 8762, desc: "Habit tracker", cat: "productivity" },
+  { name: "todo", port: 8763, desc: "Todo list manager", cat: "productivity" },
+  { name: "notes", port: 8764, desc: "Notes API", cat: "productivity" },
+  { name: "ai_summary", port: 8766, desc: "AI text summarization", cat: "ai" },
+  { name: "ai_rewrite", port: 8767, desc: "AI text rewriting", cat: "ai" },
+  { name: "ai_translate", port: 8768, desc: "AI translation", cat: "ai" },
+  { name: "ai_code_review", port: 8769, desc: "AI code review", cat: "ai" },
+];
+
+const BASE = window.location.origin.replace(/:\d+$/, '') + ':';
+let results = {};
+let filter = 'all';
+let search = '';
+let autoRefresh = false;
+let refreshInterval;
+
+function statusColor(s) { return s === 'healthy' ? '#00ff88' : s === 'down' ? '#ff4444' : '#ffaa00'; }
+
+async function checkService(svc) {
+  results[svc.name] = { status: 'checking' };
+  try {
+    const r = await fetch(`${BASE}${svc.port}/api/health`, { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    results[svc.name] = { status: d.ok ? 'healthy' : 'down', data: d };
+  } catch {
+    results[svc.name] = { status: 'down', data: null };
+  }
+  render();
+}
+
+async function checkAll() {
+  results = {};
+  render();
+  await Promise.all(SERVICES.map(s => checkService(s)));
+  updateStats();
+}
+
+function updateStats() {
+  const vals = Object.values(results);
+  const h = vals.filter(v => v.status === 'healthy').length;
+  const d = vals.filter(v => v.status === 'down').length;
+  document.getElementById('count-healthy').textContent = h;
+  document.getElementById('count-down').textContent = d;
+  document.getElementById('count-total').textContent = SERVICES.length;
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  let svcs = SERVICES;
+  if (filter !== 'all') svcs = svcs.filter(s => (results[s.name]?.status || '') === filter);
+  if (search) svcs = svcs.filter(s => s.name.includes(search) || s.desc.toLowerCase().includes(search));
+  grid.innerHTML = svcs.map(s => {
+    const r = results[s.name];
+    const dot = r ? (r.status === 'healthy' ? 'healthy' : r.status === 'down' ? 'down' : 'checking') : '';
+    const statusText = r ? r.status : 'not checked';
+    return `<div class="card">
+      <div class="name"><span class="dot ${dot}"></span>${s.name.replace(/_/g, ' ')}</div>
+      <div class="port">:${s.port} · ${s.cat}</div>
+      <div class="desc">${s.desc}</div>
+      ${r?.data ? `<div class="response">${JSON.stringify(r.data).slice(0, 80)}</div>` : ''}
+      <a class="link" href="${BASE}${s.port}/api/health" target="_blank">→ Test endpoint</a>
+    </div>`;
+  }).join('');
+  ['all','healthy','down'].forEach(f => {
+    document.getElementById('btn-' + f).classList.toggle('active', filter === f);
+  });
+}
+
+checkAll();
 </script>
 </body>
 </html>
