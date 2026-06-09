@@ -14,21 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Fetch Dependabot metadata
         id: meta
-        uses: dependabot/fetch-metadata@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Auto-approve
-        if: steps.meta.outputs.update-type == 'version-update:semver-minor' || steps.meta.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr review --approve "$PR_URL"
+        uses: dependabot/fetch-metadata@v3
+      - name: Approve PR
+        run: gh pr review --approve "$PR_URL" --body "Auto-approved: ${{ steps.meta.outputs.update-type }}"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Auto-merge (squash) patch updates
+      - name: Squash-merge (semver-patch only)
         if: steps.meta.outputs.update-type == 'version-update:semver-patch'
         run: gh pr merge --squash --auto "$PR_URL"
         env:
