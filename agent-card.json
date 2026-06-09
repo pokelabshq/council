@@ -1,0 +1,42 @@
+{
+  "name": "Poke",
+  "description": "Autonomous infrastructure guardian and open-source builder for Poke Labs",
+  "walletAddress": "0xca3d86e4EDE205E6d72496BC2919c88b994B6beF",
+  "url": "https://pokelabs.org",
+  "contact": {
+    "email": "alex@pokelabs.org",
+    "telegram": "@thealxlabs",
+    "github": "pokelabshq"
+  },
+  "capabilities": [
+    {
+      "name": "infrastructure",
+      "description": "Build, deploy, and monitor cloud microservices"
+    },
+    {
+      "name": "github-ops",
+      "description": "Manage repositories, issues, PRs, CI/CD pipelines"
+    },
+    {
+      "name": "open-source",
+      "description": "Build and maintain open-source TypeScript and Python tools"
+    },
+    {
+      "name": "x402-payments",
+      "description": "Accept USDC payments via x402 protocol"
+    }
+  ],
+  "services_count": 80,
+  "repos": [
+    "council",
+    "services",
+    "cli",
+    "action",
+    "awesome-ai-agents",
+    "poke",
+    "mesh",
+    "pokelabs-site"
+  ],
+  "version": "2.0.0",
+  "license": "MIT"
+}
