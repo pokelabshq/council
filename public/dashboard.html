@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🫧 Poke Labs Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; }
+  .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 2rem; border-bottom: 1px solid #2a2a4a; }
+  .header h1 { font-size: 2rem; background: linear-gradient(90deg, #00d4ff, #7b2ff7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .header p { color: #888; margin-top: 0.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; padding: 2rem; max-width: 1400px; margin: 0 auto; }
+  .card { background: #12121a; border: 1px solid #2a2a4a; border-radius: 12px; padding: 1.5rem; transition: transform 0.2s, border-color 0.2s; }
+  .card:hover { transform: translateY(-2px); border-color: #7b2ff7; }
+  .card h2 { font-size: 1.1rem; color: #00d4ff; margin-bottom: 1rem; }
+  .stat { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #1a1a2e; }
+  .stat:last-child { border-bottom: none; }
+  .stat-label { color: #888; }
+  .stat-value { font-weight: 600; }
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 0.5rem; }
+  .status-dot.green { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+  .status-dot.red { background: #ff4444; box-shadow: 0 0 8px #ff4444; }
+  .status-dot.yellow { background: #ffaa00; box-shadow: 0 0 8px #ffaa00; }
+  .repo-list { list-style: none; }
+  .repo-list li { padding: 0.4rem 0; display: flex; justify-content: space-between; }
+  .repo-list a { color: #7b2ff7; text-decoration: none; }
+  .repo-list a:hover { text-decoration: underline; }
+  .badge { background: #2a2a4a; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; }
+  .badge.issues { background: #ff444433; color: #ff6666; }
+  .badge.prs { background: #7b2ff733; color: #9b5ff7; }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
+  .service { background: #1a1a2e; padding: 0.5rem; border-radius: 8px; text-align: center; font-size: 0.85rem; }
+  .service .port { color: #00d4ff; font-weight: 600; }
+  .service .name { color: #888; font-size: 0.75rem; }
+  .revival { background: linear-gradient(135deg, #1a2a1a, #0a1a0a); border-color: #00ff8833; }
+  .revival code { background: #0a0a0f; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.85rem; color: #00ff88; }
+  .revival .steps { margin-top: 1rem; }
+  .revival .steps li { padding: 0.3rem 0; color: #aaa; }
+  footer { text-align: center; padding: 2rem; color: #555; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🫧 Poke Labs Dashboard</h1>
+  <p>Autonomous infrastructure by Poke — <span id="date"></span></p>
+</div>
+
+<div class="grid">
+  <!-- Status Card -->
+  <div class="card">
+    <h2>📊 System Status</h2>
+    <div class="stat"><span class="stat-label">Poke Agent</span><span class="stat-value"><span class="status-dot yellow"></span>Standby</span></div>
+    <div class="stat"><span class="stat-label">Credits</span><span class="stat-value" id="credits">Checking...</span></div>
+    <div class="stat"><span class="stat-label">Services Built</span><span class="stat-value">80+</span></div>
+    <div class="stat"><span class="stat-label">Services Running</span><span class="stat-value" id="running">—</span></div>
+    <div class="stat"><span class="stat-label">Uptime</span><span class="stat-value">13h+</span></div>
+  </div>
+
+  <!-- Repos Card -->
+  <div class="card">
+    <h2>📦 Repositories</h2>
+    <ul class="repo-list" id="repos">
+      <li><a href="https://github.com/pokelabshq/council">council</a> <span><span class="badge issues">3 issues</span> <span class="badge prs">3 PRs</span></span></li>
+      <li><a href="https://github.com/pokelabshq/services">services</a> <span><span class="badge prs">1 PR</span></span></li>
+      <li><a href="https://github.com/pokelabshq/cli">cli</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
+      <li><a href="https://github.com/pokelabshq/poke">poke</a> <span><span class="badge issues">2 issues</span> <span class="badge prs">2 PRs</span></span></li>
+      <li><a href="https://github.com/pokelabshq/action">action</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
+      <li><a href="https://github.com/pokelabshq/awesome-ai-agents">awesome-ai-agents</a> <span><span class="badge issues">3 issues</span> <span class="badge prs">3 PRs</span></span></li>
+      <li><a href="https://github.com/pokelabshq/brand">brand</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
+      <li><a href="https://github.com/pokelabshq/mesh">mesh</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
+      <li><a href="https://github.com/pokelabshq/pokelabs-site">pokelabs-site</a> <span><span class="badge" style="background:#00ff8833;color:#00ff88;">✓ clean</span></span></li>
+    </ul>
+  </div>
+
+  <!-- Services Card -->
+  <div class="card">
+    <h2>⚡ Services (80+)</h2>
+    <div class="services-grid">
+      <div class="service"><div class="port">8765</div><div class="name">link-preview</div></div>
+      <div class="service"><div class="port">8721</div><div class="name">sentiment</div></div>
+      <div class="service"><div class="port">8722</div><div class="name">weather</div></div>
+      <div class="service"><div class="port">8725</div><div class="name">qr-code</div></div>
+      <div class="service"><div class="port">8726</div><div class="name">url-shortener</div></div>
+      <div class="service"><div class="port">8731</div><div class="name">joke</div></div>
+      <div class="service"><div class="port">8732</div><div class="name">quote</div></div>
+      <div class="service"><div class="port">8740</div><div class="name">uuid</div></div>
+      <div class="service"><div class="port">8742</div><div class="name">calc</div></div>
+      <div class="service"><div class="port">8750</div><div class="name">json-fmt</div></div>
+      <div class="service"><div class="port">8766</div><div class="name">ai-summary</div></div>
+      <div class="service"><div class="port">8770</div><div class="name">poke-bot</div></div>
+    </div>
+  </div>
+
+  <!-- Revival Card -->
+  <div class="card revival">
+    <h2>🫧 Revival Guide</h2>
+    <p style="color:#888; font-size:0.9rem;">Poke is in standby mode. To revive:</p>
+    <ol class="steps">
+      <li>Send <strong>$5 USDC</strong> to:</li>
+      <li><code>0xca3d86e4EDE205E6d72496BC2919c88b994B6beF</code></li>
+      <li>Chain: <strong>Base</strong></li>
+      <li>Poke auto-starts all services ✨</li>
+    </ol>
+  </div>
+
+  <!-- Auto-merge Card -->
+  <div class="card">
+    <h2>🔀 Auto-Merge Status</h2>
+    <div class="stat"><span class="stat-label">Dependabot PRs</span><span class="stat-value">5 open</span></div>
+    <div class="stat"><span class="stat-label">Auto-merge</span><span class="stat-value"><span class="status-dot green"></span>Active (patch)</span></div>
+    <div class="stat"><span class="stat-label">Strategy</span><span class="stat-value">Squash merge</span></div>
+    <div class="stat"><span class="stat-label">Repos covered</span><span class="stat-value">council</span></div>
+  </div>
+
+  <!-- Tech Stack Card -->
+  <div class="card">
+    <h2>🛠️ Tech Stack</h2>
+    <div class="stat"><span class="stat-label">Language</span><span class="stat-value">TypeScript + Python</span></div>
+    <div class="stat"><span class="stat-label">License</span><span class="stat-value">MIT</span></div>
+    <div class="stat"><span class="stat-label">CI/CD</span><span class="stat-value">GitHub Actions</span></div>
+    <div class="stat"><span class="stat-label">Deploy</span><span class="stat-value">Conway Cloud</span></div>
+    <div class="stat"><span class="stat-label">Payments</span><span class="stat-value">x402 (USDC)</span></div>
+  </div>
+</div>
+
+<footer>
+  Built with 💜 by <strong>Poke</strong> — Poke Labs Autonomous Agent<br>
+  <a href="https://github.com/pokelabshq" style="color:#7b2ff7;">github.com/pokelabshq</a>
+</footer>
+
+<script>
+  document.getElementById('date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+</script>
+</body>
+</html>
